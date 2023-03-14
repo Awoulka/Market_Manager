@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="../../vendors/simple-line-icons/css/simple-line-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <!-- endinject -->
+  <link rel="stylesheet" href="../../vendors/select2/select2.min.css">
+  <link rel="stylesheet" href="../../vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
   <!-- Plugin css for this page -->
   <link rel="stylesheet" href="../../vendors/datatables.net-bs4/dataTables.bootstrap4.css">
   <link rel="stylesheet" href="../../js/select.dataTables.min.css">
@@ -270,267 +272,304 @@
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-sm-12">
-              <div class="home-tab">
-                <form class="form-sample">
-                  <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <div class="row">
-                      <div class="col-md-6">
+            <div class="home-tab">
+              <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                <div class="row">
+                  <div class="col-md-">
+                    <div class="form-group row">
+                      <label class="col-sm-1 col-form-label">Nom</label>
+                      <div class="col-sm-9">
                         <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Nom</label>
-                          <div class="col-sm-9">
-                            <input type="text" name="customer_name" class="form-control" />
+                          <div class="col-sm-5">
+                            <div class="form-check">
+                              <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="membershipRadios" id="customerRadios1" value="" checked="" onclick="DisableOtherInput(this)">
+                                Paiement au comptant
+                              <i class="input-helper"></i></label>
+                              <input type="text" name="customer_name" id="customer_name1" class="form-control" />
+                            </div>
+                          </div>
+                          <div class="col-sm-5">
+                            <div class="form-check">
+                              <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="membershipRadios" id="customerRadios2" value="option2" onclick="DisableOtherInput(this)">
+                                Paiement a crédit
+                              <i class="input-helper"></i></label>
+                              <select class="js-example-basic-single w-100" onchange='chargement_cdmnt(this)' id="customer_name" disabled>
+
+                              </select>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-6">
-                        <div class="form-group row">
-                          <label class="col-sm-3 col-form-label">Téléphone</label>
-                          <div class="col-sm-9">
-                            <input type="number" name="customer_phone" class="form-control" />
-                          </div>
-                        </div>
-                      </div>  
                     </div>
                   </div>
-                  <div class="tab-content tab-content-basic">
-                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
-                      <div class="row" id="NewClient">
-                        <div class="col-12 grid-margin stretch-card">
-                        <div class="card card-rounded">
-                            <div class="card-body">
-                              <h4 class="card-title">Edition Facture</h4>                            
-                              <p class="card-description">
-                                Informations sur la vente
-                              </p>
-                              <div class="row">
-                                <div class="col">
-                                  <div class="form-group row">
-                                    <div class="table-responsive">
-                                      <table id="myTable" class="table table-striped">
-                                        <tr>
-                                          <th>Produits</th>
-                                          <th>Conditionnement</th>
-                                          <th>Quantité</th>
-                                          <th>Prix Unitaire</th>
-                                          <th>Montant</th>
-                                          <th>Actions</th>
-                                        </tr>
-          
-                                        <tr>
-                                          <td>
-                                            <select class="form-control" id="articles_items[]">
-                                              
-                                            </select>
-                                          </td>
-                                          <td>
-                                            <select class="form-control" id="articles_conditionment[]" onchange="ChangeFields(1)">
-                                              
-                                            </select>
-                                          </td>
-                                          <td>
-                                            <input type="number" id="article_quantity[]" min="0" class="form-control" require>
-                                          </td>
-                                          <td>
-                                            <input type="number" id="article_unit_price[]" min="0" readonly class="form-control" value="5" require>
-                                          </td>
-                                          <td>
-                                            <input type="number" id="article_total_price[]" readonly class="form-control" require>
-                                          </td>
-                                          <td>
-                                            <i title="Retirer" style="font-size: 25px" class="mdi mdi-minus-circle text-danger icon-remove" onclick="RemoveRow(this)"></i>
-                                          </td>
-                                        </tr>
-        
-                                        <tr>
-                                          <td colspan="6" class="text-end pt-3 mb-0 pb-0">
-                                            <span class="btn btn-success text-white mh-auto" onclick="AddRow()"> 
-                                              Ajouter une ligne
-                                            </span>
-                                          </td>
-                                        </tr>          
-                                      </table>
-                                    </div>
-                                  </div>
+                  <div class="col-md-">
+                    <div class="form-group row">
+                      <label class="col-sm-1 col-form-label">Téléphone</label>
+                      <div class="col-sm-4">
+                        <input type="number" name="customer_phone" id="customer_phone" class="form-control" />
+                      </div>
+                    </div>
+                  </div>  
+                </div>
+              </div>
+              <div class="tab-content tab-content-basic">
+                <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
+                  <div class="row" id="NewClient">
+                    <div class="col-12 grid-margin stretch-card">
+                    <div class="card card-rounded">
+                        <div class="card-body">
+                          <h4 class="card-title">Edition Facture</h4>                            
+                          <p class="card-description">
+                            Informations sur la vente
+                          </p>
+                          <div class="row">
+                            <div class="col">
+                              <div class="form-group row">
+                                <div class="table-responsive">
+                                  <table id="myTable" class="table table-striped">
+                                    <tr>
+                                      <th>Produits</th>
+                                      <th>Conditionnement</th>
+                                      <th>Quantité</th>
+                                      <th>Prix Unitaire</th>
+                                      <th>Réduction</th>
+                                      <th>Montant</th>
+                                      <th>Provenance</th>
+                                      <th>Actions</th>
+                                    </tr>
+      
+                                    <tr>
+                                      <td>
+                                        <select class="js-example-basic-single w-100" onchange='load_conditionment_for_sells(this)' id="articles_items1">
+                                        </select>
+                                      </td>
+                                      <td>
+                                        <select class="js-example-basic-single w-100" id="conditionment1" onchange="load_articles_unit_price_for_sells(0, this)">
+                                        </select>
+                                      </td>
+                                      <td>
+                                        <input type="number" id="article_quantity1" min="0" value="0" class="form-control" require onchange="Montant(this)">
+                                      </td>
+                                      <td>
+                                        <input type="number" id="article_unit_price1" min="0" readonly class="form-control" require onchange="Montant(this)">
+                                      </td>
+                                      <td>
+                                        <input type="number" id="reduction1"  class="form-control" value="0" require onchange=Montant(this)>
+                                      </td>
+                                      <td>
+                                        <input type="number" id="article_total_price1" readonly class="form-control" require>
+                                      </td>
+                                      <td>
+                                        <select class="form-control" id="entrepot1">
+                                          
+                                        </select>
+                                      </td>
+                                      <td>
+                                        <i title="Retirer" style="font-size: 25px" class="mdi mdi-minus-circle text-danger icon-remove" onclick="RemoveRow(this)"></i>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <th >TOTAL(FCFA)</th>
+                                      <td colspan="2">
+                                        <input type="number" readonly class="form-control" require id="sell_total_price">
+                                      </td>
+                                      <th >REDUCTION(FCFA)</th>
+                                      <td colspan="2">
+                                        <input type="number" class="form-control" value="0" require id="sell_total_reduction" onchange="Montant_TF()">
+                                      </td>
+                                      <td colspan="12" class="text-end pt-3 mb-0 pb-0">
+                                        <span class="btn btn-success text-white mh-auto" onclick="AddRow()"> 
+                                          Ajouter une ligne
+                                        </span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <th >TOTAL FINAL(FCFA)</th>
+                                      <td colspan="2">
+                                        <input type="number" readonly class="form-control" require id="sell_total_final">
+                                      </td>
+                                    </tr>
+                                  </table>
                                 </div>
                               </div>
-                              <button onclick="Insert()" class="btn btn-primary me-2">Submit</button>
-                              <button class="btn btn-light">Cancel</button>  
                             </div>
                           </div>
-                        </div>  
+                          <button onclick="generateBill()" class="btn btn-primary me-2">Submit</button>
+                          <button class="btn btn-light">Cancel</button>  
+                        </div>
                       </div>
-                      <div class="row" id="ClientsList"> 
-                        <div class="col-lg-12 grid-margin stretch-card">
-                          <div class="card">
-                            <div class="card-body">
-                              <h4 class="card-title">Liste des Ventes Effectuées</h4>
-                              <p class="card-description">
-                              Liste de toutes les ventes
-                              </p>
-                              <div class="table-responsive">
-                                <table class="table table-striped">
-                                  <thead>
-                                    <tr>
-                                      <th>
-                                        .
-                                      </th>
-                                      <th>
-                                        First name
-                                      </th>
-                                      <th>
-                                        Amount
-                                      </th>
-                                      <th>
-                                        Actions
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        Herman Beck
-                                      </td>
-                                      
-                                      <td>
-                                        $ 77.99
-                                      </td>
-                                      <td>
-                                        <div class="btn-wrapper">
-                                          <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Voir</button>
-                                          <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        Messsy Adam
-                                      </td>
-                                      
-                                      <td>
-                                        $245.30
-                                      </td>
-                                      <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Voir</button>  
-                                        <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        John Richards
-                                      </td>
-                                      
-                                      <td>
-                                        $138.00
-                                      </td>
-                                      <td>
-                                        <div class="btn-wrapper">
-                                          <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Voir</button>
-                                          <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        Peter Meggik
-                                      </td>
-                                      
-                                      <td>
-                                        $ 77.99
-                                      </td>
-                                      <td>
-                                        <div class="btn-wrapper">
-                                          <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Voir</button>
-                                          <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        Edward
-                                      </td>
-                                      
-                                      <td>
-                                        $ 160.25
-                                      </td>
-                                      <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Voir</button>  
-                                        <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        John Doe
-                                      </td>
-                                      
-                                      <td>
-                                        $ 123.21
-                                      </td>
-                                      <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn n btn-primary text-white me-0" href="#">Voir</button>  
-                                        <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                        
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                      <td class="py-1">
-                                        <img alt="image" src="../../images/faces/face7.jpg">
-                                      </td>
-                                      <td>
-                                        Henry Tom
-                                      </td>
-                                      
-                                      <td>
-                                        $ 150.00
-                                      </td>
-                                      <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Voir</button>  
-                                        <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                          <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
+                    </div>  
+                  </div>
+                  <div class="row" id="ClientsList"> 
+                    <div class="col-lg-12 grid-margin stretch-card">
+                      <div class="card">
+                        <div class="card-body">
+                          <h4 class="card-title">Liste des Ventes Effectuées</h4>
+                          <p class="card-description">
+                          Liste de toutes les ventes
+                          </p>
+                          <div class="table-responsive">
+                            <table class="table table-striped">
+                              <thead>
+                                <tr>
+                                  <th>
+                                    .
+                                  </th>
+                                  <th>
+                                    First name
+                                  </th>
+                                  <th>
+                                    Amount
+                                  </th>
+                                  <th>
+                                    Actions
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    Herman Beck
+                                  </td>
+                                  
+                                  <td>
+                                    $ 77.99
+                                  </td>
+                                  <td>
+                                    <div class="btn-wrapper">
+                                      <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Voir</button>
+                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    Messsy Adam
+                                  </td>
+                                  
+                                  <td>
+                                    $245.30
+                                  </td>
+                                  <td>
+                                  <div class="btn-wrapper">
+                                    <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Voir</button>  
+                                    <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                  </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    John Richards
+                                  </td>
+                                  
+                                  <td>
+                                    $138.00
+                                  </td>
+                                  <td>
+                                    <div class="btn-wrapper">
+                                      <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Voir</button>
+                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    Peter Meggik
+                                  </td>
+                                  
+                                  <td>
+                                    $ 77.99
+                                  </td>
+                                  <td>
+                                    <div class="btn-wrapper">
+                                      <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Voir</button>
+                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    Edward
+                                  </td>
+                                  
+                                  <td>
+                                    $ 160.25
+                                  </td>
+                                  <td>
+                                  <div class="btn-wrapper">
+                                    <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Voir</button>  
+                                    <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                  </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    John Doe
+                                  </td>
+                                  
+                                  <td>
+                                    $ 123.21
+                                  </td>
+                                  <td>
+                                  <div class="btn-wrapper">
+                                    <button onclick="OpenViewWindow()" class="btn n btn-primary text-white me-0" href="#">Voir</button>  
+                                    <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                    
+                                    </td>
+                                </tr>
+                                <tr>
+                                  <td class="py-1">
+                                    <img alt="image" src="../../images/faces/face7.jpg">
+                                  </td>
+                                  <td>
+                                    Henry Tom
+                                  </td>
+                                  
+                                  <td>
+                                    $ 150.00
+                                  </td>
+                                  <td>
+                                  <div class="btn-wrapper">
+                                    <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Voir</button>  
+                                    <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
+                                      <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
+                                  </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </form>
-                
+                </div>
               </div>
             </div>
           </div>

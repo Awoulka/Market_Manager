@@ -32,7 +32,7 @@ document.getElementById("article_quantity").value = article_quantity;
 
 // Load data about article conditionment into order to add a new article
 
-window.electron.load_conditionment_items();
+// window.electron.load_conditionment_items();
 
 
 //// Function to get informations from form and register a new article
@@ -41,9 +41,16 @@ function update_article(){
 
 	if (document.getElementById("article_name").value != "" && document.getElementById("article_unit_price").value != "" && document.getElementById("article_quantity").value != "") {
 
-		window.electron.update_article(document.getElementById("article_name").value,document.getElementById("article_unit_price").value,document.getElementById("article_quantity").value,document.getElementById("conditionment_items").value);
+		window.electron.update_article(
+            document.getElementById("article_name").value,
+            document.getElementById("article_unit_price").value,
+            document.getElementById("article_quantity").value,
+            article_id,
+            GetURLParameter("article_conditionment"),
+            GetURLParameter("article_entrepot"),
+        );
 
-		document.getElementById("message").innerHTML =  '<strong style="color: green;">Enregistrement réussi. Veuillez actualiser la page pour voir affiché l\'article modifié.</strong>'
+		document.getElementById("message").innerHTML =  '<strong style="color: green;">Mise à jour de l\'article réussi. Veuillez actualiser la page pour voir affiché l\'article modifié.</strong>'
 	}
 	else{
 

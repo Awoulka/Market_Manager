@@ -83,39 +83,39 @@ sequelize.authenticate().then(() => {
 
 const afiche_fseur = () => {
 
-connection = db_connect();
-// Perform a query
+	connection = db_connect();
+	// Perform a query
 
-$query = 'SELECT * FROM `Fournisseur` ';
+	$query = 'SELECT * FROM `Fournisseur` ';
 
-connection.query($query, function(err, rows, fields) {
-    if(err){
-        console.log("An error ocurred performing the query.");
-        console.log(err);
-        return;
-    }
+	connection.query($query, function(err, rows, fields) {
+		if(err){
+			console.log("An error ocurred performing the query.");
+			console.log(err);
+			return;
+		}
 
-    let c="";
-    let r = rows.map((elem) => {
+		let c="";
+		let r = rows.map((elem) => {
 
-    		c+="<tr>";
-    		c+='<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>'+elem.nom_fournisseur+'</td><td>'+elem.telephone_fournisseur+'</td><td>'+elem.adresse_fournisseur+'</td>'
-            c+='<td><div class="btn-wrapper"><a href="voir-fournisseur.html?id='+elem.id_fournisseur+'" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; voir</a></td>'             
-            c+="</tr>"       
+				c+="<tr>";
+				c+='<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>'+elem.nom_fournisseur+'</td><td>'+elem.telephone_fournisseur+'</td><td>'+elem.adresse_fournisseur+'</td>'
+				c+='<td><div class="btn-wrapper"><a href="voir-fournisseur.html?id='+elem.id_fournisseur+'" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; voir</a></td>'             
+				c+="</tr>"       
 
 
-                           }).join();
+							}).join();
 
-    document.getElementById("tab-fseur").innerHTML = c;
-    
-                                  
-    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
-});
+		document.getElementById("tab-fseur").innerHTML = c;
+		
+									
+		//console.log("Query succesfully executed", rows[0].nom_fournisseur);
+	});
 
-// Close the connection
-connection.end(function(){
-    // The connection has been closed
-});
+	// Close the connection
+	connection.end(function(){
+		// The connection has been closed
+	});
            
          }
 
@@ -126,28 +126,28 @@ const insert_fseur = (a,b,c) => {
 
 	console.log(a,b,c);
 
-connection = db_connect();
-// Perform a query
+	connection = db_connect();
+	// Perform a query
 
-$query = 'INSERT INTO Fournisseur (nom_fournisseur,telephone_fournisseur,adresse_fournisseur) VALUES ("'+a+'","'+b+'","'+c+'")';
+	$query = 'INSERT INTO Fournisseur (nom_fournisseur,telephone_fournisseur,adresse_fournisseur) VALUES ("'+a+'","'+b+'","'+c+'")';
 
-connection.query($query, function(err, result) {
-    if(err){
-        console.log("An error ocurred performing the query.");
-        console.log(err);
-        return;
-    }
+	connection.query($query, function(err, result) {
+		if(err){
+			console.log("An error ocurred performing the query.");
+			console.log(err);
+			return;
+		}
 
-    console.log(result.insertId);
-    
-                                  
-    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
-});
+		console.log(result.insertId);
+		
+									
+		//console.log("Query succesfully executed", rows[0].nom_fournisseur);
+	});
 
-// Close the connection
-connection.end(function(){
-    // The connection has been closed
-});
+	// Close the connection
+	connection.end(function(){
+		// The connection has been closed
+	});
            
          }
 
@@ -158,27 +158,27 @@ const update_fseur = (a,b,c,id) => {
 
 	console.log(a,b,c,id);
 
-connection = db_connect();
-// Perform a query
+	connection = db_connect();
+	// Perform a query
 
-$query = "UPDATE Fournisseur SET  nom_fournisseur = '"+a+"' , telephone_fournisseur = '"+b+"' , adresse_fournisseur = '"+c+"'  WHERE id_fournisseur = "+id;
-console.log($query)
+	$query = "UPDATE Fournisseur SET  nom_fournisseur = '"+a+"' , telephone_fournisseur = '"+b+"' , adresse_fournisseur = '"+c+"'  WHERE id_fournisseur = "+id;
+	console.log($query)
 
-connection.query($query, function(err, result) {
-    if(err){
-        console.log("An error ocurred performing the query.");
-        console.log(err);
-        return;
-    }
-    
-                                  
-    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
-});
+	connection.query($query, function(err, result) {
+		if(err){
+			console.log("An error ocurred performing the query.");
+			console.log(err);
+			return;
+		}
+		
+									
+		//console.log("Query succesfully executed", rows[0].nom_fournisseur);
+	});
 
-// Close the connection
-connection.end(function(){
-    // The connection has been closed
-});
+	// Close the connection
+	connection.end(function(){
+		// The connection has been closed
+	});
            
          }
 
@@ -187,33 +187,33 @@ connection.end(function(){
 
 const detail_fseur = () => {
 
-connection = db_connect();
-// Perform a query
+	connection = db_connect();
+	// Perform a query
 
-$query = 'SELECT * FROM `Fournisseur` WHERE id_fournisseur='+GET("id");
+	$query = 'SELECT * FROM `Fournisseur` WHERE id_fournisseur='+GET("id");
 
-connection.query($query, function(err, rows, fields) {
-    if(err){
-        console.log("An error ocurred performing the query.");
-        console.log(err);
-        return;
-    }
-
-
-   
-    document.getElementById("info").innerHTML = '<img class="rounded-circle mx-auto d-block" src="../../images/faces/face1.jpg" alt="Card image cap" style="width: 20%;"><h2 class="text-sm-center mt-2 mb-1"><strong >'+rows[0].nom_fournisseur+'</strong></h2><div class="location text-sm-center"><i class="fa fa-map-marker"></i><spam >'+rows[0].adresse_fournisseur+'</spam>, <spam id="">'+rows[0].telephone_fournisseur+'</spam> </div>'
-    document.getElementById("info").innerHTML += '<input type="text" name="" id="id" hidden="true" value="'+rows[0].id_fournisseur+'"><input type="text" name="" id="nom-fseur" hidden="true" value="'+rows[0].nom_fournisseur+'"><input type="text" name="" id="adresse-fseur" hidden="true" value="'+rows[0].adresse_fournisseur+'"><input type="text" name="" id="tel-fseur" hidden="true" value="'+rows[0].telephone_fournisseur+'">';
+	connection.query($query, function(err, rows, fields) {
+		if(err){
+			console.log("An error ocurred performing the query.");
+			console.log(err);
+			return;
+		}
 
 
-    
-                                  
-    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
-});
+	
+		document.getElementById("info").innerHTML = '<img class="rounded-circle mx-auto d-block" src="../../images/faces/face1.jpg" alt="Card image cap" style="width: 20%;"><h2 class="text-sm-center mt-2 mb-1"><strong >'+rows[0].nom_fournisseur+'</strong></h2><div class="location text-sm-center"><i class="fa fa-map-marker"></i><spam >'+rows[0].adresse_fournisseur+'</spam>, <spam id="">'+rows[0].telephone_fournisseur+'</spam> </div>'
+		document.getElementById("info").innerHTML += '<input type="text" name="" id="id" hidden="true" value="'+rows[0].id_fournisseur+'"><input type="text" name="" id="nom-fseur" hidden="true" value="'+rows[0].nom_fournisseur+'"><input type="text" name="" id="adresse-fseur" hidden="true" value="'+rows[0].adresse_fournisseur+'"><input type="text" name="" id="tel-fseur" hidden="true" value="'+rows[0].telephone_fournisseur+'">';
 
-// Close the connection
-connection.end(function(){
-    // The connection has been closed
-});
+
+		
+									
+		//console.log("Query succesfully executed", rows[0].nom_fournisseur);
+	});
+
+	// Close the connection
+	connection.end(function(){
+		// The connection has been closed
+	});
            
          }
 
@@ -308,16 +308,16 @@ const chargement_cdmnt_BC = (id,indice) => {
 					document.getElementById("cdmnt"+indice).innerHTML = c;
 					
 					 
-				     var js_ = document.createElement('script');
-				     js_.type='text/javascript';  
-				     js_.src = '../../vendors/select2/select2.min.js';
-				     //document.body.removeChild(js_) 
-				     document.body.appendChild(js_) 
-				     var js = document.createElement('script');
-				     js.type='text/javascript';  
-				     js.src = '../../js/select2.js';
-				     //document.body.removeChild(js) 
-				     document.body.appendChild(js)                   
+					var js_ = document.createElement('script');
+					js_.type='text/javascript';  
+					js_.src = '../../vendors/select2/select2.min.js';
+					//document.body.removeChild(js_) 
+					document.body.appendChild(js_) 
+					var js = document.createElement('script');
+					js.type='text/javascript';  
+					js.src = '../../js/select2.js';
+					//document.body.removeChild(js) 
+					document.body.appendChild(js)                   
 				    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
 				});
 
@@ -452,7 +452,7 @@ const show_article = () => {
 						finalList.map((element) => {
 							c+="<tr>";
 							c+='<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>'+element[0].libele_article+'</td><td>'+element[0].description+'</td><td>'+element[1].stock+'</td><td>FCFA '+element[2].prix_vente+'</td><td>FCFA '+element[2].prix_vente * element[1].stock+'</td><td>'+element[2].condmnt_id+'</td>'
-							c+='<td><div class="btn-wrapper"><a href="article_details.html?article_id='+element[0].id_article+'&article_name='+element[0].libele_article+'&article_prix_unitaire='+element[2].prix_vente+'&article_quantity='+element[1].stock+'" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; Modifier</a><button href="voir-fournisseur.html?id='+element+'" type="button" class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td>'             
+							c+='<td><div class="btn-wrapper"><a href="article_details.html?article_id='+element[0].id_article+'&article_name='+element[0].libele_article+'&article_prix_unitaire='+element[2].prix_vente+'&article_quantity='+element[1].stock+'&article_conditionment='+element[2].condmnt_id+'&article_entrepot='+element[1].entrepot_id+'" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; Modifier</a><button href="voir-fournisseur.html?id='+element+'" type="button" class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td>'             
 							c+="</tr>"
 						}).join();
 		
@@ -476,7 +476,7 @@ const show_article = () => {
 
 
 const show_article_details = (article_id) => {
-	connection = db_connect();
+	// connection = db_connect();	
 	// Perform a query
 
 	$query_get_articles_conditionment = 'SELECT * FROM `Articles_Condmnt` WHERE article_id='+article_id;
@@ -605,32 +605,46 @@ const insert_article = (a,b,c,d) => {
 
 //***** Function to update informations concerning a specific article ***\\
 
-const update_article = (a,b,c,id) => {
+const update_article = (a,b,c,article_key,conditionment_key, entrepot_key) => {
 
-	console.log(a,b,c,id);
+	console.log(a,b,c,article_key,conditionment_key, entrepot_key);
 
 	sequelize.query(
 		"UPDATE Articles SET libele_article = :libele_article, description = :description WHERE id_article = :id_article",
 		{
-			replacements: {id_article: id, libele_article: a, description: a},
+			replacements: {id_article: parseInt(article_key), libele_article: a, description: a},
 			type: sequelize.QueryTypes.UPDATE
 		}
 	).then(update_article => {
 		console.log(update_article);
 
-		// sequelize.query(
-		// 	"UPDATE Articles_Condmnt SET article_id = :article_id , prix_vente = :prix_vente WHERE id_article = :id_article",
-		// 	{
-		// 		replacements: {article_id: a, prix_vente: a},
-		// 		type: sequelize.QueryTypes.SELECT
-		// 	}
-		// ).then(result => {
-		// 	  console.log(result);
-		// }).catch((error) => {
-		// 	console.error('Failed to insert data : ', error);
-		// });
+		sequelize.query(
+			"UPDATE Articles_Condmnt SET prix_vente = :prix_vente WHERE article_id = :id_article AND condmnt_id = :id_conditionment",
+			{
+				replacements: {id_article: parseInt(article_key), id_conditionment: parseInt(conditionment_key), prix_vente: parseFloat(b)},
+				type: sequelize.QueryTypes.UPDATE
+			}
+		).then(update_conditionment => {
+			console.log(update_conditionment);
+
+			sequelize.query(
+				"UPDATE Entrepot_Article SET stock = :stock WHERE article_id = :id_article AND entrepot_id = :entrepot_id AND condmnt_id = :id_conditionment",
+				{
+					replacements: {id_article: parseInt(article_key), entrepot_id: parseInt(entrepot_key), id_conditionment: parseInt(conditionment_key), stock: parseInt(c)},
+					type: sequelize.QueryTypes.UPDATE
+				}
+			).then(update_conditionment => {
+					console.log(update_conditionment);
+
+				
+			}).catch((error) => {
+				console.error('Failed to update entrepot_article data : ', error);
+			});
+		}).catch((error) => {
+			console.error('Failed to update Contditionment Article data : ', error);
+		});
 	}).catch((error) => {
-		console.error('Failed to insert data : ', error);
+		console.error('Failed to update Articles data : ', error);
 	});
 }
 
@@ -758,7 +772,7 @@ const show_sell_details = (article_id) => {
 
 //***** Function to load articles ***\\
 
-const load_articles_items = () => {
+const load_articles_items = (item) => {
 		// Perform a query
 
 	sequelize.query(
@@ -769,12 +783,26 @@ const load_articles_items = () => {
 	).then(function(Articles_query) {
 		console.log(Articles_query[0].libele_article);
 
-		// let c="";
-		// Articles_query.map((Article_item) => {
-		// 	c+='<option>'+Article_item.libele_article+'</option>'  
-		// }).join();
+		let c="";
+		Articles_query.map((Article_item) => {
+			c+='<option value='+Article_item.id_article+'>'+Article_item.libele_article+'</option>'  
+		}).join();
 
-		listArticles.push(Articles_query)
+		document.getElementById("articles_items"+item).innerHTML = c;
+					
+		var js_ = document.createElement('script');
+		js_.type='text/javascript';  
+		js_.src = '../../vendors/select2/select2.min.js';
+		//document.body.removeChild(js_) 
+		document.body.appendChild(js_)
+		var js = document.createElement('script');
+		js.type='text/javascript';  
+		js.src = '../../js/select2.js';
+		//document.body.removeChild(js) 
+		document.body.appendChild(js)                   
+		//console.log("Query succesfully executed", rows[0].nom_fournisseur);
+
+		// listArticles.push(Articles_query)
 
 		// document.getElementById("articles_items[]").innerHTML = c;
 	}).catch((error) => {
@@ -784,35 +812,97 @@ const load_articles_items = () => {
 
 //***** Function to load conditionment ***\\
 
-const load_conditionment_items_for_sells = () => {
+const load_conditionment_items_for_sells = (item_id, item_indice) => {
 	// Perform a query
 
-sequelize.query(
-	'SELECT * FROM Conditionnements',
-	{
-		type: sequelize.QueryTypes.SELECT
-	}
-).then(Conditionment_query => {
-	console.log(Conditionment_query[0].id_condmnt);
+	sequelize.query(
+		'SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = ?',
+		{
+			replacements: [item_id],
+			type: sequelize.QueryTypes.SELECT
+		}
+	).then(Conditionment_query => {
+		console.log(Conditionment_query);
 
-	// let c="";
-	// Conditionment_query.map((conditionment_item) => {
-	// 	c+='<option value='+conditionment_item.libele_condmnt+'>'+conditionment_item.libele_condmnt+'</option>'  
-	// }).join();
+		let c="";
+		Conditionment_query.map((conditionment_item) => {
+			c+='<option value='+conditionment_item.id_condmnt+'>'+conditionment_item.libele_condmnt+'</option>'  
+		}).join();
 
-	return Conditionment_query
+		console.log(item_indice)
+		console.log("conditionment"+item_indice)
 
-	// document.getElementById("articles_conditionment[]").innerHTML = c;
-}).catch((error) => {
-	console.error('Failed to retrieve Conditionment data : ', error);
-});	
+		document.getElementById("conditionment"+item_indice).innerHTML = c;
+
+		var js_ = document.createElement('script');
+		js_.type='text/javascript';  
+		js_.src = '../../vendors/select2/select2.min.js';
+		//document.body.removeChild(js_) 
+		document.body.appendChild(js_) 
+		var js = document.createElement('script');
+		js.type='text/javascript';  
+		js.src = '../../js/select2.js';
+		//document.body.removeChild(js) 
+		document.body.appendChild(js)   
+
+		// document.getElementById("articles_conditionment[]").innerHTML = c;
+	}).catch((error) => {
+		console.error('Failed to retrieve Conditionment data : ', error);
+	});	
+}
+
+//***** Function to load conditionment ***\\
+
+const load_article_items_unit_price_for_sells = (item_indice,article_id, conditionment_id) => {
+	console.log(item_indice,article_id, conditionment_id)
+	// Perform a query
+
+	sequelize.query(
+		'SELECT prix_vente FROM `Articles_Condmnt` WHERE condmnt_id = :condmnt_id AND article_id = :article_id',
+		{
+			replacements: {condmnt_id: conditionment_id, article_id: article_id},
+			type: sequelize.QueryTypes.SELECT
+		}
+	).then(Conditionment_query => {
+		console.log(Conditionment_query);
+
+		document.getElementById("article_unit_price"+item_indice).value = Conditionment_query[0].prix_vente;
+
+	}).catch((error) => {
+		console.error('Failed to retrieve Articles Unit price data : ', error);
+	});	
+}
+
+//***** Function to load articles ***\\
+
+const load_articles_items_entrepot = (item) => {
+	// Perform a query
+
+	sequelize.query(
+		'SELECT * FROM Entrepots',
+		{
+			type: sequelize.QueryTypes.SELECT
+		}
+	).then(function(Entrepots_query) {
+		console.log(Entrepots_query[0].libele_article);
+
+		let c="";
+		Entrepots_query.map((Entrepot_item) => {
+			c+='<option value='+Entrepot_item.id_entrepot+'>'+Entrepot_item.libele_entrepot+'</option>'  
+		}).join();
+
+		document.getElementById("entrepot"+item).innerHTML = c;
+		
+	}).catch((error) => {
+		console.error('Failed to retrieve Entrepots data : ', error);
+	});	
 }
 
 //***** Function to register new sell ***\\
 
-const insert_sell = (a,b,c,d) => {
+const insert_sell = (customer_data) => {
 
-	console.log(a,b,c);
+	console.log(customer_data);
 
 	// Perform a query
 
@@ -826,54 +916,6 @@ const insert_sell = (a,b,c,d) => {
 	).then(article_query => {
 		console.log(article_query);
 
-		sequelize.query(
-			'SELECT * FROM Conditionnements WHERE libele_condmnt = ?',
-			{
-			  replacements: [d],
-			  type: sequelize.QueryTypes.SELECT
-			}
-		).then(conditionment_query => {
-			console.log(conditionment_query[0].id_condmnt);
-
-			sequelize.query(
-				'INSERT INTO Articles_Condmnt (condmnt_id, article_id, prix_vente) VALUES (:condmnt_id, :article_id, :prix_vente)',
-				{
-					replacements: {condmnt_id: conditionment_query[0].id_condmnt, article_id: article_query[0], prix_vente: parseFloat(b)},
-					type: sequelize.QueryTypes.INSERT
-				}
-			).then(query_article_conditionment => {
-				console.log(query_article_conditionment);
-
-				sequelize.query(
-					'SELECT * FROM entrepots',
-					{
-					  type: sequelize.QueryTypes.SELECT
-					}
-				).then(entrepot_query => {
-					console.log(entrepot_query[0].id_entrepot);
-		
-					sequelize.query(
-						'INSERT INTO Entrepot_Article (entrepot_id, article_id, condmnt_id, stock) VALUES (:entrepot_id, :article_id, :condmnt_id, :stock)',
-						{
-							replacements: {entrepot_id: entrepot_query[0].id_entrepot, article_id: article_query[0], condmnt_id: conditionment_query[0].id_condmnt, stock: parseInt(c)},
-							type: sequelize.QueryTypes.INSERT
-						}
-					).then(query_article_entrepot => {
-						console.log(query_article_entrepot);
-		
-						
-					}).catch((error) => {
-						console.error('Failed to insert Article_entrepot data : ', error);
-					});
-				}).catch((error) => {
-					console.error('Failed to retrieve Entrepot data : ', error);
-				});
-			}).catch((error) => {
-				console.error('Failed to insert Article_Conditionment data : ', error);
-			});
-		}).catch((error) => {
-			console.error('Failed to retrieve conditionments data : ', error);
-		});
 	}).catch((error) => {
 		console.error('Failed to insert article data : ', error);
 	});
@@ -936,6 +978,8 @@ contextBridge.exposeInMainWorld(
 	load_articles_items: load_articles_items,
 	insert_sell: insert_sell,
 	update_sells: update_sells,
-	load_conditionment_items_for_sells: load_conditionment_items_for_sells
+	load_conditionment_items_for_sells: load_conditionment_items_for_sells,
+	load_articles_items_entrepot: load_articles_items_entrepot,
+	load_article_items_unit_price_for_sells: load_article_items_unit_price_for_sells,
   }
 )
