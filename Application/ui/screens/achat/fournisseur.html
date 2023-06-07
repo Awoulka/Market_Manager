@@ -36,6 +36,7 @@
   <!-- endinject -->
   <link rel="shortcut icon" href="../../images/favicon.png" />
 </head>
+
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
@@ -55,7 +56,7 @@
           </a>
         </div>
       </div>
-      <div class="navbar-menu-wrapper d-flex align-items-top"> 
+      <div class="navbar-menu-wrapper d-flex align-items-top">
         <ul class="navbar-nav">
           <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
             <h1 class="welcome-text">Espace <span class="text-black fw-bold">Fournisseurs</span></h1>
@@ -78,15 +79,20 @@
                 <p class="mb-1 mt-3 font-weight-semibold">Allen Moreno</p>
                 <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
               </div>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile <span class="badge badge-pill badge-danger">1</span></a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> FAQ</a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My
+                Profile <span class="badge badge-pill badge-danger">1</span></a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>
+                Messages</a>
+              <a class="dropdown-item"><i
+                  class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
+                FAQ</a>
               <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
             </div>
           </li>
         </ul>
-        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+          data-bs-toggle="offcanvas">
           <span class="mdi mdi-menu"></span>
         </button>
       </div>
@@ -165,7 +171,8 @@
           </li>
           <li class="nav-item nav-category">Entrepôt</li>
           <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#reception" aria-expanded="false" aria-controls="reception">
+            <a class="nav-link" data-bs-toggle="collapse" href="#reception" aria-expanded="false"
+              aria-controls="reception">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Bon de Reception</span>
               <i class="menu-arrow"></i>
@@ -175,9 +182,9 @@
                 <li class="nav-item">
                   <a class="nav-link" href="../entrepot/bon_de_reception.html">Nouveau Bon Reception</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                   <a class="nav-link" href="../entrepot/bon_de_reception.html#ClientsList">Liste des Bons Reception</a>
-                </li>
+                </li> -->
               </ul>
             </div>
           </li>
@@ -210,11 +217,14 @@
                   <a class="nav-link" href="../entrepot/entrepot.html">Nouvel Entrepôt</a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" href="../entrepot/entrepot.html#tab-entrepot">Liste des Entrepôt</a>
+                </li>
+                <!-- <li class="nav-item">
                   <a class="nav-link" href="../entrepot/details_entrepot.html">Entrepôt 1</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="../entrepot/details_entrepot.html">Entrepôt 2</a>
-                </li>
+                </li> -->
               </ul>
             </div>
           </li>
@@ -237,7 +247,8 @@
             </div>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#fournisseur" aria-expanded="false" aria-controls="fournisseur">
+            <a class="nav-link" data-bs-toggle="collapse" href="#fournisseur" aria-expanded="false"
+              aria-controls="fournisseur">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Fournisseurs</span>
               <i class="menu-arrow"></i>
@@ -255,13 +266,20 @@
           </li>
           <li class="nav-item nav-category">Administration</li>
           <li class="nav-item">
+            <a class="nav-link" href="../caissier/caissier.html">
+              <i class="menu-icon mdi mdi-cash-multiple"></i>
+              <span class="menu-title">Espace Caissier</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="../authentification/login.html">
               <i class="menu-icon mdi mdi-account-circle-outline"></i>
               <span class="menu-title">Connexion</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#user_account" aria-expanded="false" aria-controls="user_account">
+            <a class="nav-link" data-bs-toggle="collapse" href="#user_account" aria-expanded="false"
+              aria-controls="user_account">
               <i class="menu-icon mdi mdi-account-multiple"></i>
               <span class="menu-title">Compte Utilisateurs</span>
               <i class="menu-arrow"></i>
@@ -269,10 +287,12 @@
             <div class="collapse" id="user_account">
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item">
-                  <a class="nav-link" href="../authentification/user_account.html">Nouveau Utilisateur</a>
+                  <a class="nav-link" href="../authentification/user_account.html">Nouveau
+                    Utilisateur</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../authentification/user_account.html#ClientsList">Liste des utilisateurs</a>
+                  <a class="nav-link" href="../authentification/user_account.html#ClientsList">Liste des
+                    utilisateurs</a>
                 </li>
               </ul>
             </div>
@@ -288,70 +308,80 @@
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 </div>
                 <div class="tab-content tab-content-basic">
-                  <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">  
+                  <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
                     <div class="row" id="NewClient">
+                      <div class="card-header" id="card">
+
+
+
+                        <button onclick="actualiser()" type="submit" class="btn btn-success text-white me-2"><i
+                            class="mdi mdi-refresh"></i>Actualiser</button>
+
+                      </div>
+
                       <div class="col-12 grid-margin stretch-card">
-                       <div class="card card-rounded">
+                        <div class="card card-rounded">
                           <div class="card-body">
                             <h4 class="card-title">Enregistrer nouveau Fournisseur</h4>
-                            
-                              <p class="card-description">
-                               Informartions sur le fournisseur
-                              </p>
-                              <div class="row">
-                                <div class="col-md-5">
-                                  <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Nom</label>
-                                    <div class="col-sm-9">
-                                      <input type="text" name="cli_name" id="cli_name" class="form-control" />
-                                    </div>
+
+                            <p class="card-description">
+                              Informartions sur le fournisseur
+                            </p>
+                            <div class="row">
+                              <div class="col-md-5">
+                                <div class="form-group row">
+                                  <label class="col-sm-2 col-form-label">Nom</label>
+                                  <div class="col-sm-9">
+                                    <input type="text" name="cli_name" id="cli_name" class="form-control" />
                                   </div>
                                 </div>
-                                <div class="col-md-3">
-                                  <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label">Téléphone</label>
-                                    <div class="col-sm-8">
-                                      <input type="text" name="cli_phone" id="cli_phone" class="form-control" />
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="col-md-3">
-                                  <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label">Adresse</label>
-                                    <div class="col-sm-9">
-                                      <input type="text" name="cli_adresse" id="cli_adresse" class="form-control" />
-                                    </div>
-                                  </div>
-                                </div>  
                               </div>
-                              <div class="row">
-                                <div class="col-md-9">
-                                  <div class="form-group row">
-                                  
-                                    <div class="col-sm-9" id="message">
-                                      
-                                    </div>
+                              <div class="col-md-3">
+                                <div class="form-group row">
+                                  <label class="col-sm-4 col-form-label">Téléphone</label>
+                                  <div class="col-sm-8">
+                                    <input type="text" name="cli_phone" id="cli_phone" class="form-control" />
                                   </div>
                                 </div>
-                               
-                                <div class="col-md-3">
-                                 <button onclick="enreg_fseur()" type="submit" class="btn btn-primary text-white me-2">Enregistrer</button>
-                              <button class="btn btn-light">Annuler</button>
-                                </div>  
                               </div>
-                              
-                            
+                              <div class="col-md-3">
+                                <div class="form-group row">
+                                  <label class="col-sm-3 col-form-label">Adresse</label>
+                                  <div class="col-sm-9">
+                                    <input type="text" name="cli_adresse" id="cli_adresse" class="form-control" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-9">
+                                <div class="form-group row">
+
+                                  <div class="col-sm-9" id="message">
+
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="col-md-3">
+                                <button onclick="enreg_fseur()" type="submit"
+                                  class="btn btn-primary text-white me-2">Enregistrer</button>
+                                <button class="btn btn-light">Annuler</button>
+                              </div>
+                            </div>
+
+
                           </div>
                         </div>
-                      </div>  
+                      </div>
                     </div>
-                    <div class="row" id="ClientsList"> 
+                    <div class="row" id="ClientsList">
                       <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                           <div class="card-body">
                             <h4 class="card-title">Liste des Fournisseurs</h4>
                             <p class="card-description">
-                             Informartions sur tous les fournisseurs
+                              Informartions sur tous les fournisseurs
                             </p>
                             <div class="table-responsive">
                               <table class="table table-striped">
@@ -378,14 +408,14 @@
                                   </tr>
                                 </thead>
                                 <tbody id="tab-fseur">
-                                  
+
                                 </tbody>
                               </table>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>  
+                    </div>
                   </div>
                 </div>
               </div>
@@ -397,7 +427,8 @@
         <footer class="footer">
           <div class="d-sm-flex justify-content-center justify-content-sm-between">
             <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Boutique - Ngaoudéré.</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights reserved.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights
+              reserved.</span>
           </div>
         </footer> -->
       </div>
@@ -406,7 +437,7 @@
     <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
-<script src="js/fournisseur.js"></script>
+  <script src="js/fournisseur.js"></script>
   <!-- plugins:js -->
   <script src="../../vendors/js/vendor.bundle.base.js"></script>
   <!-- endinject -->
@@ -466,4 +497,3 @@
 </body>
 
 </html>
-

@@ -4,20 +4,21 @@ const path = require('path')
 
 const mainWindow = () => {
   const mainWindow = new BrowserWindow({
-    autoHideMenuBar: false,
+    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      enableRemoteModule: true,
+      preload: path.join(__dirname, 'preload.js'),
     }
     // width: 800,
     // height: 600,
   });
   mainWindow.maximize();
   
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
-  mainWindow.loadFile('ui/index.html');
+  mainWindow.loadFile('ui/screens/authentification/login.html');
 };
 
 app.whenReady().then(() => {

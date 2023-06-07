@@ -54,3 +54,19 @@ function enreg_fseur(){
 			}
 
 }
+
+function delete_fseur(id) {
+
+      
+
+      if (confirm("Attention la supression d'un fournisseur entrainera également la supression de tout enregistrement qui lui sont lié notament les bons de commandes ainsi que les bons de réceptions !!!!!!!!!!! . Confirmez vous la suppression de ce fournisseur ?"))
+      {
+       
+        window.electron.delete_fseur(id)
+      }
+      
+      
+
+    }
+
+function actualiser() { window.location.reload()}

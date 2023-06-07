@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marker Manager Bill</title>
+    <style>
+        body {
+            padding-right: 5%;
+            padding-left: 5%;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        .table_head {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .w-70 {
+            width: 70%;
+        }
+
+        .h-20{
+            height: 150px;
+        }
+
+        .p-auto {
+            padding: 12px 15px;
+        }
+
+        .my-10{
+            margin-top: 25px 0;
+            margin-bottom: 25px 0;
+        }
+
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .styled-table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Bill header -->
+    <table id="bill_table_head" class="table_head" frame="box">
+        <tbody>
+            <tr>
+                <th class="text-left w-70 p-auto">COMMERCE GENERAL</th>
+                <td class="p-auto">Date et Heure de facture</td>
+            </tr>
+            <tr>
+                <th class="text-left p-auto">Facture N°: 31335</th>
+                <td class="p-auto">Date et Heure de tirage</td>
+            </tr>
+            <tr>
+                <th class="text-left p-auto">CLIENTS COMPTOIRS</th>
+                <td class="p-auto">MAGASIN : BOUNDJERE CARTONS</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Bill body -->
+    <table class="styled-table" id="bill_table_body">
+        <thead>
+            <tr>
+                <th scope="col">N°</th>
+                <th scope="col">Article</th>
+                <th scope="col">Conditionnement</th>
+                <th scope="col">Qte</th>
+                <th scope="col">P.U. (FCFA)</th>
+                <th scope="col">Réduction (FCFA)</th>
+                <th scope="col">Montant (FCFA)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>1</th>
+                <th>Row Header 1</th>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+            </tr>
+            <tr>
+                <th>2</th>
+                <th>Row Header 2</th>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <th>Row Header 3</th>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+                <td>Data</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <!-- Bill footer -->
+    <table class="table_head">
+        <th class="p-auto">
+            NOMBRE DE COLIS :
+        </th>
+        <th class="p-auto">
+            86
+        </th>
+        <th class="p-auto">
+            NET A PAYER :
+        </th>
+        <th class="p-auto">
+            826.600 FCFA
+        </th>
+    </table>
+    <table class="my-10">
+        <td class="p-auto text-center">
+            Les marchandises vendues et livrées ne sont ni reprises ni échangées
+        </td>
+    </table>
+    <table class="">
+        <tr>
+            <th>
+                Le Caissier
+            </th>
+            <th>
+                Le Factureur
+            </th>
+        </tr>
+        <tr>
+            <td class="h-20">
+
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

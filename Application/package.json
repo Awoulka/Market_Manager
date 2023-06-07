@@ -1,21 +1,37 @@
 {
   "name": "market_manager",
   "version": "1.0.0",
-  "description": "App to manage a market trader",
+  "description": "App to manage a market store",
   "main": "index.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder --dir --win",
+    "dist": "electron-builder"
   },
-  "author": "Joachim Nedaouka & Awoulka Dawai Berrenger",
+  "author": "Joachim Nedaouka & Awoulka Dawaï Berrenger",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^23.1.2"
+    "electron": "^23.1.2",
+    "electron-builder": "^24.2.0"
   },
   "dependencies": {
-    "electron-pdf": "^20.0.0",
+    "electron-pdf-viewer": "^1.0.1",
+    "excel4node": "^1.8.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.28",
     "mariadb": "^3.1.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.2.0",
-    "sequelize": "^6.29.0"
+    "sequelize": "^6.29.0",
+    "spdf-to-printer": "^1.5.6"
+  },
+  "build": {
+    "appId": "com.jb_tech.app",
+    "productName": "Market Manager",
+    "win": {
+      "target": [
+        "zip"
+      ]
+    }
   }
 }

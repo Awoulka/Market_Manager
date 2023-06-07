@@ -5,7 +5,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Idustriel Pressing • Entrepôt</title>
+  <title>Market-Manager • Entrepôt</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/mdi/css/materialdesignicons.min.css">
@@ -13,6 +13,14 @@
   <link rel="stylesheet" href="../../vendors/typicons/typicons.css">
   <link rel="stylesheet" href="../../vendors/simple-line-icons/css/simple-line-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
+
+
+
+  <link rel="stylesheet" href="../../vendors/select2/select2.min.css">
+  <link rel="stylesheet" href="../../vendors/select2-bootstrap-theme/select2-bootstrap.min.css">
+
+
+
   <!-- endinject -->
   <!-- Plugin css for this page -->
   <link rel="stylesheet" href="../../vendors/datatables.net-bs4/dataTables.bootstrap4.css">
@@ -23,6 +31,7 @@
   <!-- endinject -->
   <link rel="shortcut icon" href="../../images/favicon.png" />
 </head>
+
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
@@ -42,7 +51,7 @@
           </a>
         </div>
       </div>
-      <div class="navbar-menu-wrapper d-flex align-items-top"> 
+      <div class="navbar-menu-wrapper d-flex align-items-top">
         <ul class="navbar-nav">
           <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
             <h1 class="welcome-text">Espace <span class="text-black fw-bold">Entrepôt</span></h1>
@@ -73,15 +82,20 @@
                 <p class="mb-1 mt-3 font-weight-semibold">Allen Moreno</p>
                 <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
               </div>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile <span class="badge badge-pill badge-danger">1</span></a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> FAQ</a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My
+                Profile <span class="badge badge-pill badge-danger">1</span></a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>
+                Messages</a>
+              <a class="dropdown-item"><i
+                  class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
+                FAQ</a>
               <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
             </div>
           </li>
         </ul>
-        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+          data-bs-toggle="offcanvas">
           <span class="mdi mdi-menu"></span>
         </button>
       </div>
@@ -128,152 +142,170 @@
               </ul>
             </div>
           </li>
-          <li class="nav-item nav-category">Boutique</li>
-          <li class="nav-item">
-            <a class="nav-link" href="../boutique/new_articles.html">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Nouvel Article</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../boutique/new_articles.html#Articles">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Stock Boutique</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#arrivee" aria-expanded="false" aria-controls="arrivee">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Reception Boutique</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="arrivee">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../boutique/arrivee.html">Arrivée</a>
+          <div id="admin_space">
+            <li class="nav-item nav-category">Boutique</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../boutique/new_articles.html">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Nouvel Article</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../boutique/new_articles.html#Articles">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Stock Boutique</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#arrivee" aria-expanded="false"
+                aria-controls="arrivee">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Reception Boutique</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="arrivee">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../boutique/arrivee.html">Arrivée</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../boutique/arrivee.html#ClientsList">Liste des Arrivées</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item nav-category">Entrepôt</li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#reception" aria-expanded="false"
+                aria-controls="reception">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Bon de Reception</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="reception">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/bon_de_reception.html">Nouveau Bon Reception</a>
+                  </li>
+                  <!-- <li class="nav-item">
+                  <a class="nav-link" href="../entrepot/bon_de_reception.html#ClientsList">Liste des Bons Reception</a>
+                </li> -->
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#sortie" aria-expanded="false" aria-controls="sortie">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Bon de Sortie</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="sortie">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/bon_de_sortie.html">Nouveau Bon de Sortie</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/bon_de_sortie.html#ClientsList">Liste des Bons de Sortie</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Entrepôts</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="tables">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/entrepot.html">Nouvel Entrepôt</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/entrepot.html#tab-entrepot">Liste des Entrepôt</a>
+                  </li>
+                  <!-- <li class="nav-item">
+                  <a class="nav-link" href="../entrepot/details_entrepot.html">Entrepôt 1</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../boutique/arrivee.html#ClientsList">Liste des Arrivées</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item nav-category">Entrepôt</li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#reception" aria-expanded="false" aria-controls="reception">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Bon de Reception</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="reception">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_reception.html">Nouveau Bon Reception</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_reception.html#ClientsList">Liste des Bons Reception</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#sortie" aria-expanded="false" aria-controls="sortie">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Bon de Sortie</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="sortie">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_sortie.html">Nouveau Bon de Sortie</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_sortie.html#ClientsList">Liste des Bons de Sortie</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Entrepôts</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="tables">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="entrepot.html">Nouvel Entrepôt</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="details_entrepot.html">Entrepôt 1</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="details_entrepot.html">Entrepôt 2</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item nav-category">Achat</li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#achat" aria-expanded="false" aria-controls="achat">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Bon de Commande</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="achat">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/achat.html">Nouveau Bon de Commande</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/achat.html#ClientsList">Liste des Bons de Commande</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#fournisseur" aria-expanded="false" aria-controls="fournisseur">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Fournisseurs</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="fournisseur">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/fournisseur.html">Nouveau Fournisseur</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/fournisseur.html#ClientsList">Liste des Fournisseurs</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item nav-category">Administration</li>
-          <li class="nav-item">
-            <a class="nav-link" href="../authentification/login.html">
-              <i class="menu-icon mdi mdi-account-circle-outline"></i>
-              <span class="menu-title">Connexion</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#user_account" aria-expanded="false" aria-controls="user_account">
-              <i class="menu-icon mdi mdi-account-multiple"></i>
-              <span class="menu-title">Compte Utilisateurs</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="user_account">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../authentification/user_account.html">Nouveau Utilisateur</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../authentification/user_account.html#ClientsList">Liste des utilisateurs</a>
-                </li>
-              </ul>
-            </div>
-          </li>
+                  <a class="nav-link" href="../entrepot/details_entrepot.html">Entrepôt 2</a>
+                </li> -->
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item nav-category">Achat</li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#achat" aria-expanded="false" aria-controls="achat">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Bon de Commande</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="achat">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/achat.html">Nouveau Bon de Commande</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/achat.html#ClientsList">Liste des Bons de Commande</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#fournisseur" aria-expanded="false"
+                aria-controls="fournisseur">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Fournisseurs</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="fournisseur">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/fournisseur.html">Nouveau Fournisseur</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/fournisseur.html#ClientsList">Liste des Fournisseurs</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item nav-category">Administration</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../caissier/caissier.html">
+                <i class="menu-icon mdi mdi-cash-multiple"></i>
+                <span class="menu-title">Espace Caissier</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../authentification/login.html">
+                <i class="menu-icon mdi mdi-account-circle-outline"></i>
+                <span class="menu-title">Connexion</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#user_account" aria-expanded="false"
+                aria-controls="user_account">
+                <i class="menu-icon mdi mdi-account-multiple"></i>
+                <span class="menu-title">Compte Utilisateurs</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="user_account">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../authentification/user_account.html">Nouveau
+                      Utilisateur</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../authentification/user_account.html#ClientsList">Liste des
+                      utilisateurs</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </div>
         </ul>
       </nav>
+
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
@@ -281,54 +313,104 @@
             <div class="col-sm-12">
               <div class="home-tab">
                 <div class="row" id="NewClient">
+                  <div class="card-header" id="card">
+
+
+
+                    <button onclick="actualiser()" type="submit" class="btn btn-success text-white me-2"><i
+                        class="mdi mdi-refresh"></i>Actualiser</button>
+
+                  </div>
                   <div class="col-12 grid-margin stretch-card">
-                   <div class="card card-rounded">
+                    <div class="card card-rounded">
                       <div class="card-body">
                         <h4 class="card-title">Enregistrer nouvel Entrepôt</h4>
-                        <form class="form-sample">
-                          <p class="card-description">
-                           Informartions sur l'entrepôt
-                          </p>
-                          <div class="row">
-                            <div class="col-md-6">
-                              <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Responsable</label>
-                                <div class="col-sm-9">
-                                  <input type="text" name="cli_name" class="form-control" />
-                                </div>
+
+                        <p class="card-description">
+                          Informartions sur l'entrepôt
+                        </p>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group row">
+                              <label class="col-sm-3 col-form-label">Nom</label>
+                              <div class="col-sm-9">
+                                <input type="text" id="nom" class="form-control" />
                               </div>
-                            </div> <div class="col-md-6">
-                              <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Téléphone</label>
-                                <div class="col-sm-9">
-                                  <input type="number" name="cli_phone" class="form-control" />
-                                </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group row">
+                              <label class="col-sm-3 col-form-label">Locatisation</label>
+                              <div class="col-sm-9">
+                                <input type="tex" id="loc" class="form-control" />
                               </div>
-                            </div>  
-                          </div>                           
-                          <div class="row">
-                            <div class="col-md-6">
-                              <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Localisation</label>
-                                <div class="col-sm-9">
-                                  <input type="text" name="cli_name" class="form-control" />
-                                </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group row">
+                              <label class="col-sm-3 col-form-label">Magazinier</label>
+                              <div class="col-sm-9">
+                                <select class="js-example-basic-single w-100" id="mag"></select>
                               </div>
-                            </div> <div class="col-md-6">
-                              <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Autre</label>
-                                <div class="col-sm-9">
-                                  <input type="text" name="cli_phone" class="form-control" />
-                                </div>
-                              </div>
-                            </div>  
-                          </div>  
-                          <button onclick="Insert()" class="btn btn-primary me-2">Submit</button>
-                          <button class="btn btn-light">Cancel</button>
-                        </form>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+
+                          </div>
+                        </div>
+                        <button onclick="Insert()" class="btn btn-primary me-2">Enregistrer</button>
+                        <button class="btn btn-light">Cancel</button>
+
+                      </div>
+
+                      <div class="col-sm-9" id="message">
+
                       </div>
                     </div>
-                  </div>  
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row" id="ClientsList">
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Liste des Entrepots</h4>
+                  <p class="card-description">
+                    Informartions sur tous les Entrepots
+                  </p>
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>
+                            .
+                          </th>
+                          <th>
+                            Entrepots
+                          </th>
+                          <th>
+                            Localisation
+                          </th>
+
+                          <!--th>
+                                      Type Produits
+                                    </th-->
+                          <th>
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="tab-entrepot">
+
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -339,7 +421,8 @@
         <footer class="footer">
           <div class="d-sm-flex justify-content-center justify-content-sm-between">
             <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Boutique - Ngaoudéré.</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights reserved.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights
+              reserved.</span>
           </div>
         </footer>
         <!-- partial -->
@@ -350,16 +433,21 @@
   </div>
   <!-- container-scroller -->
 
-  <script>
-    function OpenViewWidow(){
-    
-      window.open('../new_articles.html', '_blank', 'top : 15', 'left : 06', 'nodeIntegration:no');
-      
-    }
-  </script>
+
 
   <!-- plugins:js -->
   <script src="../../vendors/js/vendor.bundle.base.js"></script>
+  <script>
+    var checkStatus = localStorage.getItem('user_role')
+    // alert(checkStatus)
+
+    if (checkStatus != "administrateur") {
+      document.getElementById("admin_space").style.display = 'none';
+    }
+  </script>
+  <script src="../../vendors/select2/select2.min.js"></script>
+  <script src="../../js/select2.js"></script>
+  <script src="js/entrepot.js"></script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
   <script src="../../vendors/chart.js/Chart.min.js"></script>
@@ -379,8 +467,9 @@
   <script src="../../js/dashboard.js"></script>
   <script src="../../js/Chart.roundedBarCharts.js"></script>
 
+
+
   <!-- End custom js for this page-->
 </body>
 
 </html>
-

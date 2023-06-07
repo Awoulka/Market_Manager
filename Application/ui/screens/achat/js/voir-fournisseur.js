@@ -116,3 +116,7 @@ function up_fseur(){
 			}
 window.electron.detail_fseur();
 }
+
+
+
+function actualiser() { window.location.reload()}

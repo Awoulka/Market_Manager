@@ -3,17 +3,7 @@
 
 <head>
   <!--Alasql scripts-->
-  <script type="text/javascript">
-    var alasql = require('alasql');
 
-    alasql("CREATE TABLE test (language INT, hello STRING)");
-    alasql("INSERT INTO test VALUES (1, 'Hello!')");
-    alasql("INSERT INTO test VALUES (2, 'Aloha!')");
-    alasql("INSERT INTO test VALUES (3, 'Bonjour!')");
-
-    const results = alasql("SELECT * FROM test WHERE language > 1");
-    console.log(results);
-  </script>
 
   <!-- Required meta tags -->
   <meta charset="utf-8">
@@ -36,6 +26,7 @@
   <!-- endinject -->
   <link rel="shortcut icon" href="../../images/favicon.png" />
 </head>
+
 <body>
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
@@ -55,7 +46,7 @@
           </a>
         </div>
       </div>
-      <div class="navbar-menu-wrapper d-flex align-items-top"> 
+      <div class="navbar-menu-wrapper d-flex align-items-top">
         <ul class="navbar-nav">
           <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
             <h1 class="welcome-text">Espace <span class="text-black fw-bold">Bon de Reception </span></h1>
@@ -69,7 +60,7 @@
               <input type="search" class="form-control" placeholder="Search Here" title="Search here">
             </form>
           </li>
-          
+
           <li class="nav-item dropdown d-none d-lg-block user-dropdown">
             <a class="nav-link" id="UserDropdown" href="../#" data-bs-toggle="dropdown" aria-expanded="false">
               <img class="img-xs rounded-circle" src="../../images/faces/face8.jpg" alt="Profile image"> </a>
@@ -79,15 +70,20 @@
                 <p class="mb-1 mt-3 font-weight-semibold">Allen Moreno</p>
                 <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
               </div>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile <span class="badge badge-pill badge-danger">1</span></a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
-              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> FAQ</a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My
+                Profile <span class="badge badge-pill badge-danger">1</span></a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>
+                Messages</a>
+              <a class="dropdown-item"><i
+                  class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
+              <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
+                FAQ</a>
               <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
             </div>
           </li>
         </ul>
-        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+          data-bs-toggle="offcanvas">
           <span class="mdi mdi-menu"></span>
         </button>
       </div>
@@ -135,150 +131,167 @@
               </ul>
             </div>
           </li>
-          <li class="nav-item nav-category">Boutique</li>
-          <li class="nav-item">
-            <a class="nav-link" href="../boutique/new_articles.html">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Nouvel Article</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="../boutique/new_articles.html#Articles">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Stock Boutique</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#arrivee" aria-expanded="false" aria-controls="arrivee">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Reception Boutique</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="arrivee">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../boutique/arrivee.html">Arrivée</a>
+          <div id="admin_space">
+            <li class="nav-item nav-category">Boutique</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../boutique/new_articles.html">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Nouvel Article</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../boutique/new_articles.html#Articles">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Stock Boutique</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#arrivee" aria-expanded="false"
+                aria-controls="arrivee">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Reception Boutique</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="arrivee">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../boutique/arrivee.html">Arrivée</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../boutique/arrivee.html#ClientsList">Liste des Arrivées</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item nav-category">Entrepôt</li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#reception" aria-expanded="false"
+                aria-controls="reception">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Bon de Reception</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="reception">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/bon_de_reception.html">Nouveau Bon Reception</a>
+                  </li>
+                  <!-- <li class="nav-item">
+                  <a class="nav-link" href="../entrepot/bon_de_reception.html#ClientsList">Liste des Bons Reception</a>
+                </li> -->
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#sortie" aria-expanded="false" aria-controls="sortie">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Bon de Sortie</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="sortie">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/bon_de_sortie.html">Nouveau Bon de Sortie</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/bon_de_sortie.html#ClientsList">Liste des Bons de Sortie</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Entrepôts</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="tables">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/entrepot.html">Nouvel Entrepôt</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../entrepot/entrepot.html#tab-entrepot">Liste des Entrepôt</a>
+                  </li>
+                  <!-- <li class="nav-item">
+                  <a class="nav-link" href="../entrepot/details_entrepot.html">Entrepôt 1</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../boutique/arrivee.html#ClientsList">Liste des Arrivées</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item nav-category">Entrepôt</li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#reception" aria-expanded="false" aria-controls="reception">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Bon de Reception</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="reception">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_reception.html">Nouveau Bon Reception</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_reception.html#ClientsList">Liste des Bons Reception</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#sortie" aria-expanded="false" aria-controls="sortie">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Bon de Sortie</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="sortie">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_sortie.html">Nouveau Bon de Sortie</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="bon_de_sortie.html#ClientsList">Liste des Bons de Sortie</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Entrepôts</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="tables">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="entrepot.html">Nouvel Entrepôt</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="details_entrepot.html">Entrepôt 1</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="details_entrepot.html">Entrepôt 2</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item nav-category">Achat</li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#achat" aria-expanded="false" aria-controls="achat">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Bon de Commande</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="achat">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/achat.html">Nouveau Bon de Commande</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/achat.html#ClientsList">Liste des Bons de Commande</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#fournisseur" aria-expanded="false" aria-controls="fournisseur">
-              <i class="mdi mdi-grid-large menu-icon"></i>
-              <span class="menu-title">Fournisseurs</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="fournisseur">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/fournisseur.html">Nouveau Fournisseur</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../achat/fournisseur.html#ClientsList">Liste des Fournisseurs</a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item nav-category">Administration</li>
-          <li class="nav-item">
-            <a class="nav-link" href="../authentification/login.html">
-              <i class="menu-icon mdi mdi-account-circle-outline"></i>
-              <span class="menu-title">Connexion</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#user_account" aria-expanded="false" aria-controls="user_account">
-              <i class="menu-icon mdi mdi-account-multiple"></i>
-              <span class="menu-title">Compte Utilisateurs</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="user_account">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                  <a class="nav-link" href="../authentification/user_account.html">Nouveau Utilisateur</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="../authentification/user_account.html#ClientsList">Liste des utilisateurs</a>
-                </li>
-              </ul>
-            </div>
-          </li>
+                  <a class="nav-link" href="../entrepot/details_entrepot.html">Entrepôt 2</a>
+                </li> -->
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item nav-category">Achat</li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#achat" aria-expanded="false" aria-controls="achat">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Bon de Commande</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="achat">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/achat.html">Nouveau Bon de Commande</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/achat.html#ClientsList">Liste des Bons de Commande</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#fournisseur" aria-expanded="false"
+                aria-controls="fournisseur">
+                <i class="mdi mdi-grid-large menu-icon"></i>
+                <span class="menu-title">Fournisseurs</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="fournisseur">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/fournisseur.html">Nouveau Fournisseur</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../achat/fournisseur.html#ClientsList">Liste des Fournisseurs</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li class="nav-item nav-category">Administration</li>
+            <li class="nav-item">
+              <a class="nav-link" href="../caissier/caissier.html">
+                <i class="menu-icon mdi mdi-cash-multiple"></i>
+                <span class="menu-title">Espace Caissier</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../authentification/login.html">
+                <i class="menu-icon mdi mdi-account-circle-outline"></i>
+                <span class="menu-title">Connexion</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#user_account" aria-expanded="false"
+                aria-controls="user_account">
+                <i class="menu-icon mdi mdi-account-multiple"></i>
+                <span class="menu-title">Compte Utilisateurs</span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="user_account">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item">
+                    <a class="nav-link" href="../authentification/user_account.html">Nouveau
+                      Utilisateur</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="../authentification/user_account.html#ClientsList">Liste des
+                      utilisateurs</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </div>
         </ul>
       </nav>
       <!-- partial -->
@@ -290,12 +303,12 @@
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                 </div>
                 <div class="tab-content tab-content-basic">
-                  <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
+                  <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
                     <div class="row" id="BonCommande">
                       <div class="col-lg-12 grid-margin stretch-card">
                         <div class="card">
                           <div class="card-body">
-                            <h4 class="card-title">Liste des Bons de Reception</h4>
+                            <h4 class="card-title">Liste des Commandes</h4>
                             <p class="card-description">
                               Liste de toutes les commandes
                             </p>
@@ -307,21 +320,27 @@
                                       .
                                     </th>
                                     <th>
-                                      Fournisseurs
+                                      Fournisseur
                                     </th>
                                     <th>
-                                      Montant
+                                      Date
                                     </th>
                                     <th>
-                                      Etat
+                                      Montant Total
+                                    </th>
+                                    <!--  <th>
+                                      Status
+                                    </th> -->
+                                    <th>
+                                      status
                                     </th>
                                     <th>
                                       Actions
                                     </th>
                                   </tr>
                                 </thead>
-                                <tbody>
-                                  <tr>
+                                <tbody id="tab-bon_r">
+                                  <!--  <tr>
                                     <td class="py-1">
                                       <i class="mdi mdi-grid-large menu-icon"></i>
                                     </td>
@@ -340,127 +359,8 @@
                                         <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
                                       </div>
                                     </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      Messsy Adam
-                                    </td>
-                                    <td>
-                                      $ 77.99
-                                    </td>
-                                    <td>
-                                      <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Recevoir</button>
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">  
-                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                        <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      John Richards
-                                    </td>
-                                    <td>
-                                      $ 77.99
-                                    </td>
-                                    <td>
-                                      <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Recevoir</button>
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                        <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      Peter Meggik
-                                    </td>
-                                    <td>
-                                      $ 77.99
-                                    </td>
-                                    <td>
-                                      <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Recevoir</button>
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                        <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      Edward
-                                    </td>
-                                    <td>
-                                      $ 77.99
-                                    </td>
-                                    <td>
-                                      <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Recevoir</button>
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">  
-                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                        <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      John Doe
-                                    </td>
-                                    <td>
-                                      $ 77.99
-                                    </td>
-                                    <td>
-                                      <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Recevoir</button>
-                                    </td>
-                                    <td>
-                                    <div class="btn-wrapper">  
-                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                        <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      
-                                      </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      Henry Tom
-                                    </td>
-                                    <td>
-                                      $ 77.99
-                                    </td>
-                                    <td>
-                                      <button onclick="OpenViewWindow()" class="btn  btn-primary text-white me-0" href="#">Recevoir</button>
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">  
-                                      <a class="btn btn-otline-dark" href="#"><i class="icon-printer"></i> Print</a>
-                                        <a class="btn btn-primary text-white me-0" href="#"><i class="icon-download"></i> Export</a>
-                                      </div>
-                                    </td>
-                                  </tr>
+                                  </tr> -->
+
                                 </tbody>
                               </table>
                             </div>
@@ -468,183 +368,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="row" id="ClientsList"> 
-                      <div class="col-lg-12 grid-margin stretch-card">
-                        <div class="card">
-                          <div class="card-body">
-                            <h4 class="card-title">Liste de Bons de Reception</h4>
-                            <p class="card-description">
-                             Liste de tous les bons de reception
-                            </p>
-                            <div class="table-responsive">
-                              <table class="table table-striped">
-                                <thead>
-                                  <tr>
-                                    <th>
-                                      .
-                                    </th>
-                                    <th>
-                                      Fournisseur
-                                    </th>
-                                    <th>
-                                      Date
-                                    </th>
-                                    <th>
-                                      Prix Total
-                                    </th>
-                                    <th>
-                                      Actions
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td class="py-1">
-                                      <i class="mdi mdi-grid-large menu-icon"></i>
-                                    </td>
-                                    <td>
-                                      LAPASTA
-                                    </td>
-                                    <td>
-                                      20/05/2020
-                                    </td>
-                                    <td>
-                                      XAF 77.99
-                                    </td>
-                                    <td>
-                                      <div class="btn-wrapper">
-                                        <button onclick="OpenViewWindow()" class="btn btn-primary text-white me-0" href="#">Consulter</button>
-                                        <button onclick="OpenViewWindow()" class="btn btn-danger text-white me-0" href="#">Supprimer</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
                   </div>
                 </div>
               </div>
@@ -656,7 +380,8 @@
         <footer class="footer">
           <div class="d-sm-flex justify-content-center justify-content-sm-between">
             <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Boutique - Ngaoudéré.</span>
-            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights reserved.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2023. All rights
+              reserved.</span>
           </div>
         </footer>
         <!-- partial -->
@@ -666,9 +391,17 @@
     <!-- page-body-wrapper ends -->
   </div>
   <!-- container-scroller -->
-
+  <script src="js/bon_de_reception.js"></script>
   <!-- plugins:js -->
   <script src="../../vendors/js/vendor.bundle.base.js"></script>
+  <script>
+    var checkStatus = localStorage.getItem('user_role')
+    // alert(checkStatus)
+
+    if (checkStatus != "administrateur") {
+      document.getElementById("admin_space").style.display = 'none';
+    }
+  </script>
   <!-- endinject -->
   <!-- Plugin js for this page -->
   <script src="../../vendors/chart.js/Chart.min.js"></script>
@@ -690,12 +423,11 @@
   <!-- End custom js for this page-->
 
   <script>
-    function OpenViewWindow(){
+    function OpenViewWindow() {
       window.open('components/view_screen.html', '_blank', 'top : 15', 'left : 06', 'nodeIntegration:no');
     }
   </script>
-  
+
 </body>
 
 </html>
-
