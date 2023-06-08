@@ -5710,7 +5710,7 @@ const insert_article_details = (globalArticleInfo) => {
                           entrepot_id: entrepot_element.id_entrepot,
                           article_id: globalArticleInfo.article_id,
                           condmnt_id: conditionment_query[0].id_condmnt,
-                          stock: 0,
+                          stock: conditionment_element.article_quantity,
                         },
                         type: sequelize.QueryTypes.INSERT,
                       }
@@ -5741,7 +5741,9 @@ const insert_article_details = (globalArticleInfo) => {
         console.error("Failed to retrieve conditionments data : ", error);
       });
   });
-  window.location.reload();
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
 };
 
 const delete_article = (article_id) => {
@@ -6556,7 +6558,7 @@ const load_customer_items = (item) => {
         .map((customer_item) => {
           c +=
             "<option value=" +
-            customer_item.nom_client +
+            customer_item.id_client +
             ">" +
             customer_item.nom_client +
             "</option>";
@@ -6911,7 +6913,7 @@ const insert_sell = (customer_data) => {
   if (customer_data.customer_article_items.length != 0) {
     if (customer_data.customer_payement_method == "Credit") {
       sequelize
-        .query("SELECT * FROM clients WHERE nom_client = ?", {
+        .query("SELECT * FROM clients WHERE id_client = ?", {
           replacements: [customer_data.customer_name],
           type: sequelize.QueryTypes.SELECT,
         })
@@ -7938,7 +7940,7 @@ const getBillPdfFileToPrint = (id_facture) => {
       type: sequelize.QueryTypes.SELECT,
     })
     .then((bill_query) => {
-      // console.log(bill_query);
+      console.log(bill_query);
 
       // var billPdfFilePath = "../Documents/Factures_Clients/Facture_de_" +
       //   "customer_data" +
@@ -7948,52 +7950,116 @@ const getBillPdfFileToPrint = (id_facture) => {
       //   id_facture +
       //   ".pdf"
 
-      var globalBillInfo = {
-        customer_name: bill_query[0].nom_client,
-        customer_article_items: {
-          article_infos: [],
-        },
-        customer_payement_method: bill_query[0].reglement_facture,
-        customer_total_reduction: bill_query[0].reduction,
-        customer_total_sell_price: bill_query[0].montant__facture,
-      };
-
-      sequelize
-        .query(
-          "SELECT * FROM facture_article, articles, conditionnements WHERE facture_article.facture_id = :id_facture AND  articles.id_article = facture_article.article_id AND conditionnements.id_condmnt = facture_article.conditionnement_id",
-          {
+      if (bill_query[0].reglement_facture == "Credit") {
+        sequelize
+          .query("SELECT * FROM clients WHERE id_client = :id_client", {
             replacements: {
-              id_facture: bill_query[0].id_facture,
+              id_client: bill_query[0].client_id,
             },
             type: sequelize.QueryTypes.SELECT,
-          }
-        )
-        .then((bill_details_query) => {
-          // console.log(bill_details_query);
+          })
+          .then((customer_details_query) => {
+            // console.log(bill_details_query);
 
-          for (bill_detail of bill_details_query) {
-            globalBillInfo.customer_article_items.article_infos.push({
-              articles_items: bill_detail.libele_article,
-              conditionment: bill_detail.libele_condmnt,
-              article_quantity: bill_detail.qte,
-              article_unit_price: bill_detail.PU,
-              reduction: bill_detail.reduction,
-              article_total_price:
-                bill_detail.qte * (bill_detail.PU - bill_detail.reduction),
-              entrepot: bill_detail.entrepot_id,
-            });
-          }
-          // console.log(globalBillInfo)
+            var globalBillInfo = {
+              customer_name: customer_details_query[0].nom_client,
+              customer_article_items: {
+                article_infos: [],
+              },
+              customer_payement_method: bill_query[0].reglement_facture,
+              customer_total_reduction: bill_query[0].reduction,
+              customer_total_sell_price: bill_query[0].montant__facture,
+            };
 
-          generateBilPDFFile(
-            id_facture,
-            globalBillInfo,
-            bill_query[0].date_facture
-          );
-        })
-        .catch((error) => {
-          console.error("Failed to retrieve Bill Details data : ", error);
-        });
+            sequelize
+              .query(
+                "SELECT * FROM facture_article, articles, conditionnements WHERE facture_article.facture_id = :id_facture AND  articles.id_article = facture_article.article_id AND conditionnements.id_condmnt = facture_article.conditionnement_id",
+                {
+                  replacements: {
+                    id_facture: bill_query[0].id_facture,
+                  },
+                  type: sequelize.QueryTypes.SELECT,
+                }
+              )
+              .then((bill_details_query) => {
+                // console.log(bill_details_query);
+
+                for (bill_detail of bill_details_query) {
+                  globalBillInfo.customer_article_items.article_infos.push({
+                    articles_items: bill_detail.libele_article,
+                    conditionment: bill_detail.libele_condmnt,
+                    article_quantity: bill_detail.qte,
+                    article_unit_price: bill_detail.PU,
+                    reduction: bill_detail.reduction,
+                    article_total_price:
+                      bill_detail.qte *
+                      (bill_detail.PU - bill_detail.reduction),
+                    entrepot: bill_detail.entrepot_id,
+                  });
+                }
+                // console.log(globalBillInfo)
+
+                generateBilPDFFile(
+                  id_facture,
+                  globalBillInfo,
+                  bill_query[0].date_facture
+                );
+              })
+              .catch((error) => {
+                console.error("Failed to retrieve Bill Details data : ", error);
+              });
+          })
+          .catch((error) => {
+            console.error("Failed to retrieve Bill Details data : ", error);
+          });
+      } else {
+        var globalBillInfo = {
+          customer_name: bill_query[0].nom_client,
+          customer_article_items: {
+            article_infos: [],
+          },
+          customer_payement_method: bill_query[0].reglement_facture,
+          customer_total_reduction: bill_query[0].reduction,
+          customer_total_sell_price: bill_query[0].montant__facture,
+        };
+
+        sequelize
+          .query(
+            "SELECT * FROM facture_article, articles, conditionnements WHERE facture_article.facture_id = :id_facture AND  articles.id_article = facture_article.article_id AND conditionnements.id_condmnt = facture_article.conditionnement_id",
+            {
+              replacements: {
+                id_facture: bill_query[0].id_facture,
+              },
+              type: sequelize.QueryTypes.SELECT,
+            }
+          )
+          .then((bill_details_query) => {
+            // console.log(bill_details_query);
+
+            for (bill_detail of bill_details_query) {
+              globalBillInfo.customer_article_items.article_infos.push({
+                articles_items: bill_detail.libele_article,
+                conditionment: bill_detail.libele_condmnt,
+                article_quantity: bill_detail.qte,
+                article_unit_price: bill_detail.PU,
+                reduction: bill_detail.reduction,
+                article_total_price:
+                  bill_detail.qte * (bill_detail.PU - bill_detail.reduction),
+                entrepot: bill_detail.entrepot_id,
+              });
+            }
+            // console.log(globalBillInfo)
+
+            generateBilPDFFile(
+              id_facture,
+              globalBillInfo,
+              bill_query[0].date_facture
+            );
+          })
+          .catch((error) => {
+            console.error("Failed to retrieve Bill Details data : ", error);
+          });
+      }
     })
     .catch((error) => {
       console.error("Failed to retrieve Bill data : ", error);
