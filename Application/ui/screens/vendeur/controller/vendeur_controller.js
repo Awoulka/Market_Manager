@@ -271,7 +271,7 @@ function generateBill() {
   }
 
   var globalBillInfo = {
-    customer_name: payment_method
+    customer_name: payment_method !== "Comptant"
       ? document.getElementById("customer_name").value
       : document.getElementById("customer_name1").value,
     customer_phone: document.getElementById("customer_phone").value,
