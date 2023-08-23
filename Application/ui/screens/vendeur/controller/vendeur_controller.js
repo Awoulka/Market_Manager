@@ -271,12 +271,14 @@ function generateBill() {
   }
 
   var globalBillInfo = {
-    customer_name: payment_method !== "Comptant"
-      ? document.getElementById("customer_name").value
-      : document.getElementById("customer_name1").value,
+    customer_name:
+      payment_method !== "Comptant"
+        ? document.getElementById("customer_name").value
+        : document.getElementById("customer_name1").value,
     customer_phone: document.getElementById("customer_phone").value,
     customer_article_items: bill_article_from_boutique,
-    customer_article_items_entrepot: bill_article_list_per_entrepot,
+    // customer_article_items_entrepot: bill_article_list_per_entrepot,
+    customer_article_items_entrepot: {},
     customer_payement_method: payment_method,
     customer_total_reduction: document.getElementById("sell_total_reduction")
       .value,

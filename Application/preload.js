@@ -86,7 +86,7 @@ sequelize
 
 const afiche_fseur = () => {
   connection = db_connect();
-  $query = "SELECT * FROM `Fournisseur` ";
+  $query = "SELECT * FROM `fournisseur` ";
   connection.query($query, function (err, rows, fields) {
     if (err) {
       console.log("An error ocurred performing the query.");
@@ -134,7 +134,7 @@ const insert_fseur = (a, b, c) => {
 
   connection = db_connect();
   $query =
-    'INSERT INTO Fournisseur (nom_fournisseur,telephone_fournisseur,adresse_fournisseur) VALUES ("' +
+    'INSERT INTO fournisseur (nom_fournisseur,telephone_fournisseur,adresse_fournisseur) VALUES ("' +
     a +
     '","' +
     b +
@@ -166,7 +166,7 @@ const update_fseur = (a, b, c, id) => {
   connection = db_connect();
 
   $query =
-    "UPDATE Fournisseur SET  nom_fournisseur = '" +
+    "UPDATE fournisseur SET  nom_fournisseur = '" +
     a +
     "' , telephone_fournisseur = '" +
     b +
@@ -196,7 +196,7 @@ const update_fseur = (a, b, c, id) => {
 
 const delete_fseur = (id) => {
   sequelize
-    .query("DELETE FROM Fournisseur WHERE id_fournisseur =" + id)
+    .query("DELETE FROM fournisseur WHERE id_fournisseur =" + id)
     .then((BC) => {
       alert("Fournisseur Supprimée avec success.");
       window.location.reload();
@@ -212,7 +212,7 @@ const detail_fseur = () => {
   connection = db_connect();
   // Perform a query
 
-  $query = "SELECT * FROM `Fournisseur` WHERE id_fournisseur=" + GET("id");
+  $query = "SELECT * FROM `fournisseur` WHERE id_fournisseur=" + GET("id");
 
   connection.query($query, function (err, rows, fields) {
     if (err) {
@@ -252,7 +252,7 @@ const detail_fseur = () => {
 const chargement_articles_BC = (a) => {
   connection = db_connect();
 
-  $query = "SELECT * FROM `Articles` ";
+  $query = "SELECT * FROM `articles` ";
 
   connection.query($query, function (err, rows, fields) {
     if (err) {
@@ -298,7 +298,7 @@ const chargement_cdmnt_BC = (id, indice) => {
   connection = db_connect();
 
   $query =
-    "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+    "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
     id;
 
   connection.query($query, function (err, rows, fields) {
@@ -343,7 +343,7 @@ const chargement_cdmnt_BC = (id, indice) => {
 
 const chargement_fseur_BC = (id, indice) => {
   connection = db_connect();
-  $query = "SELECT * FROM `Fournisseur` ";
+  $query = "SELECT * FROM `fournisseur` ";
 
   connection.query($query, function (err, rows, fields) {
     if (err) {
@@ -392,7 +392,7 @@ const insertion_bon_cmd = (n, c) => {
 
   sequelize
     .query(
-      'INSERT INTO BomCommandes (date_boncmd,fournisseur_id,montant_boncmd,solde_boncmd,montant_regler) VALUES ("' +
+      'INSERT INTO bomcommandes (date_boncmd,fournisseur_id,montant_boncmd,solde_boncmd,montant_regler,status) VALUES ("' +
         document.getElementById("date").value +
         '",' +
         document.getElementById("fseur").value +
@@ -400,6 +400,8 @@ const insertion_bon_cmd = (n, c) => {
         document.getElementById("montant_total").value +
         "," +
         document.getElementById("montant_total").value +
+        "," +
+        0 +
         "," +
         0 +
         ")"
@@ -413,7 +415,7 @@ const insertion_bon_cmd = (n, c) => {
         if (document.getElementById("montant" + i).value != 0) {
           sequelize
             .query(
-              'INSERT INTO BonCmd_Article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
+              'INSERT INTO boncmd_article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
                 BC[0] +
                 '","' +
                 document.getElementById("article" + i).value +
@@ -456,7 +458,7 @@ const update_bon_cmd = (id, n, c) => {
 
   sequelize
     .query(
-      "UPDATE BomCommandes SET date_boncmd = :date_boncmd, fournisseur_id = :fourniseur_id , montant_boncmd = :montant_boncmd  , solde_boncmd = :solde_boncmd WHERE id_boncmd = :id_boncmd",
+      "UPDATE bomcommandes SET date_boncmd = :date_boncmd, fournisseur_id = :fourniseur_id , montant_boncmd = :montant_boncmd  , solde_boncmd = :solde_boncmd WHERE id_boncmd = :id_boncmd",
       {
         replacements: {
           date_boncmd: date_bon,
@@ -470,9 +472,9 @@ const update_bon_cmd = (id, n, c) => {
     )
     .then((BC) => {
       sequelize
-        .query("DELETE FROM BonCmd_Article WHERE boncmd_id =" + id)
+        .query("DELETE FROM boncmd_article WHERE boncmd_id =" + id)
         .catch((error) => {
-          console.error("Failed to DELETE BonCmd_Article data : ", error);
+          console.error("Failed to DELETE boncmd_article data : ", error);
         });
       compteur = 0;
       for (var i = 1; i <= n; i++) {
@@ -481,7 +483,7 @@ const update_bon_cmd = (id, n, c) => {
 
           sequelize
             .query(
-              'INSERT INTO BonCmd_Article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
+              'INSERT INTO boncmd_article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
                 id +
                 '","' +
                 document.getElementById("article" + i).value +
@@ -510,7 +512,7 @@ const update_bon_cmd = (id, n, c) => {
       //setTimeout(,10000)
     })
     .catch((error) => {
-      console.error("Failed to UPDATE BomCommandes data : ", error);
+      console.error("Failed to UPDATE bomcommandes data : ", error);
     });
 };
 
@@ -518,7 +520,7 @@ const update_bon_cmd = (id, n, c) => {
 
 const delete_bon_cmd = (id) => {
   sequelize
-    .query("DELETE FROM BomCommandes WHERE id_boncmd =" + id)
+    .query("DELETE FROM bomcommandes WHERE id_boncmd =" + id)
     .then((BC) => {
       alert("Commande Supprimée avec success.");
       window.location.reload();
@@ -534,12 +536,12 @@ const afiche_BC = () => {
   let c = "";
 
   sequelize
-    .query("SELECT * FROM `BomCommandes` ")
+    .query("SELECT * FROM `bomcommandes` ")
     .then((BC) => {
       //console.log(BC[0][1])
       BC[0].map((elem) => {
         sequelize
-          .query("SELECT * FROM `Fournisseur` WHERE id_fournisseur = ? ", {
+          .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
             replacements: [elem.fournisseur_id],
             type: sequelize.QueryTypes.SELECT,
           })
@@ -577,13 +579,13 @@ const afiche_BC = () => {
 
 const afiche_detaille_BC = (id) => {
   sequelize
-    .query("SELECT * FROM `BomCommandes` WHERE id_boncmd = ? ", {
+    .query("SELECT * FROM `bomcommandes` WHERE id_boncmd = ? ", {
       replacements: [id],
       type: sequelize.QueryTypes.SELECT,
     })
     .then((BC) => {
       sequelize
-        .query("SELECT * FROM `Fournisseur` WHERE id_fournisseur = ? ", {
+        .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
           replacements: [BC[0].fournisseur_id],
           type: sequelize.QueryTypes.SELECT,
         })
@@ -601,7 +603,7 @@ const afiche_detaille_BC = (id) => {
 
       sequelize
         .query(
-          "SELECT * FROM `BonCmd_Article` , `Articles` , `BomCommandes` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonCmd_Article.conditionnement_id AND BomCommandes.id_boncmd = BonCmd_Article.boncmd_id  AND Articles.id_article = BonCmd_Article.article_id AND BomCommandes.id_boncmd = " +
+          "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
             id,
           {
             replacements: [],
@@ -648,7 +650,7 @@ const afiche_detaille_BC = (id) => {
         })
         .catch((error) => {
           console.error(
-            "Failed to retrieve BomCommandes Article conditionments data : ",
+            "Failed to retrieve bomcommandes article conditionments data : ",
             error
           );
         })
@@ -664,13 +666,13 @@ const afiche_detaille_BC = (id) => {
 
 const modif_BC = (id) => {
   sequelize
-    .query("SELECT * FROM `Fournisseur`")
+    .query("SELECT * FROM `fournisseur`")
     .then((fseurs) => {
       console.log(fseurs[0]);
 
       sequelize
         .query(
-          "SELECT * FROM `Fournisseur` , `BomCommandes`  WHERE Fournisseur.id_fournisseur = BomCommandes.fournisseur_id AND BomCommandes.id_boncmd =" +
+          "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
             id
         )
         .then((BC) => {
@@ -726,7 +728,7 @@ const modif_BC = (id) => {
 
   sequelize
     .query(
-      "SELECT * FROM `BonCmd_Article` , `Articles` , `BomCommandes` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonCmd_Article.conditionnement_id AND BomCommandes.id_boncmd = BonCmd_Article.boncmd_id  AND Articles.id_article = BonCmd_Article.article_id AND BomCommandes.id_boncmd = " +
+      "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
         id,
       {
         replacements: [],
@@ -739,11 +741,11 @@ const modif_BC = (id) => {
       n = 0;
       t = 0;
       artcl.map((elem) => {
-        sequelize.query("SELECT * FROM `Articles` ").then((a) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
           //alert(c+"aaaaa")
           sequelize
             .query(
-              "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
                 elem.article_id
             )
             .then((cnd) => {
@@ -870,7 +872,7 @@ const chargement_mag = () => {
   let c = "";
 
   sequelize
-    .query("SELECT * FROM `Personnels` ")
+    .query("SELECT * FROM `personnels` ")
     .then((P) => {
       //console.log(BC[0][1])
 
@@ -895,7 +897,7 @@ const chargement_mag = () => {
 const insertion_entrepot = () => {
   sequelize
     .query(
-      'INSERT INTO Entrepots (libele_entrepot,localisation_entrepot,magazinier) VALUES ("' +
+      'INSERT INTO entrepots (libele_entrepot,localisation_entrepot,magazinier) VALUES ("' +
         document.getElementById("nom").value +
         '","' +
         document.getElementById("loc").value +
@@ -905,14 +907,14 @@ const insertion_entrepot = () => {
     )
     .then((entpr) => {
       sequelize
-        .query("SELECT * FROM Articles", {
+        .query("SELECT * FROM articles", {
           type: sequelize.QueryTypes.SELECT,
         })
         .then((articles) => {
           articles.map((elem) => {
             sequelize
               .query(
-                "SELECT * FROM Articles_Condmnt  WHERE article_id = " +
+                "SELECT * FROM articles_condmnt  WHERE article_id = " +
                   elem.id_article,
                 {
                   type: sequelize.QueryTypes.SELECT,
@@ -925,7 +927,7 @@ const insertion_entrepot = () => {
 
                   sequelize
                     .query(
-                      "INSERT INTO Entrepot_Article (entrepot_id,article_id,condmnt_id,stock) VALUES (" +
+                      "INSERT INTO entrepot_article (entrepot_id,article_id,condmnt_id,stock) VALUES (" +
                         entpr[0] +
                         "," +
                         elem.id_article +
@@ -961,7 +963,7 @@ const insertion_entrepot = () => {
         });
 
       sequelize
-        .query("SELECT * FROM Entrepots  WHERE id_entrepot = " + entpr[0], {
+        .query("SELECT * FROM entrepots  WHERE id_entrepot = " + entpr[0], {
           type: sequelize.QueryTypes.SELECT,
         })
         .then((ent) => {
@@ -1004,7 +1006,7 @@ const insertion_entrepot = () => {
 
 const liste_entrepot = () => {
   sequelize
-    .query("SELECT * FROM Entrepots ", {
+    .query("SELECT * FROM entrepots ", {
       type: sequelize.QueryTypes.SELECT,
     })
     .then((ent) => {
@@ -1044,7 +1046,7 @@ const detail_entrepot = (id) => {
   // Perform a query
 
   $query =
-    "SELECT * FROM `Entrepots` , `Personnels` WHERE Entrepots.magazinier = Personnels.id_personnel AND  Entrepots.id_entrepot=" +
+    "SELECT * FROM `entrepots` , `personnels` WHERE entrepots.magazinier = personnels.id_personnel AND  entrepots.id_entrepot=" +
     id;
 
   connection.query($query, function (err, rows, fields) {
@@ -1148,7 +1150,7 @@ const detail_entrepot_article = (id) => {
   // Perform a query
 
   $query =
-    "SELECT * FROM `Entrepots` , `Personnels` WHERE Entrepots.magazinier = Personnels.id_personnel AND  Entrepots.id_entrepot=" +
+    "SELECT * FROM `entrepots` , `personnels` WHERE entrepots.magazinier = personnels.id_personnel AND  entrepots.id_entrepot=" +
     id;
 
   connection.query($query, function (err, rows, fields) {
@@ -1192,9 +1194,9 @@ const detail_entrepot_mvnt = (param) => {
   if (param == "S") {
     sequelize
       .query(
-        "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+        "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
           GET("id_e") +
-          " AND Articles.id_article = " +
+          " AND articles.id_article = " +
           GET("id_a"),
 
         {
@@ -1250,11 +1252,11 @@ const detail_entrepot_mvnt = (param) => {
   if (param == "E") {
     sequelize
       .query(
-        "SELECT * FROM  `BonReceptions`, `BonReception_Article` , `Articles` , `Conditionnements` WHERE  BonReceptions.id_bonreception = BonReception_Article.bonreception_id  AND Conditionnements.id_condmnt = BonReception_Article.conditionnement_id  AND Articles.id_article = BonReception_Article.article_id AND Articles.id_article = " +
+        "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND articles.id_article = " +
           GET("id_a") +
-          " AND BonReceptions.entrepot_id = " +
+          " AND bonreceptions.entrepot_id = " +
           GET("id_e") +
-          " ORDER BY BonReceptions.date_reception ASC",
+          " ORDER BY bonreceptions.date_reception ASC",
 
         {
           type: sequelize.QueryTypes.SELECT,
@@ -1262,10 +1264,12 @@ const detail_entrepot_mvnt = (param) => {
       )
       .then((BR) => {
         console.log(BR);
+        a = " ";
+        if (BR[0] != null) a = BR[0].libele_article;
         var E =
           " <div class='card'><div class='card-header'><h4>Etats des Mouvements " +
           '"" ' +
-          BR[0].libele_article +
+          a +
           ' ""' +
           "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul>  <h4 class='card-title'>Liste des Entrées en stock</h4>";
 
@@ -1281,7 +1285,7 @@ const detail_entrepot_mvnt = (param) => {
         BR.map((e) => {
           sequelize
             .query(
-              "SELECT * FROM BomCommandes , Fournisseur WHERE  BomCommandes.fournisseur_id = Fournisseur.id_fournisseur AND id_boncmd = " +
+              "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
                 e.boncmd_id,
               {
                 type: sequelize.QueryTypes.SELECT,
@@ -1327,11 +1331,11 @@ const detail_entrepot_mvnt = (param) => {
   if (param == "SRT") {
     sequelize
       .query(
-        "SELECT * FROM  `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` WHERE  BonSortie.id_bonsortie= BonSortie_Article.bonsortie_id  AND Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id  AND Articles.id_article = BonSortie_Article.article_id AND Articles.id_article = " +
+        "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
           GET("id_a") +
-          " AND BonSortie.provenance = " +
+          " AND bonsortie.provenance = " +
           GET("id_e") +
-          " ORDER BY BonSortie.date_bonsortie ASC",
+          " ORDER BY bonsortie.date_bonsortie ASC",
 
         {
           type: sequelize.QueryTypes.SELECT,
@@ -1339,10 +1343,12 @@ const detail_entrepot_mvnt = (param) => {
       )
       .then((BS) => {
         console.log(BS);
+        a = " ";
+        if (BS[0] != null) a = BS[0].libele_article;
         var SRT =
           " <div class='card'><div class='card-header'><h4>Etats des Mouvements " +
           '"" ' +
-          BS[0].libele_article +
+          a +
           ' ""' +
           "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link active' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul> <h4 class='card-title'>Sorties</h4>";
 
@@ -1383,7 +1389,7 @@ const detail_entrepot_mvnt = (param) => {
 
               sequelize
                 .query(
-                  "SELECT * FROM Clients WHERE  id_client = " + e.client_id,
+                  "SELECT * FROM clients WHERE  id_client = " + e.client_id,
                   {
                     type: sequelize.QueryTypes.SELECT,
                   }
@@ -1418,7 +1424,7 @@ const detail_entrepot_mvnt = (param) => {
             } else {
               sequelize
                 .query(
-                  "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                  "SELECT * FROM entrepots WHERE  id_entrepot = " +
                     e.destination,
                   {
                     type: sequelize.QueryTypes.SELECT,
@@ -1484,9 +1490,9 @@ const detail_entrepot_mvnt = (param) => {
 const modif_stock = () => {
   sequelize
     .query(
-      "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+      "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
         GET("id_e") +
-        " AND Articles.id_article = " +
+        " AND articles.id_article = " +
         GET("id_a"),
 
       {
@@ -1561,7 +1567,7 @@ const enreg_modif_stock = () => {
 
     sequelize
       .query(
-        "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+        "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
         {
           replacements: {
             Stock: document.getElementById("st" + i).value,
@@ -1588,7 +1594,7 @@ const enreg_modif_stock = () => {
 
 const modif_entrepot = () => {
   sequelize
-    .query("SELECT * FROM  `Personnels` ", {
+    .query("SELECT * FROM  `personnels` ", {
       type: sequelize.QueryTypes.SELECT,
     })
     .then((pers) => {
@@ -1634,7 +1640,7 @@ const modif_entrepot = () => {
 const chr_qte = (id_c, id_a) => {
   sequelize
     .query(
-      "SELECT * FROM Entrepot_Article WHERE article_id = " +
+      "SELECT * FROM entrepot_article WHERE article_id = " +
         id_a +
         " AND condmnt_id = " +
         id_c.value +
@@ -1657,7 +1663,7 @@ const chr_qte = (id_c, id_a) => {
 const update_entrepot = (id) => {
   sequelize
     .query(
-      "UPDATE Entrepots SET libele_entrepot = '" +
+      "UPDATE entrepots SET libele_entrepot = '" +
         document.getElementById("nom").value +
         "', localisation_entrepot = '" +
         document.getElementById("loc").value +
@@ -1682,7 +1688,7 @@ const update_entrepot = (id) => {
 
 const chargement_entrepot_BS = (id, indice) => {
   connection = db_connect();
-  $query = "SELECT * FROM `Entrepots` ";
+  $query = "SELECT * FROM `entrepots` ";
 
   connection.query($query, function (err, rows, fields) {
     if (err) {
@@ -1720,7 +1726,7 @@ const chargement_entrepot_BS = (id, indice) => {
     //console.log("Query succesfully executed", rows[0].nom_fournisseur);
   });
 
-  $query = "SELECT * FROM `Clients` ";
+  $query = "SELECT * FROM `clients` ";
 
   connection.query($query, function (err, rows, fields) {
     if (err) {
@@ -1768,7 +1774,7 @@ const chargement_entrepot_BS_modif = () => {
   //alert(GET('id'))
 
   sequelize
-    .query("SELECT * FROM `Entrepots`", {
+    .query("SELECT * FROM `entrepots`", {
       type: sequelize.QueryTypes.SELECT,
     })
     .then((entr) => {
@@ -1776,7 +1782,7 @@ const chargement_entrepot_BS_modif = () => {
 
       sequelize
         .query(
-          "SELECT * FROM `BonSortie`  WHERE BonSortie.id_bonsortie =" +
+          "SELECT * FROM `bonsortie`  WHERE bonsortie.id_bonsortie =" +
             GET("id"),
           {
             type: sequelize.QueryTypes.SELECT,
@@ -1857,7 +1863,7 @@ const chargement_entrepot_BS_modif = () => {
     });
 
   sequelize
-    .query("SELECT * FROM `Clients` ", {
+    .query("SELECT * FROM `clients` ", {
       type: sequelize.QueryTypes.SELECT,
     })
     .then((cl) => {
@@ -1865,7 +1871,7 @@ const chargement_entrepot_BS_modif = () => {
 
       sequelize
         .query(
-          "SELECT * FROM `BonSortie`  WHERE BonSortie.id_bonsortie =" +
+          "SELECT * FROM `bonsortie`  WHERE bonsortie.id_bonsortie =" +
             GET("id"),
           {
             type: sequelize.QueryTypes.SELECT,
@@ -1931,7 +1937,7 @@ const chargement_entrepot_BS_modif = () => {
 
   sequelize
     .query(
-      "SELECT * FROM `BonSortie_Article` , `Articles` , `BonSortie` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id AND BonSortie.id_bonsortie = BonSortie_Article.bonsortie_id  AND Articles.id_article = BonSortie_Article.article_id AND BonSortie.id_bonsortie = " +
+      "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
         GET("id"),
       {
         replacements: [],
@@ -1946,10 +1952,10 @@ const chargement_entrepot_BS_modif = () => {
       artcl.map((elem) => {
         //alert("aaaaa")
 
-        sequelize.query("SELECT * FROM `Articles` ").then((a) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
           sequelize
             .query(
-              "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
                 elem.article_id
             )
             .then((cnd) => {
@@ -1970,11 +1976,11 @@ const chargement_entrepot_BS_modif = () => {
 
               sequelize
                 .query(
-                  "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+                  "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
                     elem.provenance +
-                    " AND Articles.id_article = " +
+                    " AND articles.id_article = " +
                     id_a +
-                    " AND Conditionnements.id_condmnt = " +
+                    " AND conditionnements.id_condmnt = " +
                     id_c,
                   {
                     type: sequelize.QueryTypes.SELECT,
@@ -2135,7 +2141,7 @@ const chargement_entrepot_BS_modif = () => {
 const chargement_articles_BS = (a) => {
   connection = db_connect();
 
-  $query = "SELECT * FROM `Articles` ";
+  $query = "SELECT * FROM `articles` ";
 
   connection.query($query, function (err, rows, fields) {
     if (err) {
@@ -2180,7 +2186,7 @@ const chargement_articles_BS = (a) => {
 const afiche_BS = () => {
   sequelize
     .query(
-      "SELECT * FROM  `BonSortie`  ORDER BY date_bonsortie DESC",
+      "SELECT * FROM  `bonsortie`  ORDER BY date_bonsortie DESC",
 
       {
         type: sequelize.QueryTypes.SELECT,
@@ -2195,7 +2201,7 @@ const afiche_BS = () => {
         if (e.nom_client !== null) {
           sequelize
             .query(
-              "SELECT * FROM Entrepots WHERE  id_entrepot = " + e.provenance,
+              "SELECT * FROM entrepots WHERE  id_entrepot = " + e.provenance,
               {
                 type: sequelize.QueryTypes.SELECT,
               }
@@ -2239,7 +2245,7 @@ const afiche_BS = () => {
           if (e.client_id !== null) {
             sequelize
               .query(
-                "SELECT * FROM Entrepots WHERE  id_entrepot = " + e.provenance,
+                "SELECT * FROM entrepots WHERE  id_entrepot = " + e.provenance,
                 {
                   type: sequelize.QueryTypes.SELECT,
                 }
@@ -2247,7 +2253,7 @@ const afiche_BS = () => {
               .then((pr) => {
                 sequelize
                   .query(
-                    "SELECT * FROM Clients WHERE  id_client = " + e.client_id,
+                    "SELECT * FROM clients WHERE  id_client = " + e.client_id,
                     {
                       type: sequelize.QueryTypes.SELECT,
                     }
@@ -2294,7 +2300,7 @@ const afiche_BS = () => {
           } else {
             sequelize
               .query(
-                "SELECT * FROM Entrepots WHERE  id_entrepot = " + e.provenance,
+                "SELECT * FROM entrepots WHERE  id_entrepot = " + e.provenance,
                 {
                   type: sequelize.QueryTypes.SELECT,
                 }
@@ -2302,7 +2308,7 @@ const afiche_BS = () => {
               .then((pr) => {
                 sequelize
                   .query(
-                    "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                    "SELECT * FROM entrepots WHERE  id_entrepot = " +
                       e.destination,
                     {
                       type: sequelize.QueryTypes.SELECT,
@@ -2379,7 +2385,7 @@ const afiche_BS = () => {
 const chargement_cdmnt_BS = (id, indice) => {
   sequelize
     .query(
-      "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+      "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
         id,
       {
         type: sequelize.QueryTypes.SELECT,
@@ -2415,11 +2421,11 @@ const chargement_cdmnt_BS = (id, indice) => {
 
       sequelize
         .query(
-          "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+          "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
             document.getElementById("entrepot_pr").value +
-            " AND Articles.id_article = " +
+            " AND articles.id_article = " +
             id +
-            " AND Conditionnements.id_condmnt = " +
+            " AND conditionnements.id_condmnt = " +
             document.getElementById("cdmnt" + indice).value,
           {
             type: sequelize.QueryTypes.SELECT,
@@ -2453,11 +2459,11 @@ const chargement_st_BS = (id, indice) => {
   connection = db_connect();
 
   ($query =
-    "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+    "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
     document.getElementById("entrepot_pr").value +
-    " AND Articles.id_article = " +
+    " AND articles.id_article = " +
     document.getElementById("article" + indice).value +
-    " AND Conditionnements.id_condmnt = " +
+    " AND conditionnements.id_condmnt = " +
     id),
     //$query = 'SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = '+id
 
@@ -2495,11 +2501,11 @@ const modif_entr_pr = (id_e, n) => {
     if (document.getElementById("article" + i).value != "null") {
       sequelize
         .query(
-          "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+          "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
             document.getElementById("entrepot_pr").value +
-            " AND Articles.id_article = " +
+            " AND articles.id_article = " +
             document.getElementById("article" + i).value +
-            " AND Conditionnements.id_condmnt = " +
+            " AND conditionnements.id_condmnt = " +
             document.getElementById("cdmnt" + i).value,
           {
             type: sequelize.QueryTypes.SELECT,
@@ -2552,7 +2558,7 @@ const insertion_bon_sortie = (n, c) => {
   compteur = 0;
   sequelize
     .query(
-      'INSERT INTO BonSortie (date_bonsortie,provenance,destination,nom_client,client_id) VALUES ("' +
+      'INSERT INTO bonsortie (date_bonsortie,provenance,destination,nom_client,client_id) VALUES ("' +
         document.getElementById("date_sortie").value +
         '",' +
         document.getElementById("entrepot_pr").value +
@@ -2565,15 +2571,11 @@ const insertion_bon_sortie = (n, c) => {
         ")"
     )
     .then((BS) => {
-      alert(
-        "Bon de Sortie enregistré avec success enregistrée avec success vous le retrouverez dans la liste des Bon de Sortie ci dessous ."
-      );
-
       for (var i = 1; i <= n; i++) {
         if (document.getElementById("qte" + i).value != 0) {
           sequelize
             .query(
-              'INSERT INTO BonSortie_Article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
+              'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
                 BS[0] +
                 '","' +
                 document.getElementById("article" + i).value +
@@ -2589,7 +2591,7 @@ const insertion_bon_sortie = (n, c) => {
               if (compteur == c) {
                 sequelize
                   .query(
-                    "SELECT * FROM BonSortie_Article WHERE bonsortie_id =" +
+                    "SELECT * FROM bonsortie_article WHERE bonsortie_id =" +
                       BS[0]
                   )
                   .then((B_A_) => {
@@ -2603,7 +2605,7 @@ const insertion_bon_sortie = (n, c) => {
 
                         sequelize
                           .query(
-                            "SELECT * FROM Entrepot_Article WHERE article_id = " +
+                            "SELECT * FROM entrepot_article WHERE article_id = " +
                               e.article_id +
                               " AND condmnt_id = " +
                               e.conditionnement_id +
@@ -2616,7 +2618,7 @@ const insertion_bon_sortie = (n, c) => {
                             // alert(e.qteSortie)
                             sequelize
                               .query(
-                                "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+                                "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
                                 {
                                   replacements: {
                                     Stock:
@@ -2633,15 +2635,18 @@ const insertion_bon_sortie = (n, c) => {
                               )
                               .then((BC) => {
                                 d++;
-
+                                alert(d);
                                 if (d == B_A_[0].length) {
-                                  alert(
-                                    "Modification enregistrées avec success ."
+                                  // alert(
+                                  //   "Modification enregistrées avec success ."
+                                  // );
+                                  warning(
+                                    "Bon de Sortie enregistré avec success enregistrée avec success vous le retrouverez dans la liste des Bon de Sortie ci dessous ."
                                   );
 
-                                  window.location.replace(
-                                    "voir-bon-sortie.html?id=" + id
-                                  );
+                                  // window.location.replace(
+                                  //   "voir-bon-sortie.html?id=" + id
+                                  // );
                                 }
                               })
                               .catch((error) => {
@@ -2684,7 +2689,7 @@ const insertion_bon_sortie = (n, c) => {
     });
 };
 
-//***** Fonction de modification d'un bon de commande  ***\\
+//***** Fonction de modification d'un bon de sorie  ***\\
 
 const update_bon_sortie = (id, n, c) => {
   date_bon = document.getElementById("date_sortie").value;
@@ -2694,55 +2699,67 @@ const update_bon_sortie = (id, n, c) => {
   }
 
   sequelize
-    .query("SELECT * FROM BonSortie_Article WHERE bonsortie_id =" + id)
-    .then((B_A) => {
-      //console.log(B_A)
+    .query("SELECT * FROM bonsortie WHERE id_bonsortie =" + id)
+    .then((BS) => {
+      sequelize
+        .query("SELECT * FROM bonsortie_article WHERE bonsortie_id =" + id)
+        .then((B_A) => {
+          //console.log(B_A)
 
-      B_A[0]
-        .map((elem) => {
-          //alert(elem.qteSortie)
+          B_A[0]
+            .map((elem) => {
+              //alert(elem.qteSortie)
 
-          sequelize
-            .query(
-              "SELECT * FROM Entrepot_Article WHERE article_id = " +
-                elem.article_id +
-                " AND condmnt_id = " +
-                elem.conditionnement_id +
-                " AND entrepot_id = " +
-                document.getElementById("entrepot_pr").value
-            )
-            .then((art_e) => {
-              //(art_e[0][0].stock - elem.qteSortie )
               sequelize
                 .query(
-                  "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
-                  {
-                    replacements: {
-                      Stock:
-                        parseInt(art_e[0][0].stock) + parseInt(elem.qteSortie),
-                      id_entrepot: document.getElementById("entrepot_pr").value,
-                      id_article: elem.article_id,
-                      id_condmnt: elem.conditionnement_id,
-                    },
-                    type: sequelize.QueryTypes.UPDATE,
-                  }
+                  "SELECT * FROM entrepot_article WHERE article_id = " +
+                    elem.article_id +
+                    " AND condmnt_id = " +
+                    elem.conditionnement_id +
+                    " AND entrepot_id = " +
+                    BS[0][0].provenance
+                  //document.getElementById("entrepot_pr").value
                 )
-                .then((BC) => {})
+                .then((art_e) => {
+                  //(art_e[0][0].stock - elem.qteSortie )
+                  sequelize
+                    .query(
+                      "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+                      {
+                        replacements: {
+                          Stock:
+                            parseInt(art_e[0][0].stock) +
+                            parseInt(elem.qteSortie),
+                          id_entrepot: BS[0][0].provenance,
+                          id_article: elem.article_id,
+                          id_condmnt: elem.conditionnement_id,
+                        },
+                        type: sequelize.QueryTypes.UPDATE,
+                      }
+                    )
+                    .then((BC) => {})
+                    .catch((error) => {
+                      console.error(
+                        "Failed to update entrepot_Article data : ",
+                        error
+                      );
+                    });
+                })
                 .catch((error) => {
                   console.error(
-                    "Failed to update entrepot_Article data : ",
+                    "Failed to select entrepot_Article data : ",
                     error
                   );
                 });
             })
-            .catch((error) => {
-              console.error("Failed to select entrepot_Article data : ", error);
-            });
+            .join();
         })
-        .join();
+        .catch((error) => {
+          console.error("Failed to select BonSortie_Article data : ", error);
+        });
     })
     .catch((error) => {
-      console.error("Failed to select BonSortie_Article data : ", error);
+      console.error("Failed to select BonSortie data : ", error);
     });
 
   compteur = 0;
@@ -2761,7 +2778,7 @@ const update_bon_sortie = (id, n, c) => {
 
   sequelize
     .query(
-      "UPDATE BonSortie SET date_bonsortie = :date_bonsortie, provenance = :provenance , destination = :destination  , nom_client = :nom_client  , client_id = :client_id  WHERE id_bonsortie = :id_bonsortie",
+      "UPDATE bonsortie SET date_bonsortie = :date_bonsortie, provenance = :provenance , destination = :destination  , nom_client = :nom_client  , client_id = :client_id  WHERE id_bonsortie = :id_bonsortie",
 
       {
         replacements: {
@@ -2777,7 +2794,7 @@ const update_bon_sortie = (id, n, c) => {
     )
     .then((BS) => {
       sequelize
-        .query("DELETE FROM BonSortie_Article WHERE bonsortie_id =" + id)
+        .query("DELETE FROM bonsortie_article WHERE bonsortie_id =" + id)
         .then((D) => {
           for (var i = 1; i <= n; i++) {
             if (document.getElementById("qte" + i).value != 0) {
@@ -2785,7 +2802,7 @@ const update_bon_sortie = (id, n, c) => {
 
               sequelize
                 .query(
-                  'INSERT INTO BonSortie_Article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
+                  'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
                     id +
                     '","' +
                     document.getElementById("article" + i).value +
@@ -2801,7 +2818,7 @@ const update_bon_sortie = (id, n, c) => {
                   if (compteur == c) {
                     sequelize
                       .query(
-                        "SELECT * FROM BonSortie_Article WHERE bonsortie_id =" +
+                        "SELECT * FROM bonsortie_article WHERE bonsortie_id =" +
                           id
                       )
                       .then((B_A_) => {
@@ -2815,7 +2832,7 @@ const update_bon_sortie = (id, n, c) => {
 
                             sequelize
                               .query(
-                                "SELECT * FROM Entrepot_Article WHERE article_id = " +
+                                "SELECT * FROM entrepot_article WHERE article_id = " +
                                   e.article_id +
                                   " AND condmnt_id = " +
                                   e.conditionnement_id +
@@ -2828,7 +2845,7 @@ const update_bon_sortie = (id, n, c) => {
                                 // alert(e.qteSortie)
                                 sequelize
                                   .query(
-                                    "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+                                    "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
                                     {
                                       replacements: {
                                         Stock:
@@ -2851,9 +2868,9 @@ const update_bon_sortie = (id, n, c) => {
                                         "Modification enregistrées avec success ."
                                       );
 
-                                      window.location.replace(
-                                        "voir-bon-sortie.html?id=" + id
-                                      );
+                                      // window.location.replace(
+                                      //   "voir-bon-sortie.html?id=" + id
+                                      // );
                                     }
                                   })
                                   .catch((error) => {
@@ -2902,7 +2919,7 @@ const update_bon_sortie = (id, n, c) => {
 
 const afiche_detaille_BS = (id) => {
   sequelize
-    .query("SELECT * FROM  `BonSortie`   WHERE id_bonsortie = ? ", {
+    .query("SELECT * FROM  `bonsortie`   WHERE id_bonsortie = ? ", {
       replacements: [id],
       type: sequelize.QueryTypes.SELECT,
     })
@@ -2912,7 +2929,7 @@ const afiche_detaille_BS = (id) => {
       if (BS[0].nom_client !== null) {
         sequelize
           .query(
-            "SELECT * FROM Entrepots WHERE  id_entrepot = " + BS[0].provenance,
+            "SELECT * FROM entrepots WHERE  id_entrepot = " + BS[0].provenance,
             {
               type: sequelize.QueryTypes.SELECT,
             }
@@ -2927,7 +2944,7 @@ const afiche_detaille_BS = (id) => {
 
             sequelize
               .query(
-                "SELECT * FROM `BonSortie_Article` , `Articles` , `BonSortie` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id AND BonSortie.id_bonsortie = BonSortie_Article.bonsortie_id  AND Articles.id_article = BonSortie_Article.article_id AND BonSortie.id_bonsortie = " +
+                "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
                   id,
                 {
                   replacements: [],
@@ -2980,7 +2997,7 @@ const afiche_detaille_BS = (id) => {
         if (BS[0].client_id !== null) {
           sequelize
             .query(
-              "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+              "SELECT * FROM entrepots WHERE  id_entrepot = " +
                 BS[0].provenance,
               {
                 type: sequelize.QueryTypes.SELECT,
@@ -2989,7 +3006,7 @@ const afiche_detaille_BS = (id) => {
             .then((pr) => {
               sequelize
                 .query(
-                  "SELECT * FROM Clients WHERE  id_client = " + BS[0].client_id,
+                  "SELECT * FROM clients WHERE  id_client = " + BS[0].client_id,
                   {
                     type: sequelize.QueryTypes.SELECT,
                   }
@@ -3005,7 +3022,7 @@ const afiche_detaille_BS = (id) => {
 
                   sequelize
                     .query(
-                      "SELECT * FROM `BonSortie_Article` , `Articles` , `BonSortie` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id AND BonSortie.id_bonsortie = BonSortie_Article.bonsortie_id  AND Articles.id_article = BonSortie_Article.article_id AND BonSortie.id_bonsortie = " +
+                      "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
                         id,
                       {
                         replacements: [],
@@ -3061,7 +3078,7 @@ const afiche_detaille_BS = (id) => {
         } else {
           sequelize
             .query(
-              "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+              "SELECT * FROM entrepots WHERE  id_entrepot = " +
                 BS[0].provenance,
               {
                 type: sequelize.QueryTypes.SELECT,
@@ -3070,7 +3087,7 @@ const afiche_detaille_BS = (id) => {
             .then((pr) => {
               sequelize
                 .query(
-                  "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                  "SELECT * FROM entrepots WHERE  id_entrepot = " +
                     BS[0].destination,
                   {
                     type: sequelize.QueryTypes.SELECT,
@@ -3087,7 +3104,7 @@ const afiche_detaille_BS = (id) => {
 
                   sequelize
                     .query(
-                      "SELECT * FROM `BonSortie_Article` , `Articles` , `BonSortie` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id AND BonSortie.id_bonsortie = BonSortie_Article.bonsortie_id  AND Articles.id_article = BonSortie_Article.article_id AND BonSortie.id_bonsortie = " +
+                      "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
                         id,
                       {
                         replacements: [],
@@ -3155,7 +3172,7 @@ const afiche_detaille_BS = (id) => {
 
 const delete_bon_sortie = (id) => {
   sequelize
-    .query("DELETE FROM BonSortie WHERE id_bonsortie =" + id)
+    .query("DELETE FROM bonsortie WHERE id_bonsortie =" + id)
     .then((BC) => {
       alert("Bon de Sortie Supprimée avec success.");
       window.location.reload();
@@ -3171,12 +3188,12 @@ const afiche_BR = () => {
   let c = "";
 
   sequelize
-    .query("SELECT * FROM `BomCommandes` ")
+    .query("SELECT * FROM `bomcommandes` ")
     .then((BC) => {
       //console.log(BC[0][1])
       BC[0].map((elem) => {
         sequelize
-          .query("SELECT * FROM `Fournisseur` WHERE id_fournisseur = ? ", {
+          .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
             replacements: [elem.fournisseur_id],
             type: sequelize.QueryTypes.SELECT,
           })
@@ -3225,13 +3242,13 @@ const afiche_BR = () => {
 
 const reception_BC = (id) => {
   sequelize
-    .query("SELECT * FROM `Fournisseur`")
+    .query("SELECT * FROM `fournisseur`")
     .then((fseurs) => {
       console.log(fseurs[0]);
 
       sequelize
         .query(
-          "SELECT * FROM `Fournisseur` , `BomCommandes`  WHERE Fournisseur.id_fournisseur = BomCommandes.fournisseur_id AND BomCommandes.id_boncmd =" +
+          "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
             id
         )
         .then((BC) => {
@@ -3287,7 +3304,7 @@ const reception_BC = (id) => {
 
   sequelize
     .query(
-      "SELECT * FROM `BonCmd_Article` , `Articles` , `BomCommandes` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonCmd_Article.conditionnement_id AND BomCommandes.id_boncmd = BonCmd_Article.boncmd_id  AND Articles.id_article = BonCmd_Article.article_id AND BomCommandes.id_boncmd = " +
+      "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
         id,
       {
         replacements: [],
@@ -3300,11 +3317,11 @@ const reception_BC = (id) => {
       n = 0;
       t = 0;
       artcl.map((elem) => {
-        sequelize.query("SELECT * FROM `Articles` ").then((a) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
           //alert(c+"aaaaa")
           sequelize
             .query(
-              "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
                 elem.article_id
             )
             .then((cnd) => {
@@ -3399,7 +3416,7 @@ const reception_BC = (id) => {
             });
 
           sequelize
-            .query("SELECT * FROM  `Entrepots` ", {
+            .query("SELECT * FROM  `entrepots` ", {
               type: sequelize.QueryTypes.SELECT,
             })
             .then((pers) => {
@@ -3432,7 +3449,7 @@ const reception_BC = (id) => {
         });
       });
 
-      document.getElementById("montant_total").value = artcl[0].montant_boncmd;
+      //document.getElementById("montant_total").value = artcl[0].montant_boncmd;
     })
     .catch((error) => {
       console.error("Failed to retrieve BomCommandes data : ", error);
@@ -3446,7 +3463,7 @@ const insert_BR = (n, c) => {
 
   sequelize
     .query(
-      'INSERT INTO BonReceptions (date_reception,boncmd_id,entrepot_id) VALUES ("' +
+      'INSERT INTO bonreceptions (date_reception,boncmd_id,entrepot_id) VALUES ("' +
         document.getElementById("date").value +
         '",' +
         GET("id") +
@@ -3460,7 +3477,7 @@ const insert_BR = (n, c) => {
 
         sequelize
           .query(
-            'INSERT INTO BonReception_Article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
+            'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
               BR[0] +
               '","' +
               document.getElementById("article" + i).value +
@@ -3476,7 +3493,7 @@ const insert_BR = (n, c) => {
             if (compteur == c) {
               sequelize
                 .query(
-                  "UPDATE BomCommandes SET status = :status WHERE id_boncmd = :id_boncmd",
+                  "UPDATE bomcommandes SET status = :status WHERE id_boncmd = :id_boncmd",
                   {
                     replacements: { status: 1, id_boncmd: GET("id") },
                     type: sequelize.QueryTypes.UPDATE,
@@ -3485,7 +3502,7 @@ const insert_BR = (n, c) => {
                 .then((BC) => {
                   sequelize
                     .query(
-                      "SELECT * FROM BonReception_Article WHERE bonreception_id =" +
+                      "SELECT * FROM bonreception_article WHERE bonreception_id =" +
                         BR[0]
                     )
                     .then((B_R) => {
@@ -3497,7 +3514,7 @@ const insert_BR = (n, c) => {
 
                           sequelize
                             .query(
-                              "SELECT * FROM Entrepot_Article WHERE article_id = " +
+                              "SELECT * FROM entrepot_article WHERE article_id = " +
                                 e.article_id +
                                 " AND condmnt_id = " +
                                 e.conditionnement_id +
@@ -3511,7 +3528,7 @@ const insert_BR = (n, c) => {
 
                               sequelize
                                 .query(
-                                  "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+                                  "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
                                   {
                                     replacements: {
                                       Stock:
@@ -3587,13 +3604,13 @@ const insert_BR = (n, c) => {
 
 const voir_reception_BC = (id) => {
   sequelize
-    .query("SELECT * FROM `Fournisseur`")
+    .query("SELECT * FROM `fournisseur`")
     .then((fseurs) => {
       console.log(fseurs[0]);
 
       sequelize
         .query(
-          "SELECT * FROM `Fournisseur` , `BomCommandes`  WHERE Fournisseur.id_fournisseur = BomCommandes.fournisseur_id AND BomCommandes.id_boncmd =" +
+          "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
             id
         )
         .then((BC) => {
@@ -3649,7 +3666,7 @@ const voir_reception_BC = (id) => {
 
   sequelize
     .query(
-      "SELECT * FROM `BonCmd_Article` , `Articles` , `BomCommandes` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonCmd_Article.conditionnement_id AND BomCommandes.id_boncmd = BonCmd_Article.boncmd_id  AND Articles.id_article = BonCmd_Article.article_id AND BomCommandes.id_boncmd = " +
+      "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
         id,
       {
         replacements: [],
@@ -3662,17 +3679,17 @@ const voir_reception_BC = (id) => {
       n = 0;
       t = 0;
       artcl.map((elem) => {
-        sequelize.query("SELECT * FROM `Articles` ").then((a) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
           //alert(c+"aaaaa")
           sequelize
             .query(
-              "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
                 elem.article_id
             )
             .then((cnd) => {
               sequelize
                 .query(
-                  "SELECT * FROM `BonReceptions`  WHERE boncmd_id = " +
+                  "SELECT * FROM `bonreceptions`  WHERE boncmd_id = " +
                     GET("id"),
                   {
                     replacements: [],
@@ -3680,13 +3697,16 @@ const voir_reception_BC = (id) => {
                   }
                 )
                 .then((br) => {
+                  console.log("yoyo");
+                  console.log(br);
+                  console.log("yiyi");
                   sequelize
                     .query(
-                      "SELECT * FROM `BonReception_Article`  WHERE BonReception_Article.conditionnement_id= " +
+                      "SELECT * FROM `bonreception_article`  WHERE bonreception_article.conditionnement_id= " +
                         elem.conditionnement_id +
-                        " AND BonReception_Article.article_id = " +
+                        " AND bonreception_article.article_id = " +
                         elem.article_id +
-                        " AND BonReception_Article.bonreception_id = " +
+                        " AND bonreception_article.bonreception_id = " +
                         br[0].id_bonreception,
                       {
                         replacements: [],
@@ -3695,7 +3715,7 @@ const voir_reception_BC = (id) => {
                     )
                     .then((art_r) => {
                       sequelize
-                        .query("SELECT * FROM  `Entrepots` ", {
+                        .query("SELECT * FROM  `entrepots` ", {
                           type: sequelize.QueryTypes.SELECT,
                         })
                         .then((pers) => {
@@ -3858,13 +3878,13 @@ const voir_reception_BC = (id) => {
 
 const modif_reception_BC = (id) => {
   sequelize
-    .query("SELECT * FROM `Fournisseur`")
+    .query("SELECT * FROM `fournisseur`")
     .then((fseurs) => {
       console.log(fseurs[0]);
 
       sequelize
         .query(
-          "SELECT * FROM `Fournisseur` , `BomCommandes`  WHERE Fournisseur.id_fournisseur = BomCommandes.fournisseur_id AND BomCommandes.id_boncmd =" +
+          "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
             id
         )
         .then((BC) => {
@@ -3920,7 +3940,7 @@ const modif_reception_BC = (id) => {
 
   sequelize
     .query(
-      "SELECT * FROM `BonCmd_Article` , `Articles` , `BomCommandes` , `Conditionnements` WHERE Conditionnements.id_condmnt = BonCmd_Article.conditionnement_id AND BomCommandes.id_boncmd = BonCmd_Article.boncmd_id  AND Articles.id_article = BonCmd_Article.article_id AND BomCommandes.id_boncmd = " +
+      "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
         id,
       {
         replacements: [],
@@ -3933,17 +3953,17 @@ const modif_reception_BC = (id) => {
       n = 0;
       t = 0;
       artcl.map((elem) => {
-        sequelize.query("SELECT * FROM `Articles` ").then((a) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
           //alert(c+"aaaaa")
           sequelize
             .query(
-              "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
                 elem.article_id
             )
             .then((cnd) => {
               sequelize
                 .query(
-                  "SELECT * FROM `BonReceptions`  WHERE boncmd_id = " +
+                  "SELECT * FROM `bonreceptions`  WHERE boncmd_id = " +
                     GET("id"),
                   {
                     replacements: [],
@@ -3953,11 +3973,11 @@ const modif_reception_BC = (id) => {
                 .then((br) => {
                   sequelize
                     .query(
-                      "SELECT * FROM `BonReception_Article`  WHERE BonReception_Article.conditionnement_id= " +
+                      "SELECT * FROM `bonreception_article`  WHERE bonreception_article.conditionnement_id= " +
                         elem.conditionnement_id +
-                        " AND BonReception_Article.article_id = " +
+                        " AND bonreception_article.article_id = " +
                         elem.article_id +
-                        " AND BonReception_Article.bonreception_id = " +
+                        " AND bonreception_article.bonreception_id = " +
                         br[0].id_bonreception,
                       {
                         replacements: [],
@@ -3966,7 +3986,7 @@ const modif_reception_BC = (id) => {
                     )
                     .then((art_r) => {
                       sequelize
-                        .query("SELECT * FROM  `Entrepots` ", {
+                        .query("SELECT * FROM  `entrepots` ", {
                           type: sequelize.QueryTypes.SELECT,
                         })
                         .then((pers) => {
@@ -4161,11 +4181,11 @@ const Update_BR = (n, c) => {
   compteur = 0;
 
   sequelize
-    .query("SELECT * FROM BonReceptions WHERE  boncmd_id = " + GET("id"))
+    .query("SELECT * FROM bonreceptions WHERE  boncmd_id = " + GET("id"))
     .then((BR) => {
       sequelize
         .query(
-          "SELECT * FROM BonReception_Article WHERE bonreception_id =" +
+          "SELECT * FROM bonreception_article WHERE bonreception_id =" +
             BR[0][0].id_bonreception
         )
         .then((B_R) => {
@@ -4177,12 +4197,12 @@ const Update_BR = (n, c) => {
 
               sequelize
                 .query(
-                  "SELECT * FROM Entrepot_Article WHERE article_id = " +
+                  "SELECT * FROM entrepot_article WHERE article_id = " +
                     e.article_id +
                     " AND condmnt_id = " +
                     e.conditionnement_id +
                     " AND entrepot_id = " +
-                    document.getElementById("entrepot").value
+                    BR[0][0].entrepot_id
                 )
                 .then((art_e) => {
                   //(art_e[0][0].stock - elem.qteSortie )
@@ -4191,13 +4211,12 @@ const Update_BR = (n, c) => {
 
                   sequelize
                     .query(
-                      "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+                      "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
                       {
                         replacements: {
                           Stock:
                             parseInt(art_e[0][0].stock) - parseInt(e.qteReçu),
-                          id_entrepot:
-                            document.getElementById("entrepot").value,
+                          id_entrepot: BR[0][0].entrepot_id,
                           id_article: e.article_id,
                           id_condmnt: e.conditionnement_id,
                         },
@@ -4244,7 +4263,7 @@ const Update_BR = (n, c) => {
 
   sequelize
     .query(
-      "UPDATE BonReceptions SET date_reception = :date_reception , entrepot_id = :entrepot_id  WHERE boncmd_id = :boncmd_id",
+      "UPDATE bonreceptions SET date_reception = :date_reception , entrepot_id = :entrepot_id  WHERE boncmd_id = :boncmd_id",
       {
         replacements: {
           date_reception: date_bon,
@@ -4257,7 +4276,7 @@ const Update_BR = (n, c) => {
     .then((B) => {
       sequelize
         .query(
-          "SELECT * FROM BonReceptions WHERE boncmd_id =" + GET("id"),
+          "SELECT * FROM bonreceptions WHERE boncmd_id =" + GET("id"),
 
           {
             replacements: {},
@@ -4267,7 +4286,7 @@ const Update_BR = (n, c) => {
         .then((BR) => {
           sequelize
             .query(
-              "DELETE FROM BonReception_Article WHERE bonreception_id =" +
+              "DELETE FROM bonreception_article WHERE bonreception_id =" +
                 BR[0].id_bonreception
             )
             .then((D) => {
@@ -4276,7 +4295,7 @@ const Update_BR = (n, c) => {
 
                 sequelize
                   .query(
-                    'INSERT INTO BonReception_Article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
+                    'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
                       BR[0].id_bonreception +
                       '","' +
                       document.getElementById("article" + i).value +
@@ -4292,7 +4311,7 @@ const Update_BR = (n, c) => {
                     if (compteur == c) {
                       sequelize
                         .query(
-                          "SELECT * FROM BonReception_Article WHERE bonreception_id =" +
+                          "SELECT * FROM bonreception_article WHERE bonreception_id =" +
                             BR[0].id_bonreception
                         )
                         .then((B_R) => {
@@ -4304,7 +4323,7 @@ const Update_BR = (n, c) => {
 
                               sequelize
                                 .query(
-                                  "SELECT * FROM Entrepot_Article WHERE article_id = " +
+                                  "SELECT * FROM entrepot_article WHERE article_id = " +
                                     e.article_id +
                                     " AND condmnt_id = " +
                                     e.conditionnement_id +
@@ -4318,7 +4337,7 @@ const Update_BR = (n, c) => {
 
                                   sequelize
                                     .query(
-                                      "UPDATE Entrepot_Article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+                                      "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
                                       {
                                         replacements: {
                                           Stock:
@@ -4398,7 +4417,7 @@ const Update_BR = (n, c) => {
 
 const del_entrepot = (id) => {
   sequelize
-    .query("DELETE FROM Entrepots WHERE id_entrepot =" + id)
+    .query("DELETE FROM entrepots WHERE id_entrepot =" + id)
     .then((BC) => {
       alert("Entrepot  Supprimée avec success.");
       window.location.reload();
@@ -4451,7 +4470,7 @@ const moov_entrepot = (param) => {
     document.body.appendChild(js);
 
     sequelize
-      .query("SELECT * FROM `Articles` ", {
+      .query("SELECT * FROM `articles` ", {
         type: sequelize.QueryTypes.SELECT,
       })
       .then((a) => {
@@ -4479,7 +4498,7 @@ const moov_entrepot = (param) => {
       })
       .catch((error) => {
         console.error(
-          "Failed to retrieve `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` data : ",
+          "Failed to retrieve `entrepots`, `entrepot_article` , `articles` , `conditionnements` data : ",
           error
         );
       });
@@ -4502,7 +4521,7 @@ const moov_entrepot = (param) => {
     document.body.appendChild(js);
 
     sequelize
-      .query("SELECT * FROM  `Articles`  ", {
+      .query("SELECT * FROM  `articles`  ", {
         type: sequelize.QueryTypes.SELECT,
       })
       .then((artcl) => {
@@ -4511,9 +4530,9 @@ const moov_entrepot = (param) => {
         artcl.map((elem) => {
           sequelize
             .query(
-              "SELECT * FROM  `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` WHERE  Entrepots.id_entrepot = Entrepot_Article.entrepot_id  AND Conditionnements.id_condmnt = Entrepot_Article.condmnt_id  AND Articles.id_article = Entrepot_Article.article_id AND Entrepots.id_entrepot = " +
+              "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
                 GET("id") +
-                " AND Articles.id_article = " +
+                " AND articles.id_article = " +
                 elem.id_article,
 
               {
@@ -4527,7 +4546,7 @@ const moov_entrepot = (param) => {
               c +=
                 '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
                 elem.libele_article +
-                '</td><td><select class="js-example-basic-single w-100"  onchange=chargement_qte(this,' +
+                '</td><td><select class="form-control" style=" color : black "  onchange=chargement_qte(this,' +
                 elem.id_article +
                 ")>";
 
@@ -4537,7 +4556,7 @@ const moov_entrepot = (param) => {
                 c +=
                   '<option value="' +
                   e.condmnt_id +
-                  '" >' +
+                  '"  >' +
                   e.abreviation_condmnt +
                   "</option>";
 
@@ -4592,7 +4611,7 @@ const moov_entrepot = (param) => {
 const chargement_cdmnt_e = (id) => {
   sequelize
     .query(
-      "SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = " +
+      "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
         id,
       {
         type: sequelize.QueryTypes.SELECT,
@@ -4656,9 +4675,9 @@ const filtre_moov = () => {
 
       sequelize
         .query(
-          "SELECT * FROM  `BonReceptions`, `BonReception_Article` , `Articles` , `Conditionnements` WHERE  BonReceptions.id_bonreception = BonReception_Article.bonreception_id  AND Conditionnements.id_condmnt = BonReception_Article.conditionnement_id  AND Articles.id_article = BonReception_Article.article_id AND  BonReceptions.entrepot_id = " +
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND  bonreceptions.entrepot_id = " +
             GET("id") +
-            ' AND BonReceptions.date_reception = "' +
+            ' AND bonreceptions.date_reception = "' +
             date +
             '"',
 
@@ -4672,7 +4691,7 @@ const filtre_moov = () => {
           BR.map((e) => {
             sequelize
               .query(
-                "SELECT * FROM BomCommandes , Fournisseur WHERE  BomCommandes.fournisseur_id = Fournisseur.id_fournisseur AND id_boncmd = " +
+                "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
                   e.boncmd_id,
                 {
                   type: sequelize.QueryTypes.SELECT,
@@ -4722,9 +4741,9 @@ const filtre_moov = () => {
 
       sequelize
         .query(
-          "SELECT * FROM  `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` WHERE  BonSortie.id_bonsortie= BonSortie_Article.bonsortie_id  AND Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id  AND Articles.id_article = BonSortie_Article.article_id  AND BonSortie.provenance = " +
+          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_Article.article_id  AND bonsortie.provenance = " +
             GET("id") +
-            ' AND BonSortie.date_bonsortie = "' +
+            ' AND bonsortie.date_bonsortie = "' +
             date +
             '"',
 
@@ -4763,7 +4782,7 @@ const filtre_moov = () => {
 
                 sequelize
                   .query(
-                    "SELECT * FROM Clients WHERE  id_client = " + e.client_id,
+                    "SELECT * FROM clients WHERE  id_client = " + e.client_id,
                     {
                       type: sequelize.QueryTypes.SELECT,
                     }
@@ -4798,7 +4817,7 @@ const filtre_moov = () => {
               } else {
                 sequelize
                   .query(
-                    "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                    "SELECT * FROM entrepots WHERE  id_entrepot = " +
                       e.destination,
                     {
                       type: sequelize.QueryTypes.SELECT,
@@ -4852,7 +4871,7 @@ const filtre_moov = () => {
         })
         .catch((error) => {
           console.error(
-            "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+            "Failed to retrieve `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` data : ",
             error
           );
         });
@@ -4869,11 +4888,11 @@ const filtre_moov = () => {
 
         sequelize
           .query(
-            "SELECT * FROM  `BonReceptions`, `BonReception_Article` , `Articles` , `Conditionnements` WHERE  BonReceptions.id_bonreception = BonReception_Article.bonreception_id  AND Conditionnements.id_condmnt = BonReception_Article.conditionnement_id  AND Articles.id_article = BonReception_Article.article_id AND  BonReceptions.entrepot_id = " +
+            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND  bonreceptions.entrepot_id = " +
               GET("id") +
-              " AND Articles.id_article = " +
+              " AND articles.id_article = " +
               document.getElementById("article").value +
-              ' AND BonReceptions.date_reception = "' +
+              ' AND bonreceptions.date_reception = "' +
               date +
               '"',
 
@@ -4887,7 +4906,7 @@ const filtre_moov = () => {
             BR.map((e) => {
               sequelize
                 .query(
-                  "SELECT * FROM BomCommandes , Fournisseur WHERE  BomCommandes.fournisseur_id = Fournisseur.id_fournisseur AND id_boncmd = " +
+                  "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
                     e.boncmd_id,
                   {
                     type: sequelize.QueryTypes.SELECT,
@@ -4933,13 +4952,13 @@ const filtre_moov = () => {
       } else {
         sequelize
           .query(
-            "SELECT * FROM  `BonReceptions`, `BonReception_Article` , `Articles` , `Conditionnements` WHERE  BonReceptions.id_bonreception = BonReception_Article.bonreception_id  AND Conditionnements.id_condmnt = BonReception_Article.conditionnement_id  AND Articles.id_article = BonReception_Article.article_id AND  BonReceptions.entrepot_id = " +
+            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND  bonreceptions.entrepot_id = " +
               GET("id") +
-              " AND Articles.id_article = " +
+              " AND articles.id_article = " +
               document.getElementById("article").value +
-              " AND Conditionnements.id_condmnt = " +
+              " AND conditionnements.id_condmnt = " +
               document.getElementById("cdnmnt").value +
-              ' AND BonReceptions.date_reception = "' +
+              ' AND bonreceptions.date_reception = "' +
               date +
               '"',
 
@@ -4953,7 +4972,7 @@ const filtre_moov = () => {
             BR.map((e) => {
               sequelize
                 .query(
-                  "SELECT * FROM BomCommandes , Fournisseur WHERE  BomCommandes.fournisseur_id = Fournisseur.id_fournisseur AND id_boncmd = " +
+                  "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
                     e.boncmd_id,
                   {
                     type: sequelize.QueryTypes.SELECT,
@@ -5006,11 +5025,11 @@ const filtre_moov = () => {
       if (document.getElementById("cdnmnt").value == "null") {
         sequelize
           .query(
-            "SELECT * FROM  `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` WHERE  BonSortie.id_bonsortie= BonSortie_Article.bonsortie_id  AND Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id  AND Articles.id_article = BonSortie_Article.article_id  AND BonSortie.provenance = " +
+            "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id  AND bonsortie.provenance = " +
               GET("id") +
-              " AND Articles.id_article = " +
+              " AND articles.id_article = " +
               document.getElementById("article").value +
-              ' AND BonSortie.date_bonsortie = "' +
+              ' AND bonsortie.date_bonsortie = "' +
               date +
               '"',
 
@@ -5049,7 +5068,7 @@ const filtre_moov = () => {
 
                   sequelize
                     .query(
-                      "SELECT * FROM Clients WHERE  id_client = " + e.client_id,
+                      "SELECT * FROM clients WHERE  id_client = " + e.client_id,
                       {
                         type: sequelize.QueryTypes.SELECT,
                       }
@@ -5086,7 +5105,7 @@ const filtre_moov = () => {
                 } else {
                   sequelize
                     .query(
-                      "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                      "SELECT * FROM entrepots WHERE  id_entrepot = " +
                         e.destination,
                       {
                         type: sequelize.QueryTypes.SELECT,
@@ -5127,20 +5146,20 @@ const filtre_moov = () => {
           })
           .catch((error) => {
             console.error(
-              "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+              "Failed to retrieve `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` data : ",
               error
             );
           });
       } else {
         sequelize
           .query(
-            "SELECT * FROM  `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` WHERE  BonSortie.id_bonsortie= BonSortie_Article.bonsortie_id  AND Conditionnements.id_condmnt = BonSortie_Article.conditionnement_id  AND Articles.id_article = BonSortie_Article.article_id  AND BonSortie.provenance = " +
+            "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id  AND bonsortie.provenance = " +
               GET("id") +
-              " AND Articles.id_article = " +
+              " AND articles.id_article = " +
               document.getElementById("article").value +
-              " AND Conditionnements.id_condmnt = " +
+              " AND conditionnements.id_condmnt = " +
               document.getElementById("cdnmnt").value +
-              ' AND BonSortie.date_bonsortie = "' +
+              ' AND bonsortie.date_bonsortie = "' +
               date +
               '"',
 
@@ -5179,7 +5198,7 @@ const filtre_moov = () => {
 
                   sequelize
                     .query(
-                      "SELECT * FROM Clients WHERE  id_client = " + e.client_id,
+                      "SELECT * FROM clients WHERE  id_client = " + e.client_id,
                       {
                         type: sequelize.QueryTypes.SELECT,
                       }
@@ -5216,7 +5235,7 @@ const filtre_moov = () => {
                 } else {
                   sequelize
                     .query(
-                      "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                      "SELECT * FROM entrepots WHERE  id_entrepot = " +
                         e.destination,
                       {
                         type: sequelize.QueryTypes.SELECT,
@@ -7279,10 +7298,14 @@ const generateBilPDFFile = (id_facture, data) => {
   // First Table (Bill Head)
   doc.autoTable({
     body: [
-      ["COMMERCE GENERAL", "Date Facture : "],
+      ["COMMERCE GENERAL", "", "Date Facture : "],
       [
         "Facture N°" + id_facture,
-        +day +
+        {
+          content: "F",
+          styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
+        },
+        day +
           "/" +
           month +
           "/" +
@@ -7294,7 +7317,7 @@ const generateBilPDFFile = (id_facture, data) => {
           ":" +
           seconds,
       ],
-      ["CLIENT : " + data.customer_name, "Magasin : Boutique"],
+      ["CLIENT : " + data.customer_name, "", "Magasin : Boutique"],
     ],
     startY: 30,
     styles: {
@@ -7461,10 +7484,14 @@ const generateBonSortiePDFFile = (id_bonsortie, data) => {
   // First Table (Bill Head)
   doc.autoTable({
     body: [
-      ["COMMERCE GENERAL", "Date Bon Sortie : "],
+      ["COMMERCE GENERAL", "", "Date Bon Sortie : "],
       [
         "Bon De Sortie N°" + id_bonsortie,
-        +day +
+        {
+          content: "BS",
+          styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
+        },
+        day +
           "/" +
           month +
           "/" +
@@ -7478,6 +7505,7 @@ const generateBonSortiePDFFile = (id_bonsortie, data) => {
       ],
       [
         "Provenance : " + data.bonsortie_provenance,
+        "",
         "Destination : " + data.bonsortie_destination,
       ],
     ],
@@ -7645,10 +7673,14 @@ const generateBonCommandePDFFile = (id_boncommande, data) => {
   // First Table (Bill Head)
   doc.autoTable({
     body: [
-      ["COMMERCE GENERAL", "Date Bon Commande : "],
+      ["COMMERCE GENERAL", "", "Date Bon Commande : "],
       [
         "Bon De Commande N°" + id_boncommande,
-        +day +
+        {
+          content: "BC",
+          styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
+        },
+        day +
           "/" +
           month +
           "/" +
@@ -7660,7 +7692,7 @@ const generateBonCommandePDFFile = (id_boncommande, data) => {
           ":" +
           seconds,
       ],
-      ["Fournisseur : " + data.fournisseur, ""],
+      ["Fournisseur : " + data.fournisseur, "", ""],
     ],
     startY: 30,
     styles: {
@@ -7824,9 +7856,13 @@ const generateReceiptPDFFile = (
   // First Table (Receipt Head)
   doc.autoTable({
     body: [
-      ["COMMERCE GENERAL", "Date et Heure Tirage : "],
+      ["COMMERCE GENERAL", "", "Date et Heure Tirage : "],
       [
         "Reçu De Versement",
+        {
+          content: "R",
+          styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
+        },
         day +
           "/" +
           month +
@@ -7839,7 +7875,7 @@ const generateReceiptPDFFile = (
           ":" +
           seconds,
       ],
-      ["CLIENT : " + customer_name, "Magasin : Boutique"],
+      ["CLIENT : " + customer_name, "", "Magasin : Boutique"],
     ],
     startY: 30,
     styles: {
@@ -8068,7 +8104,7 @@ const getBillPdfFileToPrint = (id_facture) => {
 
 const findBonSortiePdfToPrint = (id_bonsortie) => {
   sequelize
-    .query("SELECT * FROM BonSortie WHERE id_bonsortie = ?", {
+    .query("SELECT * FROM bonsortie WHERE id_bonsortie = ?", {
       replacements: [id_bonsortie],
       type: sequelize.QueryTypes.SELECT,
     })
@@ -8077,7 +8113,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
 
       sequelize
         .query(
-          "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+          "SELECT * FROM entrepots WHERE  id_entrepot = " +
             bonsortie_query[0].provenance,
           {
             type: sequelize.QueryTypes.SELECT,
@@ -8087,7 +8123,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
           if (bonsortie_query[0].destination != null) {
             sequelize
               .query(
-                "SELECT * FROM Entrepots WHERE  id_entrepot = " +
+                "SELECT * FROM entrepots WHERE  id_entrepot = " +
                   bonsortie_query[0].destination,
                 {
                   type: sequelize.QueryTypes.SELECT,
@@ -8104,7 +8140,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
 
                 sequelize
                   .query(
-                    "SELECT * FROM Bonsortie_Article, Articles, Conditionnements WHERE Bonsortie_Article.bonsortie_id = :id_bonsortie AND  Articles.id_article = Bonsortie_Article.article_id AND Conditionnements.id_condmnt = Bonsortie_Article.conditionnement_id",
+                    "SELECT * FROM bonsortie_article, articles, conditionnements WHERE bonsortie_article.bonsortie_id = :id_bonsortie AND  articles.id_article = bonsortie_article.article_id AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id",
                     {
                       replacements: {
                         id_bonsortie: id_bonsortie,
@@ -8152,7 +8188,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
               };
               sequelize
                 .query(
-                  "SELECT * FROM Bonsortie_Article, Articles, Conditionnements WHERE Bonsortie_Article.bonsortie_id = :id_bonsortie AND  Articles.id_article = Bonsortie_Article.article_id AND Conditionnements.id_condmnt = Bonsortie_Article.conditionnement_id",
+                  "SELECT * FROM bonsortie_article, articles, conditionnements WHERE bonsortie_article.bonsortie_id = :id_bonsortie AND  articles.id_article = bonsortie_article.article_id AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id",
                   {
                     replacements: {
                       id_bonsortie: id_bonsortie,
@@ -8202,7 +8238,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
 
                   sequelize
                     .query(
-                      "SELECT * FROM Bonsortie_Article, Articles, Conditionnements WHERE Bonsortie_Article.bonsortie_id = :id_bonsortie AND  Articles.id_article = Bonsortie_Article.article_id AND Conditionnements.id_condmnt = Bonsortie_Article.conditionnement_id",
+                      "SELECT * FROM bonsortie_article, articles, conditionnements WHERE bonsortie_article.bonsortie_id = :id_bonsortie AND  articles.id_article = bonsortie_article.article_id AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id",
                       {
                         replacements: {
                           id_bonsortie: id_bonsortie,
@@ -8260,7 +8296,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
 const findBonCommandePdfToPrint = (id_boncommande) => {
   sequelize
     .query(
-      "SELECT * FROM BomCommandes, Fournisseur WHERE BomCommandes.id_boncmd = ? AND Fournisseur.id_fournisseur=BomCommandes.fournisseur_id",
+      "SELECT * FROM bomcommandes, fournisseur WHERE bomcommandes.id_boncmd = ? AND fournisseur.id_fournisseur=bomcommandes.fournisseur_id",
       {
         replacements: [id_boncommande],
         type: sequelize.QueryTypes.SELECT,
@@ -8279,7 +8315,7 @@ const findBonCommandePdfToPrint = (id_boncommande) => {
 
       sequelize
         .query(
-          "SELECT * FROM Boncmd_Article, Articles, Conditionnements WHERE Boncmd_Article.boncmd_id = :id_boncommande AND  Articles.id_article = Boncmd_Article.article_id AND Conditionnements.id_condmnt = Boncmd_Article.conditionnement_id",
+          "SELECT * FROM boncmd_article, articles, conditionnements WHERE boncmd_article.boncmd_id = :id_boncommande AND  articles.id_article = boncmd_article.article_id AND conditionnements.id_condmnt = boncmd_article.conditionnement_id",
           {
             replacements: {
               id_boncommande: id_boncommande,
