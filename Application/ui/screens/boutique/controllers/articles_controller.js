@@ -140,3 +140,53 @@ function addConditionment(conditionment) {
 function delete_article_from_database(article_id) {
   window.electron.delete_article(article_id);
 }
+
+function filtrer() {
+
+  //alert(document.getElementById("select_f").options[document.getElementById("select_f").options.selectedIndex].value)
+  var filtre, tableau, ligne, cellule, i, texte;
+
+  filtre = document.getElementById("maRecherche").value.toUpperCase();
+  tableau = document.getElementById("tableau-article");
+  ligne = tableau.getElementsByTagName("tr");
+  //alert(ligne.length)
+  for (i = 1; i < ligne.length; i++) {
+        let t = false;
+        for (j = 0; j <= 4; j++) {
+
+              if (j == 1 || j == 2 ) {
+                    cellule = ligne[i].getElementsByTagName("td")[j];
+
+
+                    if (cellule) {
+                          texte = cellule.innerText.toLocaleString();
+                          //alert(texte)
+                          if (texte.toUpperCase().indexOf(filtre) > -1) {
+                                ligne[i].style.display = "";
+                                t = true;
+                          }
+
+                    }
+              }
+
+
+        }
+        if (!t) {
+              ligne[i].style.display = "none";
+
+        }
+
+
+  }
+
+}
+
+
+var js_ = document.createElement("script");
+js_.type = "text/javascript";
+js_.src = "../../vendors/select2/select2.min.js";
+document.body.appendChild(js_);
+var js = document.createElement("script");
+js.type = "text/javascript";
+js.src = "../../js/select2.js";
+document.body.appendChild(js);

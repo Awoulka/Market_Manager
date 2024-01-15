@@ -59,7 +59,7 @@
           <li class="nav-item">
             <form class="search-form" action="#">
               <i class="icon-search"></i>
-              <input type="search" class="form-control" placeholder="Search Here" title="Search here">
+              <input type="search" class="form-control" placeholder="Search Here" title="Search here" id="maRecherche" onkeyup="filtrer()">
             </form>
           </li>
 
@@ -102,7 +102,7 @@
             </a>
           </li>
 
-          <li class="nav-item nav-category">Vendeur</li>
+          <!-- <li class="nav-item nav-category">Vendeur</li>
           <li class="nav-item">
             <a class="nav-link" href="../vendeur/vendeur.html">
               <i class="mdi mdi-grid-large menu-icon"></i>
@@ -120,16 +120,16 @@
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Comptes Client</span>
               <i class="menu-arrow"></i>
-            </a>
+            </a> -->
             <div class="collapse" id="clients">
-              <ul class="nav flex-column sub-menu">
+              <!-- <ul class="nav flex-column sub-menu">
                 <li class="nav-item">
                   <a class="nav-link" href="../vendeur/compte_client.html">Nouveau Client</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="../vendeur/compte_client.html#ClientsList">Liste des Clients</a>
                 </li>
-              </ul>
+              </ul> -->
             </div>
           </li>
           <div id="admin_space">
@@ -140,7 +140,7 @@
                 <span class="menu-title">Nouvel Article</span>
               </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="../boutique/new_articles.html#Articles">
                 <i class="mdi mdi-grid-large menu-icon"></i>
                 <span class="menu-title">Stock Boutique</span>
@@ -152,16 +152,16 @@
                 <i class="mdi mdi-grid-large menu-icon"></i>
                 <span class="menu-title">Reception Boutique</span>
                 <i class="menu-arrow"></i>
-              </a>
+              </a> -->
               <div class="collapse" id="arrivee">
-                <ul class="nav flex-column sub-menu">
+                <!-- <ul class="nav flex-column sub-menu">
                   <li class="nav-item">
                     <a class="nav-link" href="../boutique/arrivee.html">Arrivée</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="../boutique/arrivee.html#ClientsList">Liste des Arrivées</a>
                   </li>
-                </ul>
+                </ul> -->
               </div>
             </li>
             <li class="nav-item nav-category">Entrepôt</li>
@@ -339,7 +339,7 @@
                                   <div class="col-sm-9">
                                     <input type="text" name="cli_lname" class="form-control" id="date_sortie_a"
                                       disabled="true" />
-                                    <input type="datetime-local" name="cli_lname" id="date_sortie"
+                                    <input type="datetime-local" name="cli_lname" id="date_sortie" hidden
                                       class="form-control" />
                                   </div>
                                 </div>
@@ -387,7 +387,7 @@
                               <div class="col">
                                 <div class="form-group row">
                                   <div class="table-responsive">
-                                    <table id="myTable_m" class="" hidden>
+                                    <table id="myTable_m" class="" hidden >
                                       <tr>
                                         <th>Produits</th>
                                         <th>stock</th>

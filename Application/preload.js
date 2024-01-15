@@ -61,6 +61,10 @@ const { Sequelize, DataTypes, QueryTypes } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 const { execPath } = require("process");
+const { type } = require("os");
+const { request, get } = require("http");
+const { applyPlugin } = require("jspdf-autotable");
+const { table } = require("console");
 // const { dialog } = require('electron').remote
 
 const sequelize = new Sequelize("Market_Manager_DB", "root", null, {
@@ -295,6 +299,7 @@ const chargement_articles_BC = (a) => {
 //***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de commande  à la selection de l'article***\\
 
 const chargement_cdmnt_BC = (id, indice) => {
+
   connection = db_connect();
 
   $query =
@@ -319,6 +324,7 @@ const chargement_cdmnt_BC = (id, indice) => {
           "</option>";
       })
       .join();
+
 
     document.getElementById("cdmnt" + indice).innerHTML = c;
 
@@ -393,39 +399,35 @@ const insertion_bon_cmd = (n, c) => {
   sequelize
     .query(
       'INSERT INTO bomcommandes (date_boncmd,fournisseur_id,montant_boncmd,solde_boncmd,montant_regler,status) VALUES ("' +
-        document.getElementById("date").value +
-        '",' +
-        document.getElementById("fseur").value +
-        "," +
-        document.getElementById("montant_total").value +
-        "," +
-        document.getElementById("montant_total").value +
-        "," +
-        0 +
-        "," +
-        0 +
-        ")"
+      document.getElementById("date").value +
+      '",' +
+      document.getElementById("fseur").value +
+      "," +
+      document.getElementById("montant_total").value +
+      "," +
+      document.getElementById("montant_total").value +
+      "," +
+      0 +
+      "," +
+      0 +
+      ")"
     )
     .then((BC) => {
-      alert(
-        "Commande enregistrée avec success vous le retrouverez dans la liste des Bon de Commandes ci dessous ."
-      );
-
       for (var i = 1; i <= n; i++) {
         if (document.getElementById("montant" + i).value != 0) {
           sequelize
             .query(
               'INSERT INTO boncmd_article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
-                BC[0] +
-                '","' +
-                document.getElementById("article" + i).value +
-                '","' +
-                document.getElementById("qte" + i).value +
-                '","' +
-                document.getElementById("pu" + i).value +
-                '",' +
-                document.getElementById("cdmnt" + i).value +
-                ")"
+              BC[0] +
+              '","' +
+              document.getElementById("article" + i).value +
+              '","' +
+              document.getElementById("qte" + i).value +
+              '","' +
+              document.getElementById("pu" + i).value +
+              '",' +
+              document.getElementById("cdmnt" + i).value +
+              ")"
             )
             .then((art_bc) => {
               compteur++;
@@ -476,40 +478,82 @@ const update_bon_cmd = (id, n, c) => {
         .catch((error) => {
           console.error("Failed to DELETE boncmd_article data : ", error);
         });
-      compteur = 0;
+
+      //compteur = 0;
+      // for (var i = 1; i <= n; i++) {
+      //   if (document.getElementById("montant" + i).value != 0) {
+      //     //alert("article : "+ document.getElementById("article"+i).value+" , "+"conditionment : "+ document.getElementById("cdmnt"+i).value +" , "+"prix : "+ document.getElementById("pu"+i).value+" , "+"quantité : "+ document.getElementById("qte"+i).value )
+
+      //     sequelize
+      //       .query(
+      //         'INSERT INTO boncmd_article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
+      //         id +
+      //         '","' +
+      //         document.getElementById("article" + i).value +
+      //         '","' +
+      //         document.getElementById("qte" + i).value +
+      //         '","' +
+      //         document.getElementById("pu" + i).value +
+      //         '",' +
+      //         document.getElementById("cdmnt" + i).value +
+      //         ")"
+      //       )
+      //       .then((art_bc) => {
+      //         compteur++;
+      //         //alert(compteur+"-"+c)
+      //         if (compteur == c) {
+      //           //alert("Commande enregistrée avec success.");
+      //           //window.location.replace("voir-boncmd.html?id=" + id);
+      //           document.getElementById("message").innerHTML ="<p style='{font-color : green}'>Modification enregistrer avec success !!!</p>" 
+      //         //console.log('aaaaaaaaaaa')
+      //         }
+      //       })
+      //       .catch((error) => {
+      //         console.error("Failed to insert BonCmd_Article data : ", error);
+      //       });
+      //   }
+      // }
+
+      //a = "INSERT INTO articles (id_article, libele_article, description) VALUES (60, 'huile diamaor', ''),(61, 'Sucre', '')"
+      b = 'INSERT INTO boncmd_article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES'
       for (var i = 1; i <= n; i++) {
         if (document.getElementById("montant" + i).value != 0) {
           //alert("article : "+ document.getElementById("article"+i).value+" , "+"conditionment : "+ document.getElementById("cdmnt"+i).value +" , "+"prix : "+ document.getElementById("pu"+i).value+" , "+"quantité : "+ document.getElementById("qte"+i).value )
+          if (i != n) {
+            b += ' (' + id + "," +
+              document.getElementById("article" + i).value +
+              "," + document.getElementById("qte" + i).value +
+              "," +
+              document.getElementById("pu" + i).value +
+              ',' +
+              document.getElementById("cdmnt" + i).value +
+              ") ,"
+          } else {
+            b += ' (' + id + "," +
+              document.getElementById("article" + i).value +
+              "," + document.getElementById("qte" + i).value +
+              "," +
+              document.getElementById("pu" + i).value +
+              ',' +
+              document.getElementById("cdmnt" + i).value +
+              ") ;"
+          }
 
-          sequelize
-            .query(
-              'INSERT INTO boncmd_article (boncmd_id,article_id,qteCmd,PU,conditionnement_id) VALUES ("' +
-                id +
-                '","' +
-                document.getElementById("article" + i).value +
-                '","' +
-                document.getElementById("qte" + i).value +
-                '","' +
-                document.getElementById("pu" + i).value +
-                '",' +
-                document.getElementById("cdmnt" + i).value +
-                ")"
-            )
-            .then((art_bc) => {
-              compteur++;
-              //alert(compteur+"-"+c)
-              if (compteur == c) {
-                alert("Commande enregistrée avec success.");
-                window.location.replace("voir-boncmd.html?id=" + id);
-              }
-            })
-            .catch((error) => {
-              console.error("Failed to insert BonCmd_Article data : ", error);
-            });
+
         }
       }
+      //alert(b)
+      sequelize
+        .query(b)
+        .then((art_bc) => {
+          //alert("Commande enregistrée avec success.");
+          //window.location.replace("voir-boncmd.html?id=" + id);
+          document.getElementById("message").innerHTML = "<p style='{font-color : green}'>Modification enregistrer avec success !!!</p>"
 
-      //setTimeout(,10000)
+        })
+        .catch((error) => {
+          console.error("Failed to insert BonCmd_Article data : ", error);
+        });
     })
     .catch((error) => {
       console.error("Failed to UPDATE bomcommandes data : ", error);
@@ -533,41 +577,43 @@ const delete_bon_cmd = (id) => {
 //***** Fonction de chargement des bons de commandes ***\\
 
 const afiche_BC = () => {
+
   let c = "";
 
   sequelize
-    .query("SELECT * FROM `bomcommandes` ")
+    .query("SELECT * FROM bomcommandes,fournisseur  WHERE bomcommandes.fournisseur_id = fournisseur.id_fournisseur ORDER BY  `date_boncmd` DESC")
     .then((BC) => {
-      //console.log(BC[0][1])
+      //console.log("zezeze"+BC[0])
       BC[0].map((elem) => {
-        sequelize
-          .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
-            replacements: [elem.fournisseur_id],
-            type: sequelize.QueryTypes.SELECT,
-          })
-          .then((fseur) => {
-            document.getElementById("tab-boncmd").innerHTML +=
-              "<tr>" +
-              '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
-              fseur[0].nom_fournisseur +
-              "</td><td>" +
-              elem.date_boncmd +
-              "</td><td>" +
-              elem.montant_boncmd +
-              "</td>" +
-              '<td><div class="btn-wrapper"><a href="voir-boncmd.html?id=' +
-              elem.id_boncmd +
-              '" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonCommandePdfToPrint(' +
-              elem.id_boncmd +
-              ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick=delete_bon(' +
-              elem.id_boncmd +
-              ") id=" +
-              elem.id_boncmd +
-              '"  class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td></tr>';
-          })
-          .catch((error) => {
-            console.error("Failed to retrieve fournisseur data : ", error);
-          });
+        //console.log(elem.nom_fournisseur)
+        // sequelize
+        //   .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
+        //     replacements: [elem.fournisseur_id],
+        //     type: sequelize.QueryTypes.SELECT,
+        //   })
+        // .then((fseur) => {
+        document.getElementById("tab-boncmd").innerHTML +=
+          "<tr>" +
+          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+          elem.nom_fournisseur +
+          "</td><td>" +
+          elem.date_boncmd +
+          "</td><td>" +
+          elem.montant_boncmd +
+          "</td>" +
+          '<td><div class="btn-wrapper"><a href="voir-boncmd.html?id=' +
+          elem.id_boncmd +
+          '" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonCommandePdfToPrint(' +
+          elem.id_boncmd +
+          ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick=delete_bon(' +
+          elem.id_boncmd +
+          ") id=" +
+          elem.id_boncmd +
+          '"  class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td></tr>';
+        // })
+        // .catch((error) => {
+        //   console.error("Failed to retrieve fournisseur data : ", error);
+        // });
       });
     })
     .catch((error) => {
@@ -604,7 +650,7 @@ const afiche_detaille_BC = (id) => {
       sequelize
         .query(
           "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
-            id,
+          id,
           {
             replacements: [],
             type: sequelize.QueryTypes.SELECT,
@@ -623,25 +669,15 @@ const afiche_detaille_BC = (id) => {
             var cell2 = row.insertCell(1);
             var cell3 = row.insertCell(2);
             var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
 
-            cell1.innerHTML =
-              '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
-              elem.libele_article +
-              '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
-              elem.abreviation_condmnt +
-              '" disabled></div></div>';
-            cell2.innerHTML =
-              '<input type="text" readonly class="form-control" require id="qte" value="' +
-              elem.qteCmd +
-              '">';
-            cell3.innerHTML =
-              '<input type="text" readonly class="form-control" require id="pu" value="' +
-              elem.PU +
-              '">';
-            cell4.innerHTML =
-              '<input type="text" readonly class="form-control" require value="' +
-              elem.qteCmd * elem.PU +
-              '">';
+            cell1.innerHTML = elem.libele_article
+
+            cell2.innerHTML = elem.abreviation_condmnt
+            cell3.innerHTML = elem.qteCmd
+
+            cell4.innerHTML = elem.PU
+            cell5.innerHTML = elem.qteCmd * elem.PU
 
             n++;
             t += elem.qteCmd * elem.PU;
@@ -673,7 +709,7 @@ const modif_BC = (id) => {
       sequelize
         .query(
           "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
-            id
+          id
         )
         .then((BC) => {
           console.log(BC[0][0].id_fournisseur);
@@ -729,7 +765,7 @@ const modif_BC = (id) => {
   sequelize
     .query(
       "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
-        id,
+      id,
       {
         replacements: [],
         type: sequelize.QueryTypes.SELECT,
@@ -740,15 +776,16 @@ const modif_BC = (id) => {
 
       n = 0;
       t = 0;
-      artcl.map((elem) => {
-        sequelize.query("SELECT * FROM `articles` ").then((a) => {
-          //alert(c+"aaaaa")
-          sequelize
-            .query(
-              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-                elem.article_id
-            )
-            .then((cnd) => {
+      sequelize.query("SELECT * FROM `articles` ").then((a) => {
+        sequelize
+          .query(
+            "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id "
+          )
+          .then((cnd) => {
+            artcl.map((elem) => {
+
+              //alert(c+"aaaaa")
+
               c = "";
 
               n++;
@@ -769,6 +806,7 @@ const modif_BC = (id) => {
                     '" selected="true">' +
                     e.libele_article +
                     "</option>";
+                  aaa = e.libele_article
                 } else {
                   c +=
                     '<option value="' +
@@ -805,7 +843,7 @@ const modif_BC = (id) => {
               //alert(c+"eeeeee")
 
               cell1.innerHTML =
-                '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
+                '<div class="row"><div class="col-md-8" ><input type"texte" id="a' + n + '" value="' + aaa + '" hidden ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
                 n +
                 '">' +
                 c +
@@ -817,13 +855,13 @@ const modif_BC = (id) => {
               cell2.innerHTML =
                 '<input type="number" min="0" class="form-control" require id="qte' +
                 n +
-                '" onchange=Montant(this) value=' +
+                '" onchange=Montant(this,"qt") value=' +
                 elem.qteCmd +
                 ">";
               cell3.innerHTML =
                 '<input type="number" min="0" class="form-control" require id="pu' +
                 n +
-                '" onchange=Montant(this) value=' +
+                '" onchange=Montant(this,"pu") value=' +
                 elem.PU +
                 ">";
               cell4.innerHTML =
@@ -837,24 +875,27 @@ const modif_BC = (id) => {
                 n +
                 '"></i>';
 
-              var js_ = document.createElement("script");
-              js_.type = "text/javascript";
-              js_.src = "../../vendors/select2/select2.min.js";
-              document.body.appendChild(js_);
-              var js = document.createElement("script");
-              js.type = "text/javascript";
-              js.src = "../../js/select2.js";
-              document.body.appendChild(js);
+
 
               t += elem.qteCmd * elem.PU;
-            })
-            .catch((error) => {
-              console.error(
-                "Failed to retrieve BomCommandes Article conditionments data : ",
-                error
-              );
+
+
             });
-        });
+            var js_ = document.createElement("script");
+            js_.type = "text/javascript";
+            js_.src = "../../vendors/select2/select2.min.js";
+            document.body.appendChild(js_);
+            var js = document.createElement("script");
+            js.type = "text/javascript";
+            js.src = "../../js/select2.js";
+            document.body.appendChild(js);
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to retrieve BomCommandes Article conditionments data : ",
+              error
+            );
+          });
       });
 
       document.getElementById("montant_total").value = artcl[0].montant_boncmd;
@@ -898,12 +939,12 @@ const insertion_entrepot = () => {
   sequelize
     .query(
       'INSERT INTO entrepots (libele_entrepot,localisation_entrepot,magazinier) VALUES ("' +
-        document.getElementById("nom").value +
-        '","' +
-        document.getElementById("loc").value +
-        '",' +
-        document.getElementById("mag").value +
-        ")"
+      document.getElementById("nom").value +
+      '","' +
+      document.getElementById("loc").value +
+      '",' +
+      document.getElementById("mag").value +
+      ")"
     )
     .then((entpr) => {
       sequelize
@@ -915,7 +956,7 @@ const insertion_entrepot = () => {
             sequelize
               .query(
                 "SELECT * FROM articles_condmnt  WHERE article_id = " +
-                  elem.id_article,
+                elem.id_article,
                 {
                   type: sequelize.QueryTypes.SELECT,
                 }
@@ -928,20 +969,22 @@ const insertion_entrepot = () => {
                   sequelize
                     .query(
                       "INSERT INTO entrepot_article (entrepot_id,article_id,condmnt_id,stock) VALUES (" +
-                        entpr[0] +
-                        "," +
-                        elem.id_article +
-                        "," +
-                        ele.condmnt_id +
-                        "," +
-                        0 +
-                        ")",
+                      entpr[0] +
+                      "," +
+                      elem.id_article +
+                      "," +
+                      ele.condmnt_id +
+                      "," +
+                      0 +
+                      ")",
 
                       {
                         type: sequelize.QueryTypes.INSERT,
                       }
                     )
-                    .then((ins) => {})
+                    .then((ins) => {
+                      console.log("zzezezzeezezezez")
+                    })
                     .catch((error) => {
                       console.error(
                         "Failed to insert in Entrepot_Article data : ",
@@ -1195,9 +1238,9 @@ const detail_entrepot_mvnt = (param) => {
     sequelize
       .query(
         "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
-          GET("id_e") +
-          " AND articles.id_article = " +
-          GET("id_a"),
+        GET("id_e") +
+        " AND articles.id_article = " +
+        GET("id_a"),
 
         {
           type: sequelize.QueryTypes.SELECT,
@@ -1211,7 +1254,7 @@ const detail_entrepot_mvnt = (param) => {
           '"" ' +
           a[0].libele_article +
           ' ""' +
-          "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link active' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul> <h4 class='card-title'>Quantité en stock par conditionnement </h4>";
+          "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link active' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('INV')>Inventaires</button></li></ul> <h4 class='card-title'>Quantité en stock par conditionnement </h4>";
 
         S += '<table class="table table-striped" style="width: 50%"><thead>';
         S +=
@@ -1252,11 +1295,11 @@ const detail_entrepot_mvnt = (param) => {
   if (param == "E") {
     sequelize
       .query(
-        "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND articles.id_article = " +
-          GET("id_a") +
-          " AND bonreceptions.entrepot_id = " +
-          GET("id_e") +
-          " ORDER BY bonreceptions.date_reception ASC",
+        "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+        GET("id_a") +
+        " AND bonreceptions.entrepot_id = " +
+        GET("id_e") +
+        " ORDER BY bonreceptions.date_reception DESC",
 
         {
           type: sequelize.QueryTypes.SELECT,
@@ -1271,11 +1314,11 @@ const detail_entrepot_mvnt = (param) => {
           '"" ' +
           a +
           ' ""' +
-          "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul>  <h4 class='card-title'>Liste des Entrées en stock</h4>";
+          "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('INV')>Inventaires</button></li></ul>  <h4 class='card-title'>Liste des Entrées en stock</h4>";
 
         //let E = " <div class='card'><div class='card-header'><h4>Etats des Mouvements "+'"" '+BR[0].libele_article+' ""'+"</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link active' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul> <h4 class='card-title'>Liste des Entrées en stock</h4>"
 
-        E += '<table class="table table-striped" style=""><thead>';
+        E += '<table class="table table-striped" style="" id="tab_E"><thead>';
         E +=
           '<tr><th>.</th><th style="">Date</th><th style="">Article</th><th style="">Conditionnement</th><th style="width: 10%">Quantité Reçue</th><th style="">Provenance</th></tr>';
         E += '</thead><tbody id="tab">';
@@ -1283,42 +1326,46 @@ const detail_entrepot_mvnt = (param) => {
         document.getElementById("etats_ech").innerHTML = E;
 
         BR.map((e) => {
-          sequelize
-            .query(
-              "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
-                e.boncmd_id,
-              {
-                type: sequelize.QueryTypes.SELECT,
-              }
-            )
-            .then((BC) => {
-              //console.log(BC[0].nom_fournisseur)
 
-              E = "<tr>";
 
-              E +=
-                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-              E += '<td class="py-1">' + e.date_reception + "</td>";
-              E += '<td class="py-1">' + e.libele_article + "</td>";
-              E +=
-                "<td>" +
-                e.abreviation_condmnt +
-                '</td><td><input type="number" class="form-control"  readonly value="' +
-                e.qteReçu +
-                '"></td>';
+          // sequelize
+          //   .query(
+          //     "SELECT * FROM fournisseur WHERE  id_fournisseur = " +
+          //     e.fournisseur_id,
+          //     {
+          //       type: sequelize.QueryTypes.SELECT,
+          //     }
+          //   )
+          //   .then((BC) => {
+          //console.log(BC[0].nom_fournisseur)
 
-              E += '<td class="py-1">' + BC[0].nom_fournisseur + "</td></tr>";
+          E = "<tr>";
 
-              E += "</tr>";
+          E +=
+            '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+          E += '<td class="py-1">' + e.date_reception + "</td>";
+          E += '<td class="py-1">' + e.libele_article + "</td>";
+          E +=
+            "<td>" +
+            e.abreviation_condmnt +
+            '</td><td><input type="number" class="form-control"  readonly value="' +
+            e.qteReçu +
+            '"></td>';
 
-              document.getElementById("tab").innerHTML += E;
-            })
-            .catch((error) => {
-              console.error(
-                "Failed to retrieve Conditionnements data : ",
-                error
-              );
-            });
+          E += '<td class="py-1">' + e.nom_fournisseur + "</td></tr>";
+
+          E += "</tr>";
+
+          document.getElementById("tab").innerHTML += E;
+          // })
+          // .catch((error) => {
+          //   console.error(
+          //     "Failed to retrieve Fournisseurs data : ",
+          //     error
+          //   );
+          // });
+
+
         }).join();
       })
       .catch((error) => {
@@ -1332,10 +1379,10 @@ const detail_entrepot_mvnt = (param) => {
     sequelize
       .query(
         "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
-          GET("id_a") +
-          " AND bonsortie.provenance = " +
-          GET("id_e") +
-          " ORDER BY bonsortie.date_bonsortie ASC",
+        GET("id_a") +
+        " AND bonsortie.provenance = " +
+        GET("id_e") +
+        " ORDER BY bonsortie.date_bonsortie DESC",
 
         {
           type: sequelize.QueryTypes.SELECT,
@@ -1350,11 +1397,11 @@ const detail_entrepot_mvnt = (param) => {
           '"" ' +
           a +
           ' ""' +
-          "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link active' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul> <h4 class='card-title'>Sorties</h4>";
+          "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link active' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('INV')>Inventaires</button></li></ul> <h4 class='card-title'>Sorties</h4>";
 
         //let E = " <div class='card'><div class='card-header'><h4>Etats des Mouvements "+'"" '+BR[0].libele_article+' ""'+"</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link active' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul> <h4 class='card-title'>Liste des Entrées en stock</h4>"
 
-        SRT += '<table class="table table-striped" style=""><thead>';
+        SRT += '<table class="table table-striped" style="" id="tab_S"><thead>';
         SRT +=
           '<tr><th>.</th><th style="">Date</th><th style="">Article</th><th style="">Conditionnement</th><th style="width: 10%">Quantité Sortie</th><th style="">Destination</th></tr>';
         SRT += '</thead><tbody id="tab">';
@@ -1425,7 +1472,7 @@ const detail_entrepot_mvnt = (param) => {
               sequelize
                 .query(
                   "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                    e.destination,
+                  e.destination,
                   {
                     type: sequelize.QueryTypes.SELECT,
                   }
@@ -1482,8 +1529,506 @@ const detail_entrepot_mvnt = (param) => {
           error
         );
       });
+  } if (param == "INV") {
+
+    sequelize
+      .query(
+        "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+        GET("id_a") +
+        " AND bonsortie.provenance = " +
+        GET("id_e") +
+        " ORDER BY bonsortie.date_bonsortie DESC",
+
+        {
+          type: sequelize.QueryTypes.SELECT,
+        }
+      )
+      .then((BS) => {
+
+        sequelize
+          .query(
+            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+            GET("id_a") +
+            " AND bonreceptions.entrepot_id = " +
+            GET("id_e") +
+            " ORDER BY bonreceptions.date_reception DESC",
+
+            {
+              type: sequelize.QueryTypes.SELECT,
+            }
+          )
+          .then((BR) => {
+
+            sequelize
+              .query(
+                "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+                GET("id_a"),
+                {
+                  type: sequelize.QueryTypes.SELECT,
+                }
+              )
+              .then((art) => {
+
+                a = " ";
+                if (BS[0] != null) a = BS[0].libele_article;
+                var INV =
+                  " <div class='card'><div class='card-header'><h4>Inventaires " +
+                  '"" ' +
+                  a +
+                  ' ""' +
+                  "</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li><li class='nav-item'><button class='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('INV')>Inventaires</button></li></ul> <h4 class='card-title'>Inventaires </h4>";
+
+                //let E = " <div class='card'><div class='card-header'><h4>Etats des Mouvements "+'"" '+BR[0].libele_article+' ""'+"</h4> </div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link active' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Srocks</button></li><li class='nav-item'><button class='nav-link ' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Entrées en stock</button></li><li class='nav-item'><button class='nav-link' id='pills-profile-tab' data-toggle='pill' href='#pills-profile' role='tab' aria-controls='pills-profile' aria-selected='false' onclick=Etats_echanges('SRT')>Sorties</button></li></ul> <h4 class='card-title'>Liste des Entrées en stock</h4>"
+
+                INV += '<div class="row"><div class="col-md-6">';
+                INV +=
+                  '<div class="form-group row"><label class="col-sm-3 col-form-label">Date  </label><div class="col-sm-9">';
+                INV +=
+                  'du <input type="datetime-local" name="cli_lname" id="date" class="form-control" /> au <input type="datetime-local" name="cli_lname" id="date_f" class="form-control" /></div></div></div>';
+
+                INV +=
+                  '<div class="col-md-6"><div class="form-group row"><label class="col-sm-3 col-form-label">Conditionnement</label><div class="col-sm-9">';
+
+                INV +=
+                  '<div class="col-md-12"><div class="form-group row"><div class="col-sm-12">';
+                INV +=
+                  '<select class="js-example-basic-single w-100" id="cdnmnt"><option value="null">Choisir un conditionnement</option></select></div></div></div></div></div></div>';
+
+                INV +=
+                  '<div class="col-md-12"><button onclick="search()" style="font-size: 25px" type="submit" class="btn btn-primary text-white me-0">INVENTAIRES</button></div><div class="col-md-12"><button onclick="imprimer()" type="submit" class="btn btn-warning text-white me-2"><i class="mdi mdi-printer"></i>imprimer</button><div id="st"></div></div></div></div>';
+
+                INV += '<table class="table table-striped"  id="tab_S"><thead>';
+                INV +=
+                  '<tr><th  style="width: 10%">Date</th><th style="width: 10%">Entrées</th><th style="width: 10%">Sorties</th><th style="width: 10%">Stock</th></tr>';
+                INV += '</thead><tbody id="tab">';
+                INV += "</tbody></table></div></div>";
+                document.getElementById("etats_ech").innerHTML = INV;
+
+
+                let c = "";
+                art
+                  .map((elem) => {
+                    c +=
+                      '<option value="' +
+                      elem.id_condmnt +
+                      '">' +
+                      elem.abreviation_condmnt +
+                      "</option>";
+                  })
+                  .join();
+
+                document.getElementById("cdnmnt").innerHTML = c;
+
+
+                var js_ = document.createElement("script");
+                js_.type = "text/javascript";
+                js_.src = "../../vendors/select2/select2.min.js";
+                //document.body.removeChild(js_)
+                document.body.appendChild(js_);
+                var js = document.createElement("script");
+                js.type = "text/javascript";
+                js.src = "../../js/select2.js";
+                //document.body.removeChild(js)
+                document.body.appendChild(js);
+
+              })
+              .catch((error) => {
+                console.error(
+                  "Failed to retrieve `entrepots`, `entrepot_article` , `articles` , `conditionnements` data : ",
+                  error
+                );
+              });
+
+
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to retrieve `BR`, `BR_Article` , `Articles` , `Conditionnements` data : ",
+              error
+            );
+          });
+      })
+      .catch((error) => {
+        console.error(
+          "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+          error
+        );
+      });
+
   }
 };
+
+
+//////////////////////////// fonction pour l'état des inventaires
+const Inventaires = (id_e, id_a) => {
+  ///////////////////////////////////////////////////////:
+  date = "";
+  date_f = "";
+
+  if (document.getElementById("date").value == '' && document.getElementById("date_f").value == '') {
+    date = "";
+  } else {
+    if (document.getElementById("date_f").value != '' && document.getElementById("date").value != '') {
+      for (var i = 0; i < 10; i++) {
+        date += document.getElementById("date").value[i];
+      }
+      for (var i = 0; i < 10; i++) {
+        date_f += document.getElementById("date_f").value[i];
+      }
+      //alert(date + " " + date_f)
+    } else {
+      if (document.getElementById("date_f").value == '' && document.getElementById("date").value != '') {
+        for (var i = 0; i < 10; i++) {
+          date += document.getElementById("date").value[i];
+        }
+
+        //alert(date)
+      } else {
+        for (var i = 0; i < 10; i++) {
+          date += document.getElementById("date_f").value[i];
+        }
+
+        //alert(date)
+      }
+    }
+  }
+
+  if (document.getElementById("date").value == '' && document.getElementById("date_f").value == '') {
+
+
+    rq_e = ' ORDER BY bonreception_article.nt_r ASC'
+    rq_s = ' ORDER BY bonsortie_article.nt_s ASC'
+
+
+  } else {
+    if (document.getElementById("date_f").value != '' && document.getElementById("date").value != '') {
+
+      rq_e = ' AND bonreceptions.date_reception >= "' +
+        date + '" AND bonreceptions.date_reception <= "' +
+        date_f + '" ORDER BY bonreception_article.nt_r ASC'
+
+      rq_s = ' AND bonsortie.date_bonsortie >= "' +
+        date + '" AND bonsortie.date_bonsortie <= "' +
+        date_f + '" ORDER BY bonsortie_article.nt_s ASC'
+    } else {
+
+      rq_e = ' AND bonreceptions.date_reception = "' +
+        date + '" ORDER BY bonreception_article.nt_r ASC'
+
+      rq_s = ' AND bonsortie.date_bonsortie = "' +
+        date + '" ORDER BY bonsortie_article.nt_s ASC'
+
+    }
+
+  }
+  sequelize
+    .query(
+      "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+      id_a + " AND conditionnements.id_condmnt =" + document.getElementById("cdnmnt").value +
+      " AND bonsortie.provenance = " +
+      id_e + rq_s,
+
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((BS) => {
+
+      sequelize
+        .query(
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+          id_a + " AND conditionnements.id_condmnt =" + document.getElementById("cdnmnt").value +
+          " AND bonreceptions.entrepot_id = " +
+          id_e + rq_e,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((BR) => {
+          console.log(BS);
+          console.log(BR);
+          ent = 0
+          sort = 0
+
+          //alert(BS.length < BR.length ? BS.length : BR.length)
+          n = 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+          st = 0
+
+          BS.map((S) => {
+            if (S.nt_s < n) {
+              st = S.st_b_s
+              n = S.nt_s
+            }
+            //alert(n)
+          })
+          BR.map((R) => {
+            if (R.nt_r < n) {
+              st = R.st_b_r
+              n = R.nt_r
+            }
+
+            //alert(n)
+          })
+
+          //BS[0].nt_s < BR[0].nt_r ? BS[0].st_b_s : BR[0].st_b_r
+          INV = "<tr >";
+
+          INV +=
+            '<td class="py-1"><h4 style=" font-color : blue" ><B>Stock Initiale</B></h4></td>';
+          INV += '<td class="py-1"><h4 style=" font-color : blue" ><B>/</B></h4></td>';
+          INV += '<td class="py-1"><h4 style=" font-color : blue" ><B>/</B></h4></td>';
+          INV += '<td class="py-1"><h4 style=" font-color : blue" ><B>' + st + "</B></h4></td>";
+
+          INV += "</tr>";
+
+
+          document.getElementById("tab").innerHTML = INV;
+          taille = -10000000000000000000000000000000
+          BS.map((S) => {
+            if (taille < S.nt_s) {
+              taille = S.nt_s
+            }
+
+          })
+          BR.map((R) => {
+            if (taille < R.nt_r) {
+              taille = R.nt_r
+            }
+
+          })
+          //alert(Math.abs(taille))
+          taille = Math.abs(taille)
+          //alert(taille)
+          tab = new Array(taille).fill(0)
+
+
+          BS.map((S) => {
+            //alert(S.nt_s)
+            tab[Math.abs(S.nt_s)] = [S.date_bonsortie, -S.qteSortie]
+          })
+          BR.map((R) => {
+            //alert(R.nt_r)
+            tab[Math.abs(R.nt_r)] = [R.date_reception, R.qteReçu]
+          })
+          //alert(tab)
+          tab1 = []
+          a = 0
+
+          for (let i = 0; i < tab.length; i++) {
+            //alert(tab[i])
+            if (tab[i] != 0) {
+
+              tab1[a] = tab[i]
+              a++
+            }
+          }
+
+          if (tab1.length != 1) {
+            if (tab1[0][1] < 0) {
+              sort -= tab1[0][1]
+            } else {
+              ent += tab1[0][1]
+            }
+            st += tab1[0][1]
+          } else {
+            if (tab1[0][1] < 0) {
+              sort -= tab1[0][1]
+            } else {
+              ent += tab1[0][1]
+            }
+            st += tab1[0][1]
+
+            INV = "<tr>";
+            INV += '<td ><h4 style=" font-color : blue" ><B>' + tab1[0][0] + '</B></h4></td>';
+            INV += '<td ><h4 style=" color : blue" ><B>' + (ent != 0 ? ent : '/') + '</B></h4></td>';
+            INV += '<td ><h4 style=" color : red" ><B>' + (sort != 0 ? sort : '/') + '</B></h4></td>';
+            INV += '<td ><h4 style=" font-color : blue" ><B>' + st + '</B></h4></td>';
+            INV += "</tr>";
+            document.getElementById("tab").innerHTML += INV;
+          }
+
+          for (let i = 1; i < tab1.length; i++) {
+
+            if (tab1[i - 1][0] == tab1[i][0]) {
+              //alert(tab1[i][0])
+              if (tab1[i][1] < 0) {
+                sort -= tab1[i][1]
+                //alert(tab1[i][1])
+              } else {
+                ent += tab1[i][1]
+              }
+              st += tab1[i][1]
+            } else {
+              // alert(tab1[i][0])
+              INV = "<tr>";
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + tab1[i - 1][0] + '</B></h4></td>';
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + (ent != 0 ? ent : '/') + '</B></h4></td>';
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + (sort != 0 ? sort : '/') + '</B></h4></td>';
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + st + '</B></h4></td>';
+              INV += "</tr>";
+              document.getElementById("tab").innerHTML += INV;
+
+              ent = 0
+              sort = 0
+              if (tab1[i][1] < 0) {
+                sort -= tab1[i][1]
+              } else {
+                ent += tab1[i][1]
+              }
+              st += tab1[i][1]
+            }
+            if (i == tab1.length - 1) {
+              INV = "<tr>";
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + tab1[i][0] + '</B></h4></td>';
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + (ent != 0 ? ent : '/') + '</B></h4></td>';
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + (sort != 0 ? sort : '/') + '</B></h4></td>';
+              INV += '<td ><h4 style=" font-color : blue" ><B>' + st + '</B></h4></td>';
+              INV += "</tr>";
+              document.getElementById("tab").innerHTML += INV;
+
+
+            }
+
+
+
+          }
+          // if (BS.length != 0 && BR.length != 0) {
+
+          //   n = BS[0].nt_s < BR[0].nt_r ? BS[0].st_b_s : BR[0].st_b_r
+          //   date = BS[0].date_s <= BR[0].date_r ? BS[0].date_s : BR[0].date_r
+          //   date_p = BS[0].date_s <= BR[0].date_r ? BS[0].date_s : BR[0].date_r
+          //   m = BS.length < BR.length ? BS.length : BR.length
+          //   INV = "<tr>";
+
+          //   INV +=
+          //     '<td >Stock Initiale</i></td>';
+          //   INV += '<td >/</td>';
+          //   INV += '<td >/</td>';
+          //   INV += '<td >' + n + '</td>';
+
+          //   INV += "</tr>";
+
+
+          //   document.getElementById("tab").innerHTML = INV;
+
+          //   for (let i = 0; i < m; i++) {
+
+          //     BS.map((S) => {
+
+          //       if (S.date_s >= date) {
+          //         sort += S.qteSortie
+
+          //       }
+
+          //     })
+          //     BR.map((R) => {
+          //       if (date_p != R.date_r >= date) {
+          //         ent += R.qteReçu
+
+          //       }
+          //     })
+
+          //     INV = "<tr>";
+
+          //     INV +=
+          //       '<td >' + date + '</i></td>';
+          //     INV += '<td >' + ent + '</td>';
+          //     INV += '<td >' + sort + '</td>';
+          //     INV += '<td >' + 0 + '</td>';
+
+          //     INV += "</tr>";
+          //     document.getElementById("tab").innerHTML += INV;
+
+          //     ent = 0
+          //     sort = 0
+
+          //     // if (i != 0) {
+          //     //   //alert(BS[i].date_s <= BR[i].date_r ? BS[i].date_s : BR[i].date_r)
+          //       for (let j = i; j < m; j++) {
+          //         //alert(date_p + " " + date)
+          //         if ( (BS.length <= BR.length ? BS[j].date_s : BR[j].date_r) != date ) {
+          //            date = BS.length <= BR.length ? BS[j].date_s : BR[j].date_r
+          //            i = j
+          //           break
+          //           //alert(date)
+          //         }
+          //       }
+          //     // }
+          //     if (i != 0) {
+          //       //alert(date)
+          //       date_p = date
+          //     }
+
+
+          //   }
+
+          // } else {
+
+          // }
+
+          // BS.map((S) => {
+
+          //   if (S.nt_s = n) {
+          //     st_i = 0
+          //     n = n
+          //   }
+
+          // })
+          // BR.map((R) => {
+          //   if (R.date_reception == d) {
+          //     //alert(R.qteReçu)
+          //   }
+          // })
+
+
+
+
+
+          // for (let i = 0; i < n; i++) {
+
+
+          //   if (BS.length >= BR.length) {
+
+          //     BS.map((S) => {
+
+          //       if (S.date_bonsortie == BS[i].date_bonsortie) {
+          //         alert(S.qteSortie)
+          //       }
+
+          //     })
+          //     BR.map((R) => {
+          //       if (R.date_bonsortie == BS[i].date_bonsortie) {
+          //         alert(R.qteReçu)
+          //       }
+          //     })
+
+          //   } else {
+
+          //   }
+
+          // }
+
+
+
+
+
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve `BR`, `BR_Article` , `Articles` , `Conditionnements` data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error(
+        "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+        error
+      );
+    });
+}
 
 //***** Fonction de chargement des détaille de stock pour modification ***\\
 
@@ -1491,9 +2036,9 @@ const modif_stock = () => {
   sequelize
     .query(
       "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
-        GET("id_e") +
-        " AND articles.id_article = " +
-        GET("id_a"),
+      GET("id_e") +
+      " AND articles.id_article = " +
+      GET("id_a"),
 
       {
         type: sequelize.QueryTypes.SELECT,
@@ -1521,7 +2066,7 @@ const modif_stock = () => {
         S += "<tr>";
 
         S +=
-          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+          '<td ><i class="mdi mdi-grid-large menu-icon"></i></td>';
         S +=
           '<td><input hidden type="number" class="form-control"   id="cdmnt' +
           i +
@@ -1641,11 +2186,11 @@ const chr_qte = (id_c, id_a) => {
   sequelize
     .query(
       "SELECT * FROM entrepot_article WHERE article_id = " +
-        id_a +
-        " AND condmnt_id = " +
-        id_c.value +
-        " AND entrepot_id = " +
-        GET("id"),
+      id_a +
+      " AND condmnt_id = " +
+      id_c.value +
+      " AND entrepot_id = " +
+      GET("id"),
       {
         type: sequelize.QueryTypes.SELECT,
       }
@@ -1664,13 +2209,13 @@ const update_entrepot = (id) => {
   sequelize
     .query(
       "UPDATE entrepots SET libele_entrepot = '" +
-        document.getElementById("nom").value +
-        "', localisation_entrepot = '" +
-        document.getElementById("loc").value +
-        "', magazinier = " +
-        document.getElementById("mag").value +
-        " WHERE id_entrepot = " +
-        id
+      document.getElementById("nom").value +
+      "', localisation_entrepot = '" +
+      document.getElementById("loc").value +
+      "', magazinier = " +
+      document.getElementById("mag").value +
+      " WHERE id_entrepot = " +
+      id
     )
     .then((entpr) => {
       //detail_entrepot();
@@ -1783,7 +2328,7 @@ const chargement_entrepot_BS_modif = () => {
       sequelize
         .query(
           "SELECT * FROM `bonsortie`  WHERE bonsortie.id_bonsortie =" +
-            GET("id"),
+          GET("id"),
           {
             type: sequelize.QueryTypes.SELECT,
           }
@@ -1872,7 +2417,7 @@ const chargement_entrepot_BS_modif = () => {
       sequelize
         .query(
           "SELECT * FROM `bonsortie`  WHERE bonsortie.id_bonsortie =" +
-            GET("id"),
+          GET("id"),
           {
             type: sequelize.QueryTypes.SELECT,
           }
@@ -1902,9 +2447,9 @@ const chargement_entrepot_BS_modif = () => {
             } else {
               c +=
                 '<option value="' +
-                elem.id_entrepot +
-                '">' +
-                elem.libele_entrepot +
+                elem.id_client +
+                '" >' +
+                elem.nom_client +
                 "</option>";
 
               if (BS[0].destination === null) {
@@ -1938,7 +2483,7 @@ const chargement_entrepot_BS_modif = () => {
   sequelize
     .query(
       "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
-        GET("id"),
+      GET("id"),
       {
         replacements: [],
         type: sequelize.QueryTypes.SELECT,
@@ -1956,7 +2501,7 @@ const chargement_entrepot_BS_modif = () => {
           sequelize
             .query(
               "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-                elem.article_id
+              elem.article_id
             )
             .then((cnd) => {
               id_c = "";
@@ -1977,17 +2522,17 @@ const chargement_entrepot_BS_modif = () => {
               sequelize
                 .query(
                   "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
-                    elem.provenance +
-                    " AND articles.id_article = " +
-                    id_a +
-                    " AND conditionnements.id_condmnt = " +
-                    id_c,
+                  elem.provenance +
+                  " AND articles.id_article = " +
+                  id_a +
+                  " AND conditionnements.id_condmnt = " +
+                  id_c,
                   {
                     type: sequelize.QueryTypes.SELECT,
                   }
                 )
-                .then((art) => {
-                  c = "";
+                .then(async (art) => {
+                  let c = "";
                   let cc = "";
                   a[0].map((e) => {
                     if (e.id_article == elem.article_id) {
@@ -2000,6 +2545,8 @@ const chargement_entrepot_BS_modif = () => {
                         e.libele_article +
                         "</option>";
                       id_a = e.id_article;
+                      aaa = e.libele_article
+
                     } else {
                       c +=
                         '<option value="' +
@@ -2034,6 +2581,61 @@ const chargement_entrepot_BS_modif = () => {
                     }
                   });
 
+                  const BS = await sequelize
+                    .query(
+                      "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+                      elem.article_id +
+                      " AND bonsortie.provenance = " + art[0].entrepot_id +
+                      " AND conditionnements.id_condmnt =" + elem.conditionnement_id
+                      +
+                      " AND bonsortie_article.date_s <= '" + elem.date_s + "' "
+
+                      ,
+
+                      {
+                        type: sequelize.QueryTypes.SELECT,
+                      }
+                    )
+
+                  const BR = await sequelize
+                    .query(
+                      "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+                      elem.article_id +
+                      " AND bonreceptions.entrepot_id = " + art[0].entrepot_id
+                      + " AND conditionnements.id_condmnt =" + elem.conditionnement_id +
+                      " AND bonreceptions.date_reception <= '" + elem.date_s
+                      + "'"
+                      ,
+
+                      {
+                        type: sequelize.QueryTypes.SELECT,
+                      }
+                    )
+                  console.log(BS)
+                  console.log(BR)
+
+                  // //a++;
+                  nt = 0
+                  st = 0
+                  BS.map((S) => {
+                    if (S.nt_s > nt) {
+                      st = S.st_a_s
+                      nt = S.nt_s
+                    }
+
+                  })
+                  BR.map((R) => {
+                    if (R.nt_r > nt) {
+                      st = R.st_a_r
+                      nt = R.nt_r
+                    }
+
+                  })
+
+                  // document.getElementById("st" + n).value = st;
+                  // document.getElementById("nt" + n).value = nt;
+
+
                   n++;
 
                   var table = document.getElementById("myTable_m");
@@ -2045,7 +2647,7 @@ const chargement_entrepot_BS_modif = () => {
                   var cell4 = row.insertCell(3);
 
                   cell1.innerHTML =
-                    '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="m_article' +
+                    '<div class="row"><input type"texte" id="entrepot' + n + '" value="' + art[0].entrepot_id + '" hidden ><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="m_article' +
                     n +
                     '">' +
                     c +
@@ -2057,8 +2659,12 @@ const chargement_entrepot_BS_modif = () => {
                   cell2.innerHTML =
                     '<input type="number" min="0" class="form-control" require id="m_st' +
                     n +
-                    '" onchange=Montant(this) value=' +
-                    art[0].stock +
+                    '" value=' +
+                    elem.st_b_s +
+                    ">" + '<input type="number" min="0" class="form-control" require id="m_nt' +
+                    n +
+                    '" value=' +
+                    elem.nt_s +
                     ">";
                   cell3.innerHTML =
                     '<input type="number" min="0" class="form-control" require id="m_qte' +
@@ -2067,9 +2673,11 @@ const chargement_entrepot_BS_modif = () => {
                     elem.qteSortie +
                     ">";
                   cell4.innerHTML =
-                    '<i title="Retirer" style="font-size: 25px" class="mdi mdi-minus-circle text-danger icon-remove" onclick="RemoveRow(this)" id="m_' +
+                    '<input type="number" min="0" class="form-control" require id="entrepot' +
                     n +
-                    '"></i>';
+                    '"  value=' +
+                    art[0].entrepot_id +
+                    ">";
 
                   var table = document.getElementById("myTable");
                   var row = table.insertRow(n);
@@ -2080,7 +2688,7 @@ const chargement_entrepot_BS_modif = () => {
                   var cell4 = row.insertCell(3);
 
                   cell1.innerHTML =
-                    '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
+                    '<div class="row"><div class="col-md-8" ><input type"texte" id="a' + n + '" value="' + aaa + '" hidden ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
                     n +
                     '">' +
                     c +
@@ -2090,11 +2698,16 @@ const chargement_entrepot_BS_modif = () => {
                     cc +
                     "</select></div></div>";
                   cell2.innerHTML =
+                    '<input type="number" min="0" class="form-control" require id="nt' +
+                    n +
+                    '" readonly value=' +
+                    nt +
+                    " hidden>" +
                     '<input type="number" min="0" class="form-control" require id="st' +
                     n +
                     '" readonly value=' +
-                    art[0].stock +
-                    ">";
+                    st +
+                    " >";
                   cell3.innerHTML =
                     '<input type="number" min="0" class="form-control" require id="qte' +
                     n +
@@ -2186,199 +2799,121 @@ const chargement_articles_BS = (a) => {
 const afiche_BS = () => {
   sequelize
     .query(
-      "SELECT * FROM  `bonsortie`  ORDER BY date_bonsortie DESC",
+      "SELECT * FROM  `bonsortie`, `entrepots` WHERE bonsortie.provenance = entrepots.id_entrepot ORDER BY date_bonsortie DESC",
 
       {
         type: sequelize.QueryTypes.SELECT,
       }
     )
-    .then((BS) => {
-      console.log(BS);
-
-      BS.map((e) => {
-        //console.log(e.nom_client != )
-
-        if (e.nom_client !== null) {
+    .then(async (BS) => {
+      sequelize
+        .query(
+          "SELECT * FROM clients",
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        ).then(async (Client) => {
           sequelize
             .query(
-              "SELECT * FROM entrepots WHERE  id_entrepot = " + e.provenance,
+              "SELECT * FROM entrepots ",
               {
                 type: sequelize.QueryTypes.SELECT,
               }
-            )
-            .then((pr) => {
-              SRT = "<tr>";
+            ).then(async (des) => {
+              console.log(BS);
 
-              SRT +=
-                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-              SRT += '<td class="py-1">' + e.date_bonsortie + "</td>";
+              let SRT = "";
+              BS.map(async (item) => {
+                SRT += "<tr>";
 
-              SRT +=
-                "<td>" +
-                pr[0].libele_entrepot +
-                "</td><td>" +
-                e.nom_client +
-                "</td>";
+                SRT +=
+                  '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+                SRT += '<td class="py-1">' + item.date_bonsortie + "</td>";
 
-              SRT +=
-                '<td class="py-1"><a href="voir-bon-sortie.html?id=' +
-                e.id_bonsortie +
-                '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonSortiePdfToPrint(' +
-                e.id_bonsortie +
-                ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick=delete_bons(' +
-                e.id_bonsortie +
-                ") id=" +
-                e.id_bonsortie +
-                '"  class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td></tr>';
+                SRT += "<td>" + item.libele_entrepot + "</td>"
 
-              SRT += "</tr>";
+                if (item.nom_client !== null) {
+                  SRT += "<td>" + item.nom_client + "</td>";
+                }
+                if (item.client_id !== null) {
+                  Client.map(async (c) => {
 
-              document.getElementById("tab-bons").innerHTML += SRT;
+                    if (c.id_client == item.client_id) {
+                      SRT += "<td>" + c.nom_client + "</td>";
+                    }
+                  })
+
+
+                }
+                if (item.destination !== null) {
+                  des.map(async (d) => {
+
+                    if (d.id_entrepot == item.destination) {
+                      SRT += "<td>" + d.libele_entrepot + "</td>";
+                    }
+                  })
+
+                }
+                SRT +=
+                  '<td class="py-1"><a href="voir-bon-sortie.html?id=' +
+                  item.id_bonsortie +
+                  '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonSortiePdfToPrint(' +
+                  item.id_bonsortie +
+                  ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button>' +
+                  '</td>';
+
+                SRT += "</tr>";
+              }).join();
+
+
+              // BS.map((item) => {
+              //   // console.log(item)
+              //   SRT += "<tr>";
+
+              //   SRT +=
+              //     '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+              //   SRT += '<td class="py-1">' + item.date_bonsortie + "</td>";
+
+              //   SRT += "<td>" + item.libele_entrepot + "</td>"
+
+              //   if (item.nom_client !== null) {
+              //     SRT += "<td>" + item.nom_client + "</td>";
+              //   }
+              //   if (item.client_id !== null) {
+              //     SRT += "<td>" + item.client_id + "</td>";
+              //   }
+              //   if (item.destination !== null) {
+              //     SRT += "<td>" + item.destination + "</td>";
+              //   }
+
+              //   // SRT += "<td>" + (item.nom_client !== null) ? item.nom_client : "" + item.client_id !== null ? item.client_id : "" + item.destination !== null ? item.destination : "" + "</td>";
+              //   SRT +=
+              //     '<td class="py-1"><a href="voir-bon-sortie.html?id=' +
+              //     item.id_bonsortie +
+              //     '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonSortiePdfToPrint(' +
+              //     item.id_bonsortie +
+              //     ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button>' +
+              //     '</td>';
+
+              //   SRT += "</tr>";
+              // }).join();
+              document.getElementById("tab-bons").innerHTML = SRT;
+              //alert(SRT)
             })
             .catch((error) => {
-              console.error(
-                "Failed to retrieve Entrepots provenance data : ",
-                error
-              );
+              console.error("Failed to retrieve `BonSortie`, `Clients` data : ", error);
             });
-        } else {
-          if (e.client_id !== null) {
-            sequelize
-              .query(
-                "SELECT * FROM entrepots WHERE  id_entrepot = " + e.provenance,
-                {
-                  type: sequelize.QueryTypes.SELECT,
-                }
-              )
-              .then((pr) => {
-                sequelize
-                  .query(
-                    "SELECT * FROM clients WHERE  id_client = " + e.client_id,
-                    {
-                      type: sequelize.QueryTypes.SELECT,
-                    }
-                  )
-                  .then((Client) => {
-                    SRT = "<tr>";
+        })
+        .catch((error) => {
+          console.error("Failed to retrieve `BonSortie`, `Clients` data : ", error);
+        });
 
-                    SRT +=
-                      '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-                    SRT += '<td class="py-1">' + e.date_bonsortie + "</td>";
-
-                    SRT +=
-                      "<td>" +
-                      pr[0].libele_entrepot +
-                      "</td><td>" +
-                      Client[0].nom_client +
-                      "</td>";
-
-                    SRT +=
-                      '<td class="py-1"><a href="voir-bon-sortie.html?id=' +
-                      e.id_bonsortie +
-                      '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonSortiePdfToPrint(' +
-                      e.id_bonsortie +
-                      ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick=delete_bons(' +
-                      e.id_bonsortie +
-                      ") id=" +
-                      e.id_bonsortie +
-                      '"  class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td></tr>';
-
-                    SRT += "</tr>";
-
-                    document.getElementById("tab-bons").innerHTML += SRT;
-                  })
-                  .catch((error) => {
-                    console.error("Failed to retrieve Clients data : ", error);
-                  });
-              })
-              .catch((error) => {
-                console.error(
-                  "Failed to retrieve Entrepots provenance data : ",
-                  error
-                );
-              });
-          } else {
-            sequelize
-              .query(
-                "SELECT * FROM entrepots WHERE  id_entrepot = " + e.provenance,
-                {
-                  type: sequelize.QueryTypes.SELECT,
-                }
-              )
-              .then((pr) => {
-                sequelize
-                  .query(
-                    "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                      e.destination,
-                    {
-                      type: sequelize.QueryTypes.SELECT,
-                    }
-                  )
-                  .then((des) => {
-                    SRT = "<tr>";
-
-                    SRT +=
-                      '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-                    SRT += '<td class="py-1">' + e.date_bonsortie + "</td>";
-
-                    SRT +=
-                      "<td>" +
-                      pr[0].libele_entrepot +
-                      "</td><td>" +
-                      des[0].libele_entrepot +
-                      "</td>";
-
-                    SRT +=
-                      '<td class="py-1"><a href="voir-bon-sortie.html?id=' +
-                      e.id_bonsortie +
-                      '" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; voir</a><button onclick="getBonSortiePdfToPrint(' +
-                      e.id_bonsortie +
-                      ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick=delete_bons(' +
-                      e.id_bonsortie +
-                      ") id=" +
-                      e.id_bonsortie +
-                      '"  class="btn btn-danger text-white me-0" ></i>&nbsp; Supprimer</button></td></tr>';
-
-                    SRT += "</tr>";
-
-                    document.getElementById("tab-bons").innerHTML += SRT;
-                  })
-                  .catch((error) => {
-                    console.error(
-                      "Failed to retrieve Entrepots destination data : ",
-                      error
-                    );
-                  });
-              })
-              .catch((error) => {
-                console.error(
-                  "Failed to retrieve Entrepots provenance data : ",
-                  error
-                );
-              });
-          }
-        }
-        //  		sequelize.query(
-
-        // 			'SELECT * FROM BomCommandes , Fournisseur WHERE  BomCommandes.fournisseur_id = Fournisseur.id_fournisseur AND id_boncmd = ' + e.boncmd_id,
-        // 		{
-        // 			type: sequelize.QueryTypes.SELECT
-        // 		}
-        // 	).then(BC => {
-
-        // 		//console.log(BC[0].nom_fournisseur)
-
-        // 		SRT+='<td class="py-1">'+BC[0].nom_fournisseur+'</td></tr>'
-
-        // 	}).catch((error) => {
-
-        // console.error('Failed to retrieve Conditionnements data : ', error);});
-      }).join();
     })
     .catch((error) => {
       console.error("Failed to retrieve `BonSortie`, `Clients` data : ", error);
     });
 };
+
 
 //***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
 
@@ -2386,7 +2921,221 @@ const chargement_cdmnt_BS = (id, indice) => {
   sequelize
     .query(
       "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-        id,
+      id,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then(async (art) => {
+      console.log("kslfqsjlqjsdfkqsffklqjl oil " + art);
+
+      let c = "";
+      art
+        .map((elem) => {
+          c +=
+            '<option value="' +
+            elem.id_condmnt +
+            '">' +
+            elem.abreviation_condmnt +
+            "</option>";
+        })
+        .join();
+
+      document.getElementById("cdmnt" + indice).innerHTML = c;
+
+      var js_ = document.createElement("script");
+      js_.type = "text/javascript";
+      js_.src = "../../vendors/select2/select2.min.js";
+      //document.body.removeChild(js_)
+      document.body.appendChild(js_);
+      var js = document.createElement("script");
+      js.type = "text/javascript";
+      js.src = "../../js/select2.js";
+      //document.body.removeChild(js)
+      document.body.appendChild(js);
+
+      for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+        //alert("rtyui")
+
+        if (document.getElementById("article" + i).value != 0) {
+          const BS = await sequelize
+            .query(
+              "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+              document.getElementById("article" + i).value +
+              " AND bonsortie.provenance = " + document.getElementById("entrepot_pr").value +
+              " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value
+              +
+              " AND bonsortie_article.date_s <= '" + document.getElementById("date_sortie_a").value + "' "
+
+              ,
+
+              {
+                type: sequelize.QueryTypes.SELECT,
+              }
+            )
+
+          const BR = await sequelize
+            .query(
+              "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+              document.getElementById("article" + i).value +
+              " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+              + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value +
+              " AND bonreceptions.date_reception <= '" + document.getElementById("date_sortie_a").value
+              + "'"
+              ,
+
+              {
+                type: sequelize.QueryTypes.SELECT,
+              }
+            )
+          console.log(BS)
+          console.log(BR)
+
+          // //a++;
+          nt = 0
+          st = 0
+          BS.map((S) => {
+            if (S.nt_s > nt) {
+              st = S.st_a_s
+              nt = S.nt_s
+            }
+
+          })
+          BR.map((R) => {
+            if (R.nt_r > nt) {
+              st = R.st_a_r
+              nt = R.nt_r
+            }
+
+          })
+
+          document.getElementById("st" + i).value = st;
+          document.getElementById("nt" + i).value = nt;
+
+
+
+        }
+      }
+
+      // sequelize
+      //   .query(
+      //     "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+      //     document.getElementById("entrepot_pr").value +
+      //     " AND articles.id_article = " +
+      //     id +
+      //     " AND conditionnements.id_condmnt = " +
+      //     document.getElementById("cdmnt" + indice).value,
+      //     {
+      //       type: sequelize.QueryTypes.SELECT,
+      //     }
+      //   )
+      //   .then((st) => {
+      //     document.getElementById("st" + indice).value = st[0].stock;
+      //     document.getElementById("nt" + indice).value = st[0].n_trans;
+
+      //     var js_ = document.createElement("script");
+      //     js_.type = "text/javascript";
+      //     js_.src = "../../vendors/select2/select2.min.js";
+      //     //document.body.removeChild(js_)
+      //     document.body.appendChild(js_);
+      //     var js = document.createElement("script");
+      //     js.type = "text/javascript";
+      //     js.src = "../../js/select2.js";
+      //     //document.body.removeChild(js)
+      //     document.body.appendChild(js);
+      //   })
+      //   .catch((error) => {
+      //     console.error("Failed to update Entrepots data : ", error);
+      //   });
+    })
+    .catch((error) => {
+      console.error("Failed to update Entrepots data : ", error);
+    });
+};
+
+//***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
+
+const chargement_cdmnt_BS_ = (id, indice) => {
+  sequelize
+    .query(
+      "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+      id,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then(async (art) => {
+      console.log("kslfqsjlqjsdfkqsffklqjl oil " + art);
+
+      let c = "";
+      art
+        .map((elem) => {
+          c +=
+            '<option value="' +
+            elem.id_condmnt +
+            '">' +
+            elem.abreviation_condmnt +
+            "</option>";
+        })
+        .join();
+
+      document.getElementById("cdmnt" + indice).innerHTML = c;
+
+      var js_ = document.createElement("script");
+      js_.type = "text/javascript";
+      js_.src = "../../vendors/select2/select2.min.js";
+      //document.body.removeChild(js_)
+      document.body.appendChild(js_);
+      var js = document.createElement("script");
+      js.type = "text/javascript";
+      js.src = "../../js/select2.js";
+      //document.body.removeChild(js)
+      document.body.appendChild(js);
+
+
+      sequelize
+        .query(
+          "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+          document.getElementById("entrepot_pr").value +
+          " AND articles.id_article = " +
+          id +
+          " AND conditionnements.id_condmnt = " +
+          document.getElementById("cdmnt" + indice).value,
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((st) => {
+          document.getElementById("st" + indice).value = st[0].stock;
+          document.getElementById("nt" + indice).value = st[0].n_trans;
+
+          var js_ = document.createElement("script");
+          js_.type = "text/javascript";
+          js_.src = "../../vendors/select2/select2.min.js";
+          //document.body.removeChild(js_)
+          document.body.appendChild(js_);
+          var js = document.createElement("script");
+          js.type = "text/javascript";
+          js.src = "../../js/select2.js";
+          //document.body.removeChild(js)
+          document.body.appendChild(js);
+        })
+        .catch((error) => {
+          console.error("Failed to update Entrepots data : ", error);
+        });
+    })
+    .catch((error) => {
+      console.error("Failed to update Entrepots data : ", error);
+    });
+};
+
+//***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
+
+const chargement_cdmnt_BR = (id, indice) => {
+  sequelize
+    .query(
+      "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+      id,
       {
         type: sequelize.QueryTypes.SELECT,
       }
@@ -2422,17 +3171,18 @@ const chargement_cdmnt_BS = (id, indice) => {
       sequelize
         .query(
           "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
-            document.getElementById("entrepot_pr").value +
-            " AND articles.id_article = " +
-            id +
-            " AND conditionnements.id_condmnt = " +
-            document.getElementById("cdmnt" + indice).value,
+          document.getElementById("entrepot").value +
+          " AND articles.id_article = " +
+          id +
+          " AND conditionnements.id_condmnt = " +
+          document.getElementById("cdmnt" + indice).value,
           {
             type: sequelize.QueryTypes.SELECT,
           }
         )
         .then((st) => {
           document.getElementById("st" + indice).value = st[0].stock;
+          document.getElementById("nt" + indice).value = st[0].n_trans;
 
           var js_ = document.createElement("script");
           js_.type = "text/javascript";
@@ -2448,14 +3198,135 @@ const chargement_cdmnt_BS = (id, indice) => {
         .catch((error) => {
           console.error("Failed to update Entrepots data : ", error);
         });
+
     })
     .catch((error) => {
       console.error("Failed to update Entrepots data : ", error);
     });
 };
+
+
 //***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
 
-const chargement_st_BS = (id, indice) => {
+const chargement_cdmnt_BR_ = (id, indice) => {
+  sequelize
+    .query(
+      "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+      id,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((art) => {
+      console.log("kslfqsjlqjsdfkqsffklqjl oil " + art);
+
+      let c = "";
+      art
+        .map((elem) => {
+          c +=
+            '<option value="' +
+            elem.id_condmnt +
+            '">' +
+            elem.abreviation_condmnt +
+            "</option>";
+        })
+        .join();
+      //alert("cdmnt" + indice)
+      document.getElementById("cdmnt" + indice).innerHTML = c;
+
+      var js_ = document.createElement("script");
+      js_.type = "text/javascript";
+      js_.src = "../../vendors/select2/select2.min.js";
+      //document.body.removeChild(js_)
+      document.body.appendChild(js_);
+      var js = document.createElement("script");
+      js.type = "text/javascript";
+      js.src = "../../js/select2.js";
+      //document.body.removeChild(js)
+      document.body.appendChild(js);
+      sequelize
+        .query(
+          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+          document.getElementById("article" + indice).value +
+          " AND bonsortie.provenance = " + document.getElementById("entrepot").value +
+          " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + indice).value
+          +
+          " AND bonsortie_article.date_s <= '" + document.getElementById("date").value + "' "
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((BS) => {
+
+          sequelize
+            .query(
+              "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+              document.getElementById("article" + indice).value +
+              " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+              + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + indice).value +
+              " AND bonreceptions.date_reception <= '" + document.getElementById("date").value
+              + "'",
+
+              {
+                type: sequelize.QueryTypes.SELECT,
+              }
+            )
+            .then((BR) => {
+              console.log(BS)
+              console.log(BR)
+
+              //a++;
+              n = 0
+              st = 0
+              BS.map((S) => {
+                if (S.nt_s > n) {
+                  st = S.st_a_s
+                  n = S.nt_s
+                }
+                //alert(n)
+              })
+              BR.map((R) => {
+                if (R.nt_r > n) {
+                  st = R.st_a_r
+                  n = R.nt_r
+                }
+
+
+                //alert(n)
+              })
+              //alert(n+"--"+st)
+
+
+              //alert(art[0].stock)
+              document.getElementById("st" + indice).value = st;
+              document.getElementById("nt" + indice).value = n;
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to retrieve `BR`, `BR_Article` , `Articles` , `Conditionnements` data : ",
+                error
+              );
+            });
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+            error
+          );
+        });
+
+    })
+    .catch((error) => {
+      console.error("Failed to update Entrepots data : ", error);
+    });
+};
+
+
+//***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
+
+const chargement_st_BS = async (id, indice) => {
   connection = db_connect();
 
   ($query =
@@ -2476,6 +3347,285 @@ const chargement_st_BS = (id, indice) => {
 
       document.getElementById("st" + indice).value = rows[0].stock;
 
+      //document.getElementById("nt" + indice).value = rows[0].n_trans;
+
+      var js_ = document.createElement("script");
+      js_.type = "text/javascript";
+      js_.src = "../../vendors/select2/select2.min.js";
+      //document.body.removeChild(js_)
+      document.body.appendChild(js_);
+      var js = document.createElement("script");
+      js.type = "text/javascript";
+      js.src = "../../js/select2.js";
+      //document.body.removeChild(js)
+      document.body.appendChild(js);
+    });
+  // Close the connection
+  connection.end(function () {
+    // The connection has been closed
+  });
+
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    //alert("rtyui")
+
+    if (document.getElementById("article" + i).value != 0) {
+      const BS = await sequelize
+        .query(
+          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND bonsortie.provenance = " + document.getElementById("entrepot_pr").value +
+          " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value
+          +
+          " AND bonsortie_article.date_s <= '" + document.getElementById("date_sortie_a").value + "' "
+
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+
+      const BR = await sequelize
+        .query(
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+          + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value +
+          " AND bonreceptions.date_reception <= '" + document.getElementById("date_sortie_a").value
+          + "'"
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+      console.log(BS)
+      console.log(BR)
+
+      // //a++;
+      nt = 0
+      st = 0
+      BS.map((S) => {
+        if (S.nt_s > nt) {
+          st = S.st_a_s
+          nt = S.nt_s
+        }
+
+      })
+      BR.map((R) => {
+        if (R.nt_r > nt) {
+          st = R.st_a_r
+          nt = R.nt_r
+        }
+
+      })
+
+      document.getElementById("st" + i).value = st;
+      document.getElementById("nt" + i).value = nt;
+
+
+
+    }
+  }
+
+};
+
+
+//***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
+
+const chargement_st_BS_ = async (id, indice) => {
+  connection = db_connect();
+
+  ($query =
+    "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+    document.getElementById("entrepot_pr").value +
+    " AND articles.id_article = " +
+    document.getElementById("article" + indice).value +
+    " AND conditionnements.id_condmnt = " +
+    id),
+    //$query = 'SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = '+id
+
+    connection.query($query, function (err, rows, fields) {
+      if (err) {
+        console.log("An error ocurred performing the query.");
+        console.log(err);
+        return;
+      }
+
+      document.getElementById("st" + indice).value = rows[0].stock;
+
+      document.getElementById("nt" + indice).value = rows[0].n_trans;
+
+      var js_ = document.createElement("script");
+      js_.type = "text/javascript";
+      js_.src = "../../vendors/select2/select2.min.js";
+      //document.body.removeChild(js_)
+      document.body.appendChild(js_);
+      var js = document.createElement("script");
+      js.type = "text/javascript";
+      js.src = "../../js/select2.js";
+      //document.body.removeChild(js)
+      document.body.appendChild(js);
+    });
+  // Close the connection
+  connection.end(function () {
+    // The connection has been closed
+  });
+
+
+
+};
+
+//***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
+
+const chargement_st_BR_ = (id, indice) => {
+
+  // sequelize
+  // .query(
+  //   "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+  //   id,
+  //   {
+  //     type: sequelize.QueryTypes.SELECT,
+  //   }
+  // )
+  // .then((art) => {
+  //   console.log("kslfqsjlqjsdfkqsffklqjl oil " + art);
+
+  //   let c = "";
+  //   art
+  //     .map((elem) => {
+  //       c +=
+  //         '<option value="' +
+  //         elem.id_condmnt +
+  //         '">' +
+  //         elem.abreviation_condmnt +
+  //         "</option>";
+  //     })
+  //     .join();
+
+  //   document.getElementById("cdmnt" + indice).innerHTML = c;
+
+  //   var js_ = document.createElement("script");
+  //   js_.type = "text/javascript";
+  //   js_.src = "../../vendors/select2/select2.min.js";
+  //   //document.body.removeChild(js_)
+  //   document.body.appendChild(js_);
+  //   var js = document.createElement("script");
+  //   js.type = "text/javascript";
+  //   js.src = "../../js/select2.js";
+  //   //document.body.removeChild(js)
+  //   document.body.appendChild(js);
+
+
+
+  // })
+  // .catch((error) => {
+  //   console.error("Failed to update Entrepots data : ", error);
+  // });
+
+  sequelize
+    .query(
+      "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+      document.getElementById("article" + indice).value +
+      " AND bonsortie.provenance = " + document.getElementById("entrepot").value +
+      " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + indice).value
+      +
+      " AND bonsortie_article.date_s <= '" + document.getElementById("date").value + "' "
+
+      ,
+
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((BS) => {
+
+      sequelize
+        .query(
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+          document.getElementById("article" + indice).value +
+          " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+          + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + indice).value +
+          " AND bonreceptions.date_reception <= '" + document.getElementById("date").value
+          + "'"
+
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((BR) => {
+          console.log(BS)
+          console.log(BR)
+
+          //a++;
+          n = 0
+          st = 0
+          BS.map((S) => {
+            if (S.nt_s > n) {
+              st = S.st_a_s
+              n = S.nt_s
+            }
+            //alert(n)
+          })
+          BR.map((R) => {
+            if (R.nt_r > n) {
+              st = R.st_a_r
+              n = R.nt_r
+            }
+
+
+            //alert(n)
+          })
+          //alert(n+"--"+st)
+
+
+          //alert(art[0].stock)
+          document.getElementById("st" + indice).value = st;
+          document.getElementById("nt" + indice).value = n;
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve `BR`, `BR_Article` , `Articles` , `Conditionnements` data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error(
+        "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+        error
+      );
+    });
+};
+
+
+
+//***** Fonction de chargement des  conditionnements  dans la page d'enregistrement d'un bon de sortie à la selection de l'article***\\
+
+const chargement_st_BR = (id, indice) => {
+  connection = db_connect();
+
+  ($query =
+    "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+    document.getElementById("entrepot").value +
+    " AND articles.id_article = " +
+    document.getElementById("article" + indice).value +
+    " AND conditionnements.id_condmnt = " +
+    id),
+    //$query = 'SELECT * FROM `Conditionnements` , `Articles_Condmnt` , `Articles` WHERE Conditionnements.id_condmnt = Articles_Condmnt.condmnt_id AND Articles.id_article = Articles_Condmnt.article_id AND Articles.id_article = '+id
+
+    connection.query($query, function (err, rows, fields) {
+      if (err) {
+        console.log("An error ocurred performing the query.");
+        console.log(err);
+        return;
+      }
+
+      document.getElementById("st" + indice).value = rows[0].stock;
+      document.getElementById("nt" + indice).value = rows[0].n_trans;
+
       var js_ = document.createElement("script");
       js_.type = "text/javascript";
       js_.src = "../../vendors/select2/select2.min.js";
@@ -2495,18 +3645,139 @@ const chargement_st_BS = (id, indice) => {
 
 //***** Fonction  d'enregistrement d'un bon de commande  ***\\
 
-const modif_entr_pr = (id_e, n) => {
+const modif_entr_pr = async (id_e, n) => {
+
+  a = 0;
+  // for (var i = 1; i <= n; i++) {
+
+  //   if (document.getElementById("article" + i).value != 0) {
+  //     sequelize
+  //       .query(
+  //         "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+  //         document.getElementById("entrepot_pr").value +
+  //         " AND articles.id_article = " +
+  //         document.getElementById("article" + i).value +
+  //         " AND conditionnements.id_condmnt = " +
+  //         document.getElementById("cdmnt" + i).value,
+  //         {
+  //           type: sequelize.QueryTypes.SELECT,
+  //         }
+  //       )
+  //       .then((art) => {
+  //         a++;
+  //         //alert(art[0].stock)
+  //         if (art.length != 0) {
+  //           document.getElementById("st" + a).value = art[0].stock;
+
+  //           document.getElementById("nt" + a).value = art[0].n_trans;
+  //         } else {
+  //           document.getElementById("st" + a).value = 0;
+
+  //           document.getElementById("nt" + a).value = 0;
+  //         }
+  //         if (parseInt(document.getElementById("st" + a).value) < parseInt(document.getElementById("qte" + a).value)) {
+
+  //           alert("quantité en stock issufisant sur certaines ligne elle seront remis à 0 ")
+  //           document.getElementById("qte" + a).value = 0
+
+
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error(
+  //           "Failed to retrieve `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements`  data : ",
+  //           error
+  //         );
+  //       });
+
+  //   }
+  // }
+
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    //alert("rtyui")
+
+    if (document.getElementById("article" + i).value != 0) {
+      const BS = await sequelize
+        .query(
+          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND bonsortie.provenance = " + document.getElementById("entrepot_pr").value +
+          " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value
+          +
+          " AND bonsortie_article.date_s <= '" + document.getElementById("date_sortie_a").value + "' "
+
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+
+      const BR = await sequelize
+        .query(
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+          + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value +
+          " AND bonreceptions.date_reception <= '" + document.getElementById("date_sortie_a").value
+          + "'"
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+      console.log(BS)
+      console.log(BR)
+
+      // //a++;
+      nt = 0
+      st = 0
+      BS.map((S) => {
+        if (S.nt_s > nt) {
+          st = S.st_a_s
+          nt = S.nt_s
+        }
+
+      })
+      BR.map((R) => {
+        if (R.nt_r > nt) {
+          st = R.st_a_r
+          nt = R.nt_r
+        }
+
+      })
+
+      document.getElementById("nt" + i).value = nt;
+      document.getElementById("st" + i).value = st;
+      //alert(document.getElementById("nt" + i).value)
+
+
+    }
+  }
+
+
+};
+
+
+
+
+//***** Fonction  d'enregistrement d'un bon de commande  ***\\
+
+const modif_entr_pr_ = async (id_e, n) => {
+
   a = 0;
   for (var i = 1; i <= n; i++) {
-    if (document.getElementById("article" + i).value != "null") {
+
+    if (document.getElementById("article" + i).value != 0) {
       sequelize
         .query(
           "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
-            document.getElementById("entrepot_pr").value +
-            " AND articles.id_article = " +
-            document.getElementById("article" + i).value +
-            " AND conditionnements.id_condmnt = " +
-            document.getElementById("cdmnt" + i).value,
+          document.getElementById("entrepot_pr").value +
+          " AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND conditionnements.id_condmnt = " +
+          document.getElementById("cdmnt" + i).value,
           {
             type: sequelize.QueryTypes.SELECT,
           }
@@ -2516,8 +3787,19 @@ const modif_entr_pr = (id_e, n) => {
           //alert(art[0].stock)
           if (art.length != 0) {
             document.getElementById("st" + a).value = art[0].stock;
+
+            document.getElementById("nt" + a).value = art[0].n_trans;
           } else {
             document.getElementById("st" + a).value = 0;
+
+            document.getElementById("nt" + a).value = 0;
+          }
+          if (parseInt(document.getElementById("st" + a).value) < parseInt(document.getElementById("qte" + a).value)) {
+
+            alert("quantité en stock issufisant sur certaines ligne elle seront remis à 0 ")
+            document.getElementById("qte" + a).value = 0
+
+
           }
         })
         .catch((error) => {
@@ -2526,11 +3808,133 @@ const modif_entr_pr = (id_e, n) => {
             error
           );
         });
+
     }
   }
+
+
+
+
 };
 
 //***** Fonction  d'enregistrement d'un bon de commande  ***\\
+
+const modif_entr = (id_e, n) => {
+
+  a = 0;
+  for (var i = 1; i <= n; i++) {
+
+    if (document.getElementById("article" + i).value != 0) {
+      sequelize
+        .query(
+          "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+          document.getElementById("entrepot").value +
+          " AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND conditionnements.id_condmnt = " +
+          document.getElementById("cdmnt" + i).value,
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((art) => {
+          a++;
+          //alert(art[0].stock)
+          if (art.length != 0) {
+            document.getElementById("st" + a).value = art[0].stock;
+            document.getElementById("nt" + a).value = art[0].n_trans;
+          } else {
+            document.getElementById("st" + a).value = 0;
+            document.getElementById("nt" + a).value = 0;
+          }
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements`  data : ",
+            error
+          );
+        });
+
+    }
+  }
+
+};
+
+
+
+//***** Fonction  d'enregistrement d'un bon de commande  ***\\
+
+const modif_entr_ = async (id_e, n) => {
+
+
+  a = 0;
+  for (var i = 1; i <= n; i++) {
+    //alert("rtyui")
+
+    if (document.getElementById("article" + i).value != 0) {
+      const BS = await sequelize
+        .query(
+          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND bonsortie.provenance = " + document.getElementById("entrepot").value +
+          " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value
+          +
+          " AND bonsortie_article.date_s <= '" + document.getElementById("date").value + "' "
+
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+
+      const BR = await sequelize
+        .query(
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+          document.getElementById("article" + i).value +
+          " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+          + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value +
+          " AND bonreceptions.date_reception <= '" + document.getElementById("date").value
+          + "'"
+          ,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+      console.log(BS)
+      console.log(BR)
+
+      // //a++;
+      nt = 0
+      st = 0
+      BS.map((S) => {
+        if (S.nt_s > nt) {
+          st = S.st_a_s
+          nt = S.nt_s
+        }
+
+      })
+      BR.map((R) => {
+        if (R.nt_r > nt) {
+          st = R.st_a_r
+          nt = R.nt_r
+        }
+
+      })
+
+      document.getElementById("st" + i).value = st;
+      document.getElementById("nt" + i).value = nt;
+
+
+
+    }
+  }
+
+};
+
+//***** Fonction  d'enregistrement d'un bon de Sortie  ***\\
 
 const insertion_bon_sortie = (n, c) => {
   dest = null;
@@ -2538,13 +3942,36 @@ const insertion_bon_sortie = (n, c) => {
   nc = null;
   if (document.getElementById("entrepot_des").value != "null") {
     dest = document.getElementById("entrepot_des").value;
+    r = 'INSERT INTO bonsortie (date_bonsortie,provenance,destination) VALUES ("' +
+      document.getElementById("date_sortie").value +
+      '",' +
+      document.getElementById("entrepot_pr").value +
+      "," +
+      dest +
+      ")"
   } else {
     if (document.getElementById("client_des").value != "null") {
       cl = document.getElementById("client_des").value;
+      r = 'INSERT INTO bonsortie (date_bonsortie,provenance,client_id) VALUES ("' +
+        document.getElementById("date_sortie").value +
+        '",' +
+        document.getElementById("entrepot_pr").value +
+        "," +
+        cl +
+        ")"
     } else {
       nc = document.getElementById("nom_client").value;
+      r = 'INSERT INTO bonsortie (date_bonsortie,provenance,nom_client) VALUES ("' +
+        document.getElementById("date_sortie").value +
+        '",' +
+        document.getElementById("entrepot_pr").value +
+        ",'" +
+        nc +
+        "'" +
+        ")"
     }
   }
+
   // alert(document.getElementById('entrepot_pr').value+"+"+document.getElementById('date_sortie').value+"+"+dest+"+"+cl+"+"+nc)
 
   // 	for (var i = 1; i <=n; i++) {
@@ -2558,131 +3985,301 @@ const insertion_bon_sortie = (n, c) => {
   compteur = 0;
   sequelize
     .query(
-      'INSERT INTO bonsortie (date_bonsortie,provenance,destination,nom_client,client_id) VALUES ("' +
-        document.getElementById("date_sortie").value +
-        '",' +
-        document.getElementById("entrepot_pr").value +
-        "," +
-        dest +
-        "," +
-        nc +
-        "," +
-        cl +
-        ")"
+      r
     )
     .then((BS) => {
+      // for (var i = 1; i <= n; i++) {
+      //   if (document.getElementById("qte" + i).value != 0) {
+      //     sequelize
+      //       .query(
+      //         'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
+      //         BS[0] +
+      //         '","' +
+      //         document.getElementById("article" + i).value +
+      //         '","' +
+      //         document.getElementById("qte" + i).value +
+      //         '",' +
+      //         document.getElementById("cdmnt" + i).value +
+      //         ")"
+      //       )
+      //       .then((art_e) => {
+      //         compteur++;
+
+      //         if (compteur == c) {
+      //           sequelize
+      //             .query(
+      //               "SELECT * FROM bonsortie_article WHERE bonsortie_id =" +
+      //               BS[0]
+      //             )
+      //             .then((B_A_) => {
+      //               //console.log(B_A)
+
+      //               d = 0;
+
+      //               B_A_[0]
+      //                 .map((e) => {
+      //                   //alert(elem.qteSortie)
+
+      //                   sequelize
+      //                     .query(
+      //                       "SELECT * FROM entrepot_article WHERE article_id = " +
+      //                       e.article_id +
+      //                       " AND condmnt_id = " +
+      //                       e.conditionnement_id +
+      //                       " AND entrepot_id = " +
+      //                       document.getElementById("entrepot_pr").value
+      //                     )
+      //                     .then((art_e) => {
+      //                       //(art_e[0][0].stock - elem.qteSortie )
+
+      //                       // alert(e.qteSortie)
+      //                       sequelize
+      //                         .query(
+      //                           "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+      //                           {
+      //                             replacements: {
+      //                               Stock:
+      //                                 parseInt(art_e[0][0].stock) -
+      //                                 parseInt(e.qteSortie),
+      //                               id_entrepot:
+      //                                 document.getElementById("entrepot_pr")
+      //                                   .value,
+      //                               id_article: e.article_id,
+      //                               id_condmnt: e.conditionnement_id,
+      //                             },
+      //                             type: sequelize.QueryTypes.UPDATE,
+      //                           }
+      //                         )
+      //                         .then((BC) => {
+      //                           d++;
+      //                           //alert(d);
+      //                           if (d == B_A_[0].length) {
+      //                             // alert(
+      //                             //   "Modification enregistrées avec success ."
+      //                             // );
+      //                             warning(
+      //                               "Bon de Sortie enregistré avec success enregistrée avec success vous le retrouverez dans la liste des Bon de Sortie ci dessous ."
+      //                             );
+
+      //                             // window.location.replace(
+      //                             //   "voir-bon-sortie.html?id=" + id
+      //                             // );
+      //                           }
+      //                         })
+      //                         .catch((error) => {
+      //                           console.error(
+      //                             "Failed to update entrepot_Article data : ",
+      //                             error
+      //                           );
+      //                         });
+      //                     })
+      //                     .catch((error) => {
+      //                       console.error(
+      //                         "Failed to select entrepot_Article data : ",
+      //                         error
+      //                       );
+      //                     });
+      //                 })
+      //                 .join();
+      //             })
+      //             .catch((error) => {
+      //               console.error(
+      //                 "Failed to select BonSortie_Article data : ",
+      //                 error
+      //               );
+      //             });
+      //         }
+
+      //         window.location.reload();
+      //       })
+      //       .catch((error) => {
+      //         console.error(
+      //           "Failed to insert BonSortie_Article data : ",
+      //           error
+      //         );
+      //       });
+      //   }
+      // }
+
+
+
+      ////////////////////////////////////
+
+      req = 'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id,date_s,st_b_s,st_a_s,nt_s) VALUES'
       for (var i = 1; i <= n; i++) {
-        if (document.getElementById("qte" + i).value != 0) {
-          sequelize
-            .query(
-              'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
-                BS[0] +
-                '","' +
+        if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+          if (i != n) {
+            if (parseInt(document.getElementById("qte" + i).value.length) >
+              0) {
+              req += ' (' + BS[0] + "," +
                 document.getElementById("article" + i).value +
-                '","' +
-                document.getElementById("qte" + i).value +
-                '",' +
+                "," + document.getElementById("qte" + i).value +
+                "," +
                 document.getElementById("cdmnt" + i).value +
-                ")"
-            )
-            .then((art_e) => {
-              compteur++;
 
-              if (compteur == c) {
-                sequelize
-                  .query(
-                    "SELECT * FROM bonsortie_article WHERE bonsortie_id =" +
-                      BS[0]
-                  )
-                  .then((B_A_) => {
-                    //console.log(B_A)
+                ",'" +
+                document.getElementById("date_sortie").value +
+                "'," +
+                document.getElementById("st" + i).value +
+                "," +
+                (parseInt(document.getElementById("st" + i).value) - parseInt(document.getElementById("qte" + i).value)) +
 
-                    d = 0;
+                "," +
+                document.getElementById("nt" + i).value +
+                ") ,"
+            }
 
-                    B_A_[0]
-                      .map((e) => {
-                        //alert(elem.qteSortie)
+          } else {
 
-                        sequelize
-                          .query(
-                            "SELECT * FROM entrepot_article WHERE article_id = " +
-                              e.article_id +
-                              " AND condmnt_id = " +
-                              e.conditionnement_id +
-                              " AND entrepot_id = " +
-                              document.getElementById("entrepot_pr").value
-                          )
-                          .then((art_e) => {
-                            //(art_e[0][0].stock - elem.qteSortie )
+            if (parseInt(document.getElementById("qte" + i).value.length) >
+              0) {
 
-                            // alert(e.qteSortie)
-                            sequelize
-                              .query(
-                                "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
-                                {
-                                  replacements: {
-                                    Stock:
-                                      parseInt(art_e[0][0].stock) -
-                                      parseInt(e.qteSortie),
-                                    id_entrepot:
-                                      document.getElementById("entrepot_pr")
-                                        .value,
-                                    id_article: e.article_id,
-                                    id_condmnt: e.conditionnement_id,
-                                  },
-                                  type: sequelize.QueryTypes.UPDATE,
-                                }
-                              )
-                              .then((BC) => {
-                                d++;
-                                alert(d);
-                                if (d == B_A_[0].length) {
-                                  // alert(
-                                  //   "Modification enregistrées avec success ."
-                                  // );
-                                  warning(
-                                    "Bon de Sortie enregistré avec success enregistrée avec success vous le retrouverez dans la liste des Bon de Sortie ci dessous ."
-                                  );
+              req += ' (' + BS[0] + "," +
+                document.getElementById("article" + i).value +
+                "," + document.getElementById("qte" + i).value +
+                "," +
+                document.getElementById("cdmnt" + i).value +
 
-                                  // window.location.replace(
-                                  //   "voir-bon-sortie.html?id=" + id
-                                  // );
-                                }
-                              })
-                              .catch((error) => {
-                                console.error(
-                                  "Failed to update entrepot_Article data : ",
-                                  error
-                                );
-                              });
-                          })
-                          .catch((error) => {
-                            console.error(
-                              "Failed to select entrepot_Article data : ",
-                              error
-                            );
-                          });
-                      })
-                      .join();
-                  })
-                  .catch((error) => {
-                    console.error(
-                      "Failed to select BonSortie_Article data : ",
-                      error
-                    );
-                  });
+                ",'" +
+                document.getElementById("date_sortie").value +
+                "'," +
+                document.getElementById("st" + i).value +
+                "," +
+                (parseInt(document.getElementById("st" + i).value) - parseInt(document.getElementById("qte" + i).value)) +
+                "," +
+                document.getElementById("nt" + i).value +
+                ") ;"
+            } else {
+              req1 = req
+              req = ''
+              for (let index = 0; index < req1.length - 2; index++) {
+
+                req += req1[index]
               }
+              req += ";"
 
-              window.location.reload();
+
+            }
+
+          }
+        }
+
+
+      }
+      //alert(req)
+      req2 = 'UPDATE entrepot_article SET stock = CASE '
+      for (var i = 1; i <= n; i++) {
+        if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+          if (i != n) {
+            if (parseInt(document.getElementById("qte" + i).value.length) >
+              0) {
+              req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                ' AND article_id = ' + document.getElementById("article" + i).value +
+                ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                ' THEN stock - ' + document.getElementById("qte" + i).value
+            }
+
+          } else {
+
+            if (parseInt(document.getElementById("qte" + i).value.length) >
+              0) {
+
+              req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                ' AND article_id = ' + document.getElementById("article" + i).value +
+                ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                ' THEN stock - ' + document.getElementById("qte" + i).value +
+                " ELSE stock END"
+            } else {
+
+              req2 += " ELSE stock END"
+
+            }
+
+          }
+        }
+
+
+      }
+
+      req3 = 'UPDATE entrepot_article SET n_trans = CASE '
+      for (var i = 1; i <= n; i++) {
+        if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+          if (i != n) {
+            if (parseInt(document.getElementById("qte" + i).value.length) >
+              0) {
+              req3 += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                ' AND article_id = ' + document.getElementById("article" + i).value +
+                ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                ' THEN n_trans + 1'
+            }
+
+          } else {
+
+            if (parseInt(document.getElementById("qte" + i).value.length) >
+              0) {
+
+              req3 += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                ' AND article_id = ' + document.getElementById("article" + i).value +
+                ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                ' THEN n_trans + 1 ' +
+                " ELSE n_trans END"
+            } else {
+
+              req3 += " ELSE n_trans END"
+
+            }
+
+          }
+        }
+
+
+      }
+
+
+      //alert(req)
+      sequelize
+        .query(req)
+        .then((art_bR) => {
+
+
+          sequelize
+            .query(req2)
+            .then((BC) => {
+              sequelize
+                .query(req3)
+                .then((BC) => {
+                  alert(
+                    "Bon de Sortie enregistré avec success enregistrée avec success vous le retrouverez dans la liste des Bon de Sortie ci dessous ."
+                  );
+                  window.location.reload();
+
+                })
+                .catch((error) => {
+                  console.error(
+                    "Failed to update entrepot_Article data : ",
+                    error
+                  );
+                });
+
             })
             .catch((error) => {
               console.error(
-                "Failed to insert BonSortie_Article data : ",
+                "Failed to update entrepot_Article data : ",
                 error
               );
             });
-        }
-      }
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to insert Bonsortie_Article data : ",
+            error
+          );
+        });
+
     })
     .catch((error) => {
       console.error("Failed to insert BonSortie data : ", error);
@@ -2698,71 +4295,42 @@ const update_bon_sortie = (id, n, c) => {
     date_bon = document.getElementById("date_sortie_a").value;
   }
 
-  sequelize
-    .query("SELECT * FROM bonsortie WHERE id_bonsortie =" + id)
-    .then((BS) => {
-      sequelize
-        .query("SELECT * FROM bonsortie_article WHERE bonsortie_id =" + id)
-        .then((B_A) => {
-          //console.log(B_A)
+  // req2 = 'UPDATE entrepot_article SET stock = CASE '
+  // for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 2; i++) {
 
-          B_A[0]
-            .map((elem) => {
-              //alert(elem.qteSortie)
+  //   if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+  //     //alert( document.getElementById("myTable_m").rows.length-2)
+  //     if (i != document.getElementById("myTable_m").rows.length - 2) {
+  //       if (parseInt(document.getElementById("m_qte" + i).value.length) >
+  //         0) {
+  //         req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+  //           ' AND article_id = ' + document.getElementById("m_article" + i).value +
+  //           ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+  //           ' THEN stock + ' + document.getElementById("m_qte" + i).value
 
-              sequelize
-                .query(
-                  "SELECT * FROM entrepot_article WHERE article_id = " +
-                    elem.article_id +
-                    " AND condmnt_id = " +
-                    elem.conditionnement_id +
-                    " AND entrepot_id = " +
-                    BS[0][0].provenance
-                  //document.getElementById("entrepot_pr").value
-                )
-                .then((art_e) => {
-                  //(art_e[0][0].stock - elem.qteSortie )
-                  sequelize
-                    .query(
-                      "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
-                      {
-                        replacements: {
-                          Stock:
-                            parseInt(art_e[0][0].stock) +
-                            parseInt(elem.qteSortie),
-                          id_entrepot: BS[0][0].provenance,
-                          id_article: elem.article_id,
-                          id_condmnt: elem.conditionnement_id,
-                        },
-                        type: sequelize.QueryTypes.UPDATE,
-                      }
-                    )
-                    .then((BC) => {})
-                    .catch((error) => {
-                      console.error(
-                        "Failed to update entrepot_Article data : ",
-                        error
-                      );
-                    });
-                })
-                .catch((error) => {
-                  console.error(
-                    "Failed to select entrepot_Article data : ",
-                    error
-                  );
-                });
-            })
-            .join();
-        })
-        .catch((error) => {
-          console.error("Failed to select BonSortie_Article data : ", error);
-        });
-    })
-    .catch((error) => {
-      console.error("Failed to select BonSortie data : ", error);
-    });
+  //       }
 
-  compteur = 0;
+  //     } else {
+
+  //       if (parseInt(document.getElementById("m_qte" + i).value.length) >
+  //         0) {
+
+  //         req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+  //           ' AND article_id = ' + document.getElementById("m_article" + i).value +
+  //           ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+  //           ' THEN stock + ' + document.getElementById("m_qte" + i).value +
+  //           " ELSE stock END"
+  //       } else {
+
+  //         req2 += " ELSE stock END"
+
+  //       }
+
+  //     }
+  //   }
+
+
+  // }
   dest = null;
   cl = null;
   nc = null;
@@ -2776,143 +4344,982 @@ const update_bon_sortie = (id, n, c) => {
     }
   }
 
-  sequelize
-    .query(
-      "UPDATE bonsortie SET date_bonsortie = :date_bonsortie, provenance = :provenance , destination = :destination  , nom_client = :nom_client  , client_id = :client_id  WHERE id_bonsortie = :id_bonsortie",
+  // sequelize
+  //   .query(req2)
+  //   .then((BC) => {
 
-      {
-        replacements: {
-          date_bonsortie: date_bon,
-          provenance: document.getElementById("entrepot_pr").value,
-          destination: dest,
-          nom_client: nc,
-          client_id: cl,
-          id_bonsortie: id,
-        },
-        type: sequelize.QueryTypes.UPDATE,
+
+  //     sequelize
+  //       .query(
+  //         "UPDATE bonsortie SET date_bonsortie = :date_bonsortie, provenance = :provenance , destination = :destination  , nom_client = :nom_client  , client_id = :client_id  WHERE id_bonsortie = :id_bonsortie",
+
+  //         {
+  //           replacements: {
+  //             date_bonsortie: date_bon,
+  //             provenance: document.getElementById("entrepot_pr").value,
+  //             destination: dest,
+  //             nom_client: nc,
+  //             client_id: cl,
+  //             id_bonsortie: id,
+  //           },
+  //           type: sequelize.QueryTypes.UPDATE,
+  //         }
+  //       )
+  //       .then((BS) => {
+  //         sequelize
+  //           .query("DELETE FROM bonsortie_article WHERE bonsortie_id =" + id)
+  //           .then((D) => {
+
+  //             req = 'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES'
+  //             for (var i = 1; i <= n; i++) {
+  //               if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+  //                 if (i != n) {
+  //                   if (parseInt(document.getElementById("qte" + i).value.length) >
+  //                     0) {
+  //                     req += ' (' + GET("id") + "," +
+  //                       document.getElementById("article" + i).value +
+  //                       "," + document.getElementById("qte" + i).value +
+  //                       "," +
+  //                       document.getElementById("cdmnt" + i).value +
+  //                       ") ,"
+  //                   }
+
+  //                 } else {
+
+  //                   if (parseInt(document.getElementById("qte" + i).value.length) >
+  //                     0) {
+
+  //                     req += ' (' + GET("id") + "," +
+  //                       document.getElementById("article" + i).value +
+  //                       "," + document.getElementById("qte" + i).value +
+  //                       "," +
+  //                       document.getElementById("cdmnt" + i).value +
+  //                       ") ;"
+  //                   } else {
+  //                     req1 = req
+  //                     req = ''
+  //                     for (let index = 0; index < req1.length - 2; index++) {
+
+  //                       req += req1[index]
+  //                     }
+  //                     req += ";"
+
+
+  //                   }
+
+  //                 }
+  //               }
+
+
+  //             }
+  //             //alert(req)
+  //             req2 = 'UPDATE entrepot_article SET stock = CASE '
+  //             for (var i = 1; i <= n; i++) {
+  //               if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+  //                 if (i != n) {
+  //                   if (parseInt(document.getElementById("qte" + i).value.length) >
+  //                     0) {
+  //                     req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+  //                       ' AND article_id = ' + document.getElementById("article" + i).value +
+  //                       ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+  //                       ' THEN stock - ' + document.getElementById("qte" + i).value
+  //                   }
+
+  //                 } else {
+
+  //                   if (parseInt(document.getElementById("qte" + i).value.length) >
+  //                     0) {
+
+  //                     req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+  //                       ' AND article_id = ' + document.getElementById("article" + i).value +
+  //                       ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+  //                       ' THEN stock - ' + document.getElementById("qte" + i).value +
+  //                       " ELSE stock END"
+  //                   } else {
+
+  //                     req2 += " ELSE stock END"
+
+  //                   }
+
+  //                 }
+  //               }
+
+
+  //             }
+
+
+  //             //alert(req)
+  //             sequelize
+  //               .query(req)
+  //               .then((art_bR) => {
+
+
+  //                 sequelize
+  //                   .query(req2)
+  //                   .then((BC) => {
+  //                     window.location.replace(
+  //                       "voir-bon-sortie.html?id=" + id
+  //                     );
+
+  //                   })
+  //                   .catch((error) => {
+  //                     console.error(
+  //                       "Failed to update entrepot_Article data : ",
+  //                       error
+  //                     );
+  //                   });
+
+  //               })
+  //               .catch((error) => {
+  //                 console.error(
+  //                   "Failed to insert Bonsortie_Article data : ",
+  //                   error
+  //                 );
+  //               });
+
+  //           })
+  //           .catch((error) => {
+  //             console.error("Failed to insert BonSortie data : ", error);
+  //           });
+
+
+  //       })
+  //       .catch((error) => {
+  //         console.error("Failed to DELETE BonSortie_Article data : ", error);
+  //       });
+  //   })
+  //   .catch((error) => {
+  //     console.error("Failed to insert BonSortie data : ", error);
+  //   });
+
+  ///////////////////////////////////////////////////
+
+  req = 'UPDATE entrepot_article SET stock = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+            ' AND article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' THEN stock + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+            ' AND article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' THEN stock + ' + document.getElementById("m_qte" + i).value +
+            " ELSE stock END"
+        } else {
+
+          req += " ELSE stock END"
+
+        }
+
       }
-    )
-    .then((BS) => {
+    }
+
+
+  }
+
+  dest = null;
+  cl = null;
+  nc = null;
+  if (document.getElementById("entrepot_des").value != "null") {
+    dest = document.getElementById("entrepot_des").value;
+  } else {
+    if (document.getElementById("client_des").value != "null") {
+      cl = document.getElementById("client_des").value;
+    } else {
+      nc = document.getElementById("nom_client").value;
+    }
+  }
+  req_r1 = 'UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_b_r = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_r1 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' + date_bon +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_r + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_r1 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' + date_bon +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_r + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_r1 += " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  req_r2 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_a_r = CASE '
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_r2 += '   WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' + date_bon +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_r + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_r2 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' + date_bon +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_r + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_r2 += " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+
+  req_s1 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie  \n SET  st_b_s = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_s1 += '\n WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' + date_bon +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_s + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_s1 += '\n WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' + date_bon +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_s + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_s1 += " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  req_s2 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  st_a_s = CASE '
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_s2 += '  \n WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' + date_bon +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_s + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_s2 += '  \n WHEN ' +
+            '  article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' + date_bon +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_s + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_s2 += " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  //alert(req_s)
+
+  sequelize
+    .query(req)
+    .then((BC) => {
       sequelize
-        .query("DELETE FROM bonsortie_article WHERE bonsortie_id =" + id)
-        .then((D) => {
-          for (var i = 1; i <= n; i++) {
-            if (document.getElementById("qte" + i).value != 0) {
-              //alert(i)
-
+        .query(req_r1)
+        .then((BC) => {
+          sequelize
+            .query(req_r2)
+            .then((BC) => {
               sequelize
-                .query(
-                  'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id) VALUES ("' +
-                    id +
-                    '","' +
-                    document.getElementById("article" + i).value +
-                    '","' +
-                    document.getElementById("qte" + i).value +
-                    '",' +
-                    document.getElementById("cdmnt" + i).value +
-                    ")"
-                )
-                .then((art_bc) => {
-                  compteur++;
+                .query(req_s1)
+                .then((BC) => {
+                  sequelize
+                    .query(req_s2)
+                    .then(async (BC) => {
 
-                  if (compteur == c) {
-                    sequelize
-                      .query(
-                        "SELECT * FROM bonsortie_article WHERE bonsortie_id =" +
-                          id
-                      )
-                      .then((B_A_) => {
-                        //console.log(B_A)
+                      for (var i = 1; i <= n; i++) {
+                        //alert("rtyui")
 
-                        d = 0;
+                        if (document.getElementById("article" + i).value != 0) {
+                          const BS = await sequelize
+                            .query(
+                              "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+                              document.getElementById("article" + i).value +
+                              " AND bonsortie.provenance = " + document.getElementById("entrepot_pr").value +
+                              " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value
+                              +
+                              " AND bonsortie_article.date_s <= '" + date_bon + "' "
 
-                        B_A_[0]
-                          .map((e) => {
-                            //alert(elem.qteSortie)
+                              ,
 
-                            sequelize
-                              .query(
-                                "SELECT * FROM entrepot_article WHERE article_id = " +
-                                  e.article_id +
-                                  " AND condmnt_id = " +
-                                  e.conditionnement_id +
-                                  " AND entrepot_id = " +
-                                  document.getElementById("entrepot_pr").value
-                              )
-                              .then((art_e) => {
-                                //(art_e[0][0].stock - elem.qteSortie )
+                              {
+                                type: sequelize.QueryTypes.SELECT,
+                              }
+                            )
 
-                                // alert(e.qteSortie)
-                                sequelize
-                                  .query(
-                                    "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
-                                    {
-                                      replacements: {
-                                        Stock:
-                                          parseInt(art_e[0][0].stock) -
-                                          parseInt(e.qteSortie),
-                                        id_entrepot:
-                                          document.getElementById("entrepot_pr")
-                                            .value,
-                                        id_article: e.article_id,
-                                        id_condmnt: e.conditionnement_id,
-                                      },
-                                      type: sequelize.QueryTypes.UPDATE,
-                                    }
-                                  )
-                                  .then((BC) => {
-                                    d++;
+                          const BR = await sequelize
+                            .query(
+                              "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+                              document.getElementById("article" + i).value +
+                              " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+                              + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value +
+                              " AND bonreceptions.date_reception <= '" + date_bon
+                              + "'"
+                              ,
 
-                                    if (d == B_A_[0].length) {
-                                      alert(
-                                        "Modification enregistrées avec success ."
-                                      );
+                              {
+                                type: sequelize.QueryTypes.SELECT,
+                              }
+                            )
+                          console.log(BS)
+                          console.log(BR)
 
-                                      // window.location.replace(
-                                      //   "voir-bon-sortie.html?id=" + id
-                                      // );
-                                    }
-                                  })
-                                  .catch((error) => {
-                                    console.error(
-                                      "Failed to update entrepot_Article data : ",
-                                      error
-                                    );
-                                  });
-                              })
-                              .catch((error) => {
-                                console.error(
-                                  "Failed to select entrepot_Article data : ",
-                                  error
-                                );
-                              });
+                          // //a++;
+                          nt = 0
+                          st = 0
+                          BS.map((S) => {
+                            if (S.nt_s > nt) {
+                              st = S.st_a_s
+                              nt = S.nt_s
+                            }
+
                           })
-                          .join();
-                      })
-                      .catch((error) => {
-                        console.error(
-                          "Failed to select BonSortie_Article data : ",
-                          error
-                        );
-                      });
-                  }
+                          BR.map((R) => {
+                            if (R.nt_r > nt) {
+                              st = R.st_a_r
+                              nt = R.nt_r
+                            }
+
+                          })
+
+                          document.getElementById("st" + i).value = st;
+                          document.getElementById("nt" + i).value = nt;
+
+
+
+                        }
+                      }
+
+                      sequelize
+                        .query(
+                          "UPDATE bonsortie SET date_bonsortie = :date_bonsortie, provenance = :provenance , destination = :destination  , nom_client = :nom_client  , client_id = :client_id  WHERE id_bonsortie = :id_bonsortie",
+
+                          {
+                            replacements: {
+                              date_bonsortie: date_bon,
+                              provenance: document.getElementById("entrepot_pr").value,
+                              destination: dest,
+                              nom_client: nc,
+                              client_id: cl,
+                              id_bonsortie: id,
+                            },
+                            type: sequelize.QueryTypes.UPDATE,
+                          }
+                        )
+                        .then((B) => {
+                          sequelize
+                            .query("DELETE FROM bonsortie_article WHERE bonsortie_id =" + id)
+                            .then((D) => {
+
+                              req = 'INSERT INTO bonsortie_article (bonsortie_id,article_id,qteSortie,conditionnement_id,date_s,st_b_s,st_a_s,nt_s) VALUES'
+                              for (var i = 1; i <= n; i++) {
+                                if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                  if (i != n) {
+                                    if (parseInt(document.getElementById("qte" + i).value.length) >
+                                      0) {
+                                      req += ' (' + GET("id") + "," +
+                                        document.getElementById("article" + i).value +
+                                        "," + document.getElementById("qte" + i).value +
+                                        "," +
+                                        document.getElementById("cdmnt" + i).value +
+                                        ",'" +
+                                        date_bon +
+                                        "'," +
+                                        document.getElementById("st" + i).value +
+                                        "," +
+                                        (parseInt(document.getElementById("st" + i).value) - parseInt(document.getElementById("qte" + i).value)) +
+                                        "," +
+                                        (parseInt(document.getElementById("nt" + i).value) + 1) +
+                                        ") ,"
+                                    }
+
+                                  } else {
+
+                                    if (parseInt(document.getElementById("qte" + i).value.length) >
+                                      0) {
+
+                                      req += ' (' + GET("id") + "," +
+                                        document.getElementById("article" + i).value +
+                                        "," + document.getElementById("qte" + i).value +
+                                        "," +
+                                        document.getElementById("cdmnt" + i).value +
+                                        ",'" +
+                                        date_bon +
+                                        "'," +
+                                        document.getElementById("st" + i).value +
+                                        "," +
+                                        (parseInt(document.getElementById("st" + i).value) - parseInt(document.getElementById("qte" + i).value)) +
+                                        "," +
+                                        (parseInt(document.getElementById("nt" + i).value) + 1) +
+                                        ") ;"
+                                    } else {
+                                      req1 = req
+                                      req = ''
+                                      for (let index = 0; index < req1.length - 2; index++) {
+
+                                        req += req1[index]
+                                      }
+                                      req += ";"
+
+
+                                    }
+
+                                  }
+                                }
+
+
+                              }
+                              //alert(req)
+
+                              sequelize
+                                .query(req)
+                                .then((BC) => {
+
+                                  req = 'UPDATE entrepot_article SET stock = CASE '
+                                  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                    if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                      if (i != document.getElementById("myTable").rows.length - 2) {
+                                        if (parseInt(document.getElementById("qte" + i).value.length) >
+                                          0) {
+                                          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN stock - ' + document.getElementById("qte" + i).value
+
+                                        }
+
+                                      } else {
+
+                                        if (parseInt(document.getElementById("qte" + i).value.length) >
+                                          0) {
+
+                                          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN stock - ' + document.getElementById("qte" + i).value +
+                                            " ELSE stock END"
+                                        } else {
+
+                                          req += " ELSE stock END"
+
+                                        }
+
+                                      }
+                                    }
+
+
+                                  }
+
+
+                                  req_ = 'UPDATE entrepot_article SET n_trans = CASE '
+                                  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+
+                                    if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                      if (i != document.getElementById("myTable").rows.length - 2) {
+                                        if (parseInt(document.getElementById("qte" + i).value.length) >
+                                          0) {
+                                          req_ += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN n_trans + 1'
+
+                                        }
+
+                                      } else {
+
+                                        if (parseInt(document.getElementById("qte" + i).value.length) >
+                                          0) {
+
+                                          req_ += ' WHEN entrepot_id = ' + document.getElementById("entrepot_pr").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN n_trans + 1' +
+                                            " ELSE n_trans END"
+                                        } else {
+
+                                          req_ += " ELSE n_trans END"
+
+                                        }
+
+                                      }
+                                    }
+                                    //alert(req_)
+
+                                  }
+
+
+                                  sequelize
+                                    .query(req)
+                                    .then((BC) => {
+                                      sequelize
+                                        .query(req_)
+                                        .then((BC) => {
+
+
+                                          req_r1 = 'UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_b_r = CASE '
+
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+                                                  req_r1 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + date_bon +
+                                                    '" THEN st_b_r - ' + document.getElementById("qte" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+
+                                                  req_r1 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + date_bon +
+                                                    '" THEN st_b_r - ' + document.getElementById("qte" + i).value +
+                                                    " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+                                                } else {
+
+                                                  req_r1 += " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+                                          req_r2 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_a_r = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+                                                  req_r2 += '   WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + date_bon +
+                                                    '" THEN st_a_r - ' + document.getElementById("qte" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+
+                                                  req_r2 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + date_bon +
+                                                    '" THEN st_a_r - ' + document.getElementById("qte" + i).value +
+                                                    " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+                                                } else {
+
+                                                  req_r2 += " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+
+                                          req_r3 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  nt_r = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+                                                  req_r3 += '   WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + date_bon +
+                                                    '" THEN nt_r + 1 '
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+
+                                                  req_r3 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + date_bon +
+                                                    '" THEN nt_r + 1 ' +
+                                                    " ELSE nt_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+                                                } else {
+
+                                                  req_r3 += " ELSE nt_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot_pr").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+
+                                          req_s1 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie  \n SET  st_b_s = CASE '
+
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+                                                  req_s1 += '\n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + date_bon +
+                                                    '" THEN st_b_s - ' + document.getElementById("qte" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+
+                                                  req_s1 += '\n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + date_bon +
+                                                    '" THEN st_b_s - ' + document.getElementById("qte" + i).value +
+                                                    " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot_pr").value
+                                                } else {
+
+                                                  req_s1 += " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot_pr").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+                                          req_s2 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  st_a_s = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+                                                  req_s2 += '  \n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + date_bon +
+                                                    '" THEN st_a_s - ' + document.getElementById("qte" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+
+                                                  req_s2 += '  \n WHEN ' +
+                                                    '  article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + date_bon +
+                                                    '" THEN st_a_s - ' + document.getElementById("qte" + i).value +
+                                                    " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot_pr").value
+                                                } else {
+
+                                                  req_s2 += " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot_pr").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+
+                                          req_s3 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  nt_s = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qte" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+                                                  req_s3 += '  \n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + date_bon +
+                                                    '" THEN nt_s + 1'
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qte" + i).value.length) >
+                                                  0) {
+
+                                                  req_s3 += '  \n WHEN ' +
+                                                    '  article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + date_bon +
+                                                    '" THEN nt_s + 1' +
+                                                    " ELSE nt_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot_pr").value
+                                                } else {
+
+                                                  req_s3 += " ELSE nt_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot_pr").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+                                          sequelize
+                                            .query(req_r1)
+                                            .then((BC) => {
+                                              sequelize
+                                                .query(req_r2)
+                                                .then((BC) => {
+                                                  sequelize
+                                                    .query(req_r3)
+                                                    .then((BC) => {
+                                                      sequelize
+                                                        .query(req_s1)
+                                                        .then((BC) => {
+                                                          sequelize
+                                                            .query(req_s2)
+                                                            .then((BC) => {
+                                                              sequelize
+                                                                .query(req_s3)
+                                                                .then((BC) => {
+                                                                  ////////////////////
+                                                                  alert(
+                                                                    "Reception modifieé avec success."
+                                                                  );
+                                                                  window.location.replace(
+                                                                    "voir_bon_R_.html?id=" + GET("id")
+                                                                  );
+                                                                })
+                                                                .catch((error) => {
+                                                                  console.error(
+                                                                    "Failed to update entrepot_Article data : ",
+                                                                    error
+                                                                  );
+                                                                });
+                                                            })
+                                                            .catch((error) => {
+                                                              console.error(
+                                                                "Failed to update entrepot_Article data : ",
+                                                                error
+                                                              );
+                                                            });
+                                                        })
+                                                        .catch((error) => {
+                                                          console.error(
+                                                            "Failed to update entrepot_Article data : ",
+                                                            error
+                                                          );
+                                                        });
+                                                    })
+                                                    .catch((error) => {
+                                                      console.error(
+                                                        "Failed to update entrepot_Article data : ",
+                                                        error
+                                                      );
+                                                    });
+                                                })
+                                                .catch((error) => {
+                                                  console.error(
+                                                    "Failed to update entrepot_Article data : ",
+                                                    error
+                                                  );
+                                                });
+                                            })
+                                            .catch((error) => {
+                                              console.error(
+                                                "Failed to update entrepot_Article data : ",
+                                                error
+                                              );
+                                            });
+                                        })
+                                        .catch((error) => {
+                                          console.error(
+                                            "Failed to update entrepot_Article data : ",
+                                            error
+                                          );
+                                        });
+
+
+
+                                    })
+                                    .catch((error) => {
+                                      console.error(
+                                        "Failed to Insert bomreception_Article data : ",
+                                        error
+                                      );
+                                    });
+
+
+
+                                })
+                                .catch((error) => {
+                                  console.error(
+                                    "Failed to DELETE BonReception_Article data : ",
+                                    error
+                                  );
+                                });
+
+                            })
+                            .catch((error) => {
+                              console.error("Failed to update BonReceptions data : ", error);
+                            });
+                        })
+                        .catch((error) => {
+                          console.error("Failed to update BonReceptions data : ", error);
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(
+                        "Failed to update entrepot_Article data : ",
+                        error
+                      );
+                    });
                 })
                 .catch((error) => {
                   console.error(
-                    "Failed to insert BonSortie_Article data : ",
+                    "Failed to update entrepot_Article data : ",
                     error
                   );
                 });
-            }
-          }
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to update entrepot_Article data : ",
+                error
+              );
+            });
         })
         .catch((error) => {
-          console.error("Failed to DELETE BonSortie_Article data : ", error);
+          console.error(
+            "Failed to update entrepot_Article data : ",
+            error
+          );
         });
     })
     .catch((error) => {
-      console.error("Failed to insert BonSortie data : ", error);
+      console.error(
+        "Failed to update entrepot_Article data : ",
+        error
+      );
     });
+
 };
 
 //***** Fonction de d'affichage des détailles d'un bon de sortie***\\
@@ -2945,7 +5352,7 @@ const afiche_detaille_BS = (id) => {
             sequelize
               .query(
                 "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
-                  id,
+                id,
                 {
                   replacements: [],
                   type: sequelize.QueryTypes.SELECT,
@@ -2963,19 +5370,30 @@ const afiche_detaille_BS = (id) => {
                   var cell1 = row.insertCell(0);
                   var cell2 = row.insertCell(1);
                   var cell3 = row.insertCell(2);
+                  var cell4 = row.insertCell(3);
 
                   cell1.innerHTML =
-                    '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+                    '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>' +
+                    '<input type"texte" id="entrepot' + n + '" value="' + pr[0].id_entrepot +
+                    '" hidden><input type="text" hidden id="m_article' + n + '" value="' + elem.article_id + '">' +
+                    '<input type="text"  hidden id="m_cdmnt' + n + '" value="' + elem.conditionnement_id + '">' +
+                    '<input type="number" hidden class="form-control" require id="m_qte' + n +
+                    '"  value=' + elem.qteSortie + ">"+
+                    '<input type="text"  hidden id="date' + n + '" value="' + elem.date_bonsortie + '">'+
+                    '<input type="text" hidden   id="m_nt' + n + '" value="' + elem.nt_s + '">';
                   cell2.innerHTML =
-                    '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
-                    elem.libele_article +
-                    '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
-                    elem.abreviation_condmnt +
-                    '" disabled></div></div>';
-                  cell3.innerHTML =
-                    '<input type="text" readonly class="form-control" require id="qte" value="' +
-                    elem.qteSortie +
-                    '">';
+                    // '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
+                    elem.libele_article
+                  // +
+                  // '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
+                  cell3.innerHTML = elem.abreviation_condmnt
+                  // +
+                  // '" disabled></div></div>';
+                  cell4.innerHTML =
+                    // '<input type="text" readonly class="form-control" require id="qte" value="' +
+                    elem.qteSortie
+                  // +
+                  // '">';
 
                   n++;
                 });
@@ -2998,7 +5416,7 @@ const afiche_detaille_BS = (id) => {
           sequelize
             .query(
               "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                BS[0].provenance,
+              BS[0].provenance,
               {
                 type: sequelize.QueryTypes.SELECT,
               }
@@ -3023,7 +5441,7 @@ const afiche_detaille_BS = (id) => {
                   sequelize
                     .query(
                       "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
-                        id,
+                      id,
                       {
                         replacements: [],
                         type: sequelize.QueryTypes.SELECT,
@@ -3041,19 +5459,30 @@ const afiche_detaille_BS = (id) => {
                         var cell1 = row.insertCell(0);
                         var cell2 = row.insertCell(1);
                         var cell3 = row.insertCell(2);
+                        var cell4 = row.insertCell(3);
 
                         cell1.innerHTML =
-                          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+                          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>' +
+                          '<input type"texte" id="entrepot' + n + '" value="' + pr[0].id_entrepot +
+                          '" hidden><input type="text" hidden id="m_article' + n + '" value="' + elem.article_id + '">' +
+                          '<input type="text"  hidden id="m_cdmnt' + n + '" value="' + elem.conditionnement_id + '">' +
+                          '<input type="number" hidden class="form-control" require id="m_qte' + n +
+                          '"  value=' + elem.qteSortie + ">"+
+                          '<input type="text"  hidden id="date' + n + '" value="' + elem.date_bonsortie + '">'+
+                          '<input type="text" hidden   id="m_nt' + n + '" value="' + elem.nt_s + '">';
                         cell2.innerHTML =
-                          '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
-                          elem.libele_article +
-                          '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
-                          elem.abreviation_condmnt +
-                          '" disabled></div></div>';
-                        cell3.innerHTML =
-                          '<input type="text" readonly class="form-control" require id="qte" value="' +
-                          elem.qteSortie +
-                          '">';
+                          // '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
+                          elem.libele_article
+                        // +
+                        // '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
+                        cell3.innerHTML = elem.abreviation_condmnt
+                        //  +
+                        // '" disabled></div></div>';
+                        cell4.innerHTML =
+                          // '<input type="text" readonly class="form-control" require id="qte" value="' +
+                          elem.qteSortie
+                        // +
+                        // '">';
 
                         n++;
                       });
@@ -3079,7 +5508,7 @@ const afiche_detaille_BS = (id) => {
           sequelize
             .query(
               "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                BS[0].provenance,
+              BS[0].provenance,
               {
                 type: sequelize.QueryTypes.SELECT,
               }
@@ -3088,7 +5517,7 @@ const afiche_detaille_BS = (id) => {
               sequelize
                 .query(
                   "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                    BS[0].destination,
+                  BS[0].destination,
                   {
                     type: sequelize.QueryTypes.SELECT,
                   }
@@ -3105,7 +5534,7 @@ const afiche_detaille_BS = (id) => {
                   sequelize
                     .query(
                       "SELECT * FROM `bonsortie_article` , `articles` , `bonsortie` , `conditionnements` WHERE conditionnements.id_condmnt = bonsortie_article.conditionnement_id AND bonsortie.id_bonsortie = bonsortie_article.bonsortie_id  AND articles.id_article = bonsortie_article.article_id AND bonsortie.id_bonsortie = " +
-                        id,
+                      id,
                       {
                         replacements: [],
                         type: sequelize.QueryTypes.SELECT,
@@ -3123,19 +5552,30 @@ const afiche_detaille_BS = (id) => {
                         var cell1 = row.insertCell(0);
                         var cell2 = row.insertCell(1);
                         var cell3 = row.insertCell(2);
+                        var cell4 = row.insertCell(3);
 
                         cell1.innerHTML =
-                          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+                          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>' +
+                          '<input type"texte" id="entrepot' + n + '" value="' + pr[0].id_entrepot +
+                          '" hidden><input type="text" hidden id="m_article' + n + '" value="' + elem.article_id + '">' +
+                          '<input type="text"  hidden id="m_cdmnt' + n + '" value="' + elem.conditionnement_id + '">' +
+                          '<input type="number" hidden class="form-control" require id="m_qte' + n +
+                          '"  value=' + elem.qteSortie + ">"+
+                          '<input type="text"  hidden id="date' + n + '" value="' + elem.date_bonsortie + '">'+
+                          '<input type="text" hidden   id="m_nt' + n + '" value="' + elem.nt_s + '">';
                         cell2.innerHTML =
-                          '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
-                          elem.libele_article +
-                          '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
-                          elem.abreviation_condmnt +
-                          '" disabled></div></div>';
-                        cell3.innerHTML =
-                          '<input type="text" readonly class="form-control" require id="qte" value="' +
-                          elem.qteSortie +
-                          '">';
+                          // '<div class="row"><div class="col-md-8" ><input  type="text" name="cli_lname" class="form-control" value="' +
+                          elem.libele_article
+                        // +
+                        // '" disabled></div><div class="col-md-4" ><input  type="text" name="cli_lname" class="form-control" value="' +
+                        cell3.innerHTML = elem.abreviation_condmnt
+                        //  +
+                        // '" disabled></div></div>';
+                        cell4.innerHTML =
+                          // '<input type="text" readonly class="form-control" require id="qte" value="' +
+                          elem.qteSortie
+                        // +
+                        // '">';
 
                         n++;
                       });
@@ -3170,16 +5610,759 @@ const afiche_detaille_BS = (id) => {
 
 //***** Fonction de suppression d'un bon de sortie  ***\\
 
-const delete_bon_sortie = (id) => {
+const delete_bon_sortie = (t, id) => {
+  if (t == 1) {
+    sequelize
+      .query("DELETE FROM bonsortie WHERE id_bonsortie =" + id)
+      .then((BC) => {
+        alert("Bon de Reception Supprimée avec success.");
+        window.location.replace(
+          "bon_de_sortie.html"
+        )
+      })
+      .catch((error) => {
+        console.error("Failed to DELETE Bonreception data : ", error);
+      });
+
+
+  } else {
+
+    // req2 = 'UPDATE entrepot_article SET stock = CASE '
+    // for (var i = 1; i <= document.getElementById("myTable").rows.length - 1; i++) {
+    //   //alert(i)
+
+    //   if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+    //     //alert( document.getElementById("myTable_m").rows.length-2)
+    //     if (i != document.getElementById("myTable").rows.length - 1) {
+    //       if (parseInt(document.getElementById("m_qte" + i).value.length) >
+    //         0) {
+    //         req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+    //           ' AND article_id = ' + document.getElementById("m_article" + i).value +
+    //           ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+    //           ' THEN stock + ' + document.getElementById("m_qte" + i).value
+
+    //       }
+
+    //     } else {
+
+    //       if (parseInt(document.getElementById("m_qte" + i).value.length) >
+    //         0) {
+
+    //         req2 += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+    //           ' AND article_id = ' + document.getElementById("m_article" + i).value +
+    //           ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+    //           ' THEN stock + ' + document.getElementById("m_qte" + i).value +
+    //           " ELSE stock END"
+    //       } else {
+
+    //         req2 += " ELSE stock END"
+
+    //       }
+
+    //     }
+    //   }
+
+
+    // }
+
+
+  req = 'UPDATE entrepot_article SET stock = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+            ' AND article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' THEN stock + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+            ' AND article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND condmnt_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' THEN stock + ' + document.getElementById("m_qte" + i).value +
+            " ELSE stock END"
+        } else {
+
+          req += " ELSE stock END"
+
+        }
+
+      }
+    }
+
+
+  }
+
+  // alert(req)
+  req_r1 = 'UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_b_r = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_r1 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_r + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_r1 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_r + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_r1 += " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  
+  req_r2 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_a_r = CASE '
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_r2 += '   WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_r + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_r2 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_r >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_r >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_r + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_r2 += " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+ 
+
+  req_s1 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie   SET  st_b_s = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    //alert("req_s2")
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_s1 += '\n WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_s + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_s1 += '\n WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_b_s + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_s1 += " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+  }
+  req_s2 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie  SET  st_a_s = CASE '
+  for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+    if (parseInt(document.getElementById("m_qte" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable").rows.length - 2) {
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+          req_s2 += '  \n WHEN ' +
+            ' article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' +document.getElementById("date" + i).value +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_s + ' + document.getElementById("m_qte" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("m_qte" + i).value.length) >
+          0) {
+
+          req_s2 += '  \n WHEN ' +
+            '  article_id = ' + document.getElementById("m_article" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("m_cdmnt" + i).value +
+            ' AND date_s >= "' + document.getElementById("date" + i).value +
+            '" AND  nt_s >= ' + document.getElementById("m_nt" + i).value +
+            ' THEN st_a_s + ' + document.getElementById("m_qte" + i).value +
+            " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_s2 += " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+
   sequelize
-    .query("DELETE FROM bonsortie WHERE id_bonsortie =" + id)
-    .then((BC) => {
-      alert("Bon de Sortie Supprimée avec success.");
-      window.location.reload();
-    })
-    .catch((error) => {
-      console.error("Failed to DELETE BonSortie data : ", error);
-    });
+  .query(req)
+  .then((BC) => {
+    sequelize
+      .query(req_r1)
+      .then((BC) => {
+        sequelize
+          .query(req_r2)
+          .then((BC) => {
+            sequelize
+              .query(req_s1)
+              .then((BC) => {
+                sequelize
+                  .query(req_s2)
+                  .then(async (BC) => {
+
+        sequelize
+          .query("DELETE FROM bonsortie WHERE id_bonsortie =" + id)
+          .then((BC) => {
+            alert("Bon de Reception Supprimée avec success.");
+            window.location.replace(
+              "bon_de_sortie.html"
+            )
+          })
+          .catch((error) => {
+            console.error("Failed to DELETE Bonreception data : ", error);
+          });
+      })
+      .catch((error) => {
+        console.error(
+          "Failed to update entrepot_Article data : ",
+          error
+        );
+      }); })
+      .catch((error) => {
+        console.error(
+          "Failed to update entrepot_Article data : ",
+          error
+        );
+      }); })
+      .catch((error) => {
+        console.error(
+          "Failed to update entrepot_Article data : ",
+          error
+        );
+      }); })
+      .catch((error) => {
+        console.error(
+          "Failed to update entrepot_Article data : ",
+          error
+        );
+      }); })
+      .catch((error) => {
+        console.error(
+          "Failed to update entrepot_Article data : ",
+          error
+        );
+      });
+
+    // sequelize
+    //   .query("SELECT * FROM bonsortie WHERE id_bonsortie =" + id)
+    //   .then((BS) => {
+    //     sequelize
+    //       .query("SELECT * FROM bonsortie_article WHERE bonsortie_id =" + id)
+    //       .then((B_A) => {
+    //         //console.log(B_A)
+    //         d = 0;
+    //         B_A[0]
+    //           .map((elem) => {
+    //             //alert(elem.qteSortie)
+
+    //             sequelize
+    //               .query(
+    //                 "SELECT * FROM entrepot_article WHERE article_id = " +
+    //                 elem.article_id +
+    //                 " AND condmnt_id = " +
+    //                 elem.conditionnement_id +
+    //                 " AND entrepot_id = " +
+    //                 BS[0][0].provenance
+    //                 //document.getElementById("entrepot_pr").value
+    //               )
+    //               .then((art_e) => {
+    //                 //(art_e[0][0].stock - elem.qteSortie )
+    //                 sequelize
+    //                   .query(
+    //                     "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+    //                     {
+    //                       replacements: {
+    //                         Stock:
+    //                           parseInt(art_e[0][0].stock) +
+    //                           parseInt(elem.qteSortie),
+    //                         id_entrepot: BS[0][0].provenance,
+    //                         id_article: elem.article_id,
+    //                         id_condmnt: elem.conditionnement_id,
+    //                       },
+    //                       type: sequelize.QueryTypes.UPDATE,
+    //                     }
+    //                   )
+    //                   .then((BC) => {
+    //                     d++;
+    //                     if (d == B_A[0].length) {
+    //                       //alert("Reception enregistrée avec success.")
+    //                       //window.location.replace('bon_de_reception.html');
+    //                       sequelize
+    //                         .query("DELETE FROM bonsortie WHERE id_bonsortie =" + id)
+    //                         .then((BC) => {
+    //                           alert("Bon de Sortie Supprimée avec success.");
+    //                           window.location.replace(
+    //                             "bon_de_sortie.html"
+    //                           )
+    //                         })
+    //                         .catch((error) => {
+    //                           console.error("Failed to DELETE Bonreception data : ", error);
+    //                         });
+    //                     }
+    //                   })
+    //                   .catch((error) => {
+    //                     console.error(
+    //                       "Failed to update entrepot_Article data : ",
+    //                       error
+    //                     );
+    //                   });
+    //               })
+    //               .catch((error) => {
+    //                 console.error(
+    //                   "Failed to select entrepot_Article data : ",
+    //                   error
+    //                 );
+    //               });
+    //           })
+    //           .join();
+    //       })
+    //       .catch((error) => {
+    //         console.error("Failed to select BonSortie_Article data : ", error);
+    //       });
+    //   })
+    //   .catch((error) => {
+    //     console.error("Failed to select BonSortie data : ", error);
+    //   });
+
+  }
+
+};
+
+//***** Fonction de suppression d'un bon de sortie  ***\\
+
+const delete_br = (t, id) => {
+  if (t == 1) {
+    sequelize
+      .query("DELETE FROM bonreceptions WHERE id_bonreception =" + id)
+      .then((BC) => {
+        alert("Bon de Reception Supprimée avec success.");
+        window.location.replace(
+          "bon_de_reception.html"
+        )
+
+      })
+      .catch((error) => {
+        console.error("Failed to DELETE Reception data : ", error);
+      });
+  } else {
+    //alert(t)
+    req = 'UPDATE entrepot_article SET stock = CASE '
+    for (var i = 1; i <= document.getElementById("myTable").rows.length - 1; i++) {
+      //alert("article : "+ document.getElementById("article"+i).value+" , "+"conditionment : "+ document.getElementById("cdmnt"+i).value +" , "+"prix : "+ document.getElementById("pu"+i).value+" , "+"quantité : "+ document.getElementById("qte"+i).value )
+      if (i != document.getElementById("myTable").rows.length - 1) {
+        req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+          ' AND article_id = ' + document.getElementById("article" + i).value +
+          ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+          ' THEN stock - ' + document.getElementById("qteR" + i).value
+
+      } else {
+        req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+          ' AND article_id = ' + document.getElementById("article" + i).value +
+          ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+          ' THEN stock - ' + document.getElementById("qteR" + i).value +
+          " ELSE stock END"
+      }
+    }
+    //alert(req)
+
+
+
+    req_r1 = 'UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_b_r = CASE '
+
+    for (var i = 1; i <= document.getElementById("myTable").rows.length - 1; i++) {
+      
+      if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+        if (i != document.getElementById("myTable").rows.length - 1) {
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+            req_r1 += ' WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_r >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_r >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_b_r - ' + document.getElementById("qteR" + i).value
+
+          }
+
+        } else {
+
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+
+            req_r1 += ' WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_r >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_r >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_b_r - ' + document.getElementById("qteR" + i).value +
+              " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+          } else {
+
+            req_r1 += " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+          }
+
+        }
+      }
+    }
+    req_r2 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_a_r = CASE '
+    for (var i = 1; i <= document.getElementById("myTable").rows.length - 1; i++) {
+      if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+        if (i != document.getElementById("myTable").rows.length - 1) {
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+            req_r2 += '   WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_r >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_r >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_a_r - ' + document.getElementById("qteR" + i).value
+
+          }
+
+        } else {
+
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+
+            req_r2 += ' WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_r >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_r >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_a_r - ' + document.getElementById("qteR" + i).value +
+              " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+          } else {
+
+            req_r2 += " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+          }
+
+        }
+      }
+
+
+    }
+
+    req_s1 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie  \n SET  st_b_s = CASE '
+
+    for (var i = 1; i <= document.getElementById("myTable").rows.length - 1; i++) {
+      if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+        if (i != document.getElementById("myTable").rows.length - 1) {
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+            req_s1 += '\n WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_s >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_s >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_b_s - ' + document.getElementById("qteR" + i).value
+
+          }
+
+        } else {
+
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+
+            req_s1 += '\n WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_s >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_s >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_b_s - ' + document.getElementById("qteR" + i).value +
+              " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+          } else {
+
+            req_s1 += " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+          }
+
+        }
+      }
+
+
+    }
+    req_s2 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  st_a_s = CASE '
+    for (var i = 1; i <= document.getElementById("myTable").rows.length - 1; i++) {
+      if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+        if (i != document.getElementById("myTable").rows.length - 1) {
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+            req_s2 += '  \n WHEN ' +
+              ' article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_s >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_s >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_a_s - ' + document.getElementById("qteR" + i).value
+
+          }
+
+        } else {
+
+          if (parseInt(document.getElementById("qteR" + i).value.length) >
+            0) {
+
+            req_s2 += '  \n WHEN ' +
+              '  article_id = ' + document.getElementById("article" + i).value +
+              ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+              ' AND date_s >= "' + document.getElementById("date"+i).value +
+              '" AND  nt_s >= ' + document.getElementById("nt" + i).value +
+              ' THEN st_a_s - ' + document.getElementById("qteR" + i).value +
+              " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+          } else {
+
+            req_s2 += " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+          }
+
+        }
+      }
+
+
+    }
+    //alert(req_r1)
+
+    sequelize
+      .query(req)
+      .then((BC) => {
+        sequelize
+          .query(req_r1)
+          .then((BC) => {
+            sequelize
+              .query(req_r2)
+              .then((BC) => {
+                sequelize
+                  .query(req_s1)
+                  .then((BC) => {
+                    sequelize
+                      .query(req_s2)
+
+                      .then((BC) => {
+                        sequelize.query("DELETE FROM bonreceptions WHERE id_bonreception =" + id)
+                          .then((BC) => {
+                            alert("Bon de Reception Supprimée avec success.");
+                            window.location.replace(
+                              "bon_de_reception.html"
+                            )
+
+                            console.error("Failed to DELETE BonSortie data : ", error);
+                          });
+
+                      })
+                      .catch((error) => {
+                        console.error(
+                          "Failed to update entrepot_Article data : ",
+                          error
+                        );
+                      });
+                  })
+                  .catch((error) => {
+                    console.error(
+                      "Failed to update entrepot_Article data : ",
+                      error
+                    );
+                  });
+              })
+              .catch((error) => {
+                console.error(
+                  "Failed to update entrepot_Article data : ",
+                  error
+                );
+              });
+          })
+          .catch((error) => {
+            console.error(
+              "Failed to update entrepot_Article data : ",
+              error
+            );
+          });
+      })
+      .catch((error) => {
+        console.error(
+          "Failed to update entrepot_Article data : ",
+          error
+        );
+      });
+
+    // sequelize
+    //   .query("SELECT * FROM bonreceptions WHERE  id_bonreception = " + id)
+    //   .then((BR) => {
+    //     sequelize
+    //       .query(
+    //         "SELECT * FROM bonreception_article WHERE bonreception_id =" +
+    //         id
+    //       )
+    //       .then((B_R) => {
+    //         //console.log(B_A)
+    //         d = 0;
+    //         B_R[0]
+    //           .map((e) => {
+
+    //             sequelize
+    //               .query(
+    //                 "SELECT * FROM entrepot_article WHERE article_id = " +
+    //                 e.article_id +
+    //                 " AND condmnt_id = " +
+    //                 e.conditionnement_id +
+    //                 " AND entrepot_id = " +
+    //                 BR[0][0].entrepot_id
+    //               )
+    //               .then((art_e) => {
+    //                 //alert(e.qteReçu)
+
+    //                 //(art_e[0][0].stock - elem.qteSortie )
+
+    //                 //alert(art_e[0][0].stock)
+
+    //                 sequelize
+    //                   .query(
+    //                     "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+    //                     {
+    //                       replacements: {
+    //                         Stock:
+    //                           parseInt(art_e[0][0].stock) - parseInt(e.qteReçu),
+    //                         id_entrepot: BR[0][0].entrepot_id,
+    //                         id_article: e.article_id,
+    //                         id_condmnt: e.conditionnement_id,
+    //                       },
+    //                       type: sequelize.QueryTypes.UPDATE,
+    //                     }
+    //                   )
+    //                   .then((BC) => {
+    //                     d++;
+
+    //                     if (d == B_R[0].length) {
+    //                       //alert("Reception enregistrée avec success.")
+    //                       //window.location.replace('bon_de_reception.html');
+    //                       sequelize
+    //                         .query("DELETE FROM bonreceptions WHERE id_bonreception =" + id)
+    //                         .then((BC) => {
+    //                           alert("Bon de Reception Supprimée avec success.");
+    //                           window.location.replace(
+    //                             "bon_de_reception.html"
+    //                           )
+
+    //                         })
+    //                         .catch((error) => {
+    //                           console.error("Failed to DELETE BonSortie data : ", error);
+    //                         });
+    //                     }
+    //                   })
+    //                   .catch((error) => {
+    //                     console.error(
+    //                       "Failed to update entrepot_Article data : ",
+    //                       error
+    //                     );
+    //                   });
+    //               })
+    //               .catch((error) => {
+    //                 console.error(
+    //                   "Failed to select entrepot_Article data : ",
+    //                   error
+    //                 );
+    //               });
+    //           })
+    //           .join();
+    //       })
+    //       .catch((error) => {
+    //         console.error("Failed to select BonReception_Article data : ", error);
+    //       });
+    //   })
+    //   .catch((error) => {
+    //     console.error("Failed to insert BonReceptions data : ", error);
+    //   });
+
+
+
+  }
+
 };
 
 //***** Fonction de chargement des bons de reception ***\\
@@ -3188,54 +6371,173 @@ const afiche_BR = () => {
   let c = "";
 
   sequelize
-    .query("SELECT * FROM `bomcommandes` ")
+    .query("SELECT * FROM bomcommandes,fournisseur  WHERE bomcommandes.fournisseur_id = fournisseur.id_fournisseur ORDER BY  `date_boncmd` DESC")
     .then((BC) => {
       //console.log(BC[0][1])
       BC[0].map((elem) => {
-        sequelize
-          .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
-            replacements: [elem.fournisseur_id],
-            type: sequelize.QueryTypes.SELECT,
-          })
-          .then((fseur) => {
-            if (elem.status == 0) {
-              document.getElementById("tab-bon_r").innerHTML +=
-                "<tr>" +
-                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
-                fseur[0].nom_fournisseur +
-                "</td><td>" +
-                elem.date_boncmd +
-                "</td><td>" +
-                elem.montant_boncmd +
-                "</td>" +
-                '<td><button onclick="" class="btn  btn-danger text-white me-0" href="#" readonly>Non Reçu</button></td>' +
-                '<td><div class="btn-wrapper"><a href="reception.html?id=' +
-                elem.id_boncmd +
-                '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; Recevoir</a> </td></tr>';
-            } else {
-              document.getElementById("tab-bon_r").innerHTML +=
-                "<tr>" +
-                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
-                fseur[0].nom_fournisseur +
-                "</td><td>" +
-                elem.date_boncmd +
-                "</td><td>" +
-                elem.montant_boncmd +
-                "</td>" +
-                '<td><button onclick="" class="btn  btn-success text-white me-0" href="#" readonly>Reçu</button></td>' +
-                '<td><div class="btn-wrapper"><a href="voir_bon_R.html?id=' +
-                elem.id_boncmd +
-                '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; voir</a> </td></tr>';
-            }
-          })
-          .catch((error) => {
-            console.error("Failed to retrieve fournisseur data : ", error);
-          });
+        // sequelize
+        //   .query("SELECT * FROM `fournisseur` WHERE id_fournisseur = ? ", {
+        //     replacements: [elem.fournisseur_id],
+        //     type: sequelize.QueryTypes.SELECT,
+        //   })
+        //   .then((fseur) => {
+        if (elem.status == 0) {
+          document.getElementById("tab-bon_r").innerHTML +=
+            "<tr>" +
+            '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+            elem.nom_fournisseur +
+            "</td><td>" +
+            elem.date_boncmd +
+            "</td><td>" +
+            elem.montant_boncmd +
+            "</td>" +
+            '<td><button onclick="" class="btn  btn-danger text-white me-0" href="#" readonly>Non Reçu</button></td>' +
+            '<td><div class="btn-wrapper"><a href="reception.html?id=' +
+            elem.id_boncmd +
+            '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; Recevoir</a> </td></tr>';
+        } else {
+          document.getElementById("tab-bon_r").innerHTML +=
+            "<tr>" +
+            '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+            elem.nom_fournisseur +
+            "</td><td>" +
+            elem.date_boncmd +
+            "</td><td>" +
+            elem.montant_boncmd +
+            "</td>" +
+            '<td><button onclick="" class="btn  btn-success text-white me-0" href="#" readonly>Reçu</button></td>' +
+            '<td><div class="btn-wrapper"><a href="voir_bon_R.html?id=' +
+            elem.id_boncmd +
+            '" type="button" class="btn btn-primary text-white me-0" ></i>&nbsp; voir</a> </td></tr>';
+        }
+        // })
+        // .catch((error) => {
+        //   console.error("Failed to retrieve fournisseur data : ", error);
+        // });
       });
+
+
     })
     .catch((error) => {
       console.error("Failed to retrieve BomCommandes data : ", error);
     });
+
+
+
+
+  c = "";
+
+  sequelize
+    .query("SELECT * FROM bonreceptions , fournisseur  WHERE bonreceptions.fournisseur_id = fournisseur.id_fournisseur ORDER BY  `date_reception` DESC")
+    .then((BC) => {
+      //console.log(BC[0][1])
+      BC[0].map((elem) => {
+
+        document.getElementById("tab-bon_r_d").innerHTML +=
+          "<tr>" +
+          '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+          elem.nom_fournisseur +
+          "</td><td>" +
+          elem.date_reception +
+          "</td>" +
+          '<td><div class="btn-wrapper">' + '<a href="voir_bon_R_.html?id=' +
+          elem.id_bonreception +
+          '" type="button" class="btn btn-primary text-white me-0" ><i class="mdi mdi-eye"></i> Voir</a><a  href="modif_bon_R_.html?id=' +
+          elem.id_bonreception +
+          '"class=" btn btn-warning text-white me-0" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false" ><i class="mdi mdi-pencil"></i>Modifier</a></td></tr>';
+
+      });
+
+
+    })
+    .catch((error) => {
+      console.error("Failed to retrieve BomCommandes data : ", error);
+    });
+};
+
+
+
+//***** Fonction de chargement de la page de reception simple ***\\
+
+const chargement_entrepot_R = () => {
+  connection = db_connect();
+  $query = "SELECT * FROM `entrepots` ";
+
+  connection.query($query, function (err, rows, fields) {
+    if (err) {
+      console.log("An error ocurred performing the query.");
+      console.log(err);
+      return;
+    }
+
+    let c = "";
+
+    rows
+      .map((elem) => {
+        c +=
+          '<option value="' +
+          elem.id_entrepot +
+          '">' +
+          elem.libele_entrepot +
+          "</option>";
+      })
+      .join();
+
+    document.getElementById("entrepot").innerHTML += c;
+
+    var js_ = document.createElement("script");
+    js_.type = "text/javascript";
+    js_.src = "../../vendors/select2/select2.min.js";
+    //document.body.removeChild(js_)
+    document.body.appendChild(js_);
+    var js = document.createElement("script");
+    js.type = "text/javascript";
+    js.src = "../../js/select2.js";
+    //document.body.removeChild(js)
+    document.body.appendChild(js);
+    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
+  });
+
+  $query = "SELECT * FROM `fournisseur` ";
+
+  connection.query($query, function (err, rows, fields) {
+    if (err) {
+      console.log("An error ocurred performing the query.");
+      console.log(err);
+      return;
+    }
+
+    let c = "";
+
+    rows
+      .map((elem) => {
+        c +=
+          '<option value="' +
+          elem.id_fournisseur +
+          '">' +
+          elem.nom_fournisseur +
+          "</option>";
+      })
+      .join();
+
+    document.getElementById("fseur").innerHTML += c;
+
+    var js_ = document.createElement("script");
+    js_.type = "text/javascript";
+    js_.src = "../../vendors/select2/select2.min.js";
+    //document.body.removeChild(js_)
+    document.body.appendChild(js_);
+    var js = document.createElement("script");
+    js.type = "text/javascript";
+    js.src = "../../js/select2.js";
+    //document.body.removeChild(js)
+    document.body.appendChild(js);
+    //console.log("Query succesfully executed", rows[0].nom_fournisseur);
+  });
+  // Close the connection
+  connection.end(function () {
+    // The connection has been closed
+  });
 };
 
 //***** Fonction de chargement de la page de reception d'une commande ***\\
@@ -3244,18 +6546,19 @@ const reception_BC = (id) => {
   sequelize
     .query("SELECT * FROM `fournisseur`")
     .then((fseurs) => {
-      console.log(fseurs[0]);
+      //alert(fseurs[0]);
 
       sequelize
         .query(
           "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
-            id
+          id
         )
         .then((BC) => {
-          console.log(BC[0][0].id_fournisseur);
+          //alert(BC[0][0].id_fournisseur);
 
           let c = "";
           fseurs[0].map((elem) => {
+
             if (elem.id_fournisseur == BC[0][0].id_fournisseur) {
               c +=
                 '<option value="' +
@@ -3287,6 +6590,7 @@ const reception_BC = (id) => {
           //console.log("Query succesfully executed", rows[0].nom_fournisseur);
 
           document.getElementById("date_a").value = BC[0][0].date_boncmd;
+
         })
         .catch((error) => {
           console.error(
@@ -3305,14 +6609,14 @@ const reception_BC = (id) => {
   sequelize
     .query(
       "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
-        id,
+      id,
       {
         replacements: [],
         type: sequelize.QueryTypes.SELECT,
       }
     )
     .then((artcl) => {
-      //console.log(artcl)
+      //alert(id)
 
       n = 0;
       t = 0;
@@ -3322,7 +6626,7 @@ const reception_BC = (id) => {
           sequelize
             .query(
               "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-                elem.article_id
+              elem.article_id
             )
             .then((cnd) => {
               c = "";
@@ -3407,46 +6711,49 @@ const reception_BC = (id) => {
               js.type = "text/javascript";
               js.src = "../../js/select2.js";
               document.body.appendChild(js);
-            })
-            .catch((error) => {
-              console.error(
-                "Failed to retrieve BomCommandes Article conditionments data : ",
-                error
-              );
-            });
 
-          sequelize
-            .query("SELECT * FROM  `entrepots` ", {
-              type: sequelize.QueryTypes.SELECT,
-            })
-            .then((pers) => {
-              let c = "";
-              pers
-                .map((e) => {
-                  c +=
-                    '<option value="' +
-                    e.id_entrepot +
-                    '" >' +
-                    e.libele_entrepot +
-                    "</option>";
+
+              sequelize
+                .query("SELECT * FROM  `entrepots` ", {
+                  type: sequelize.QueryTypes.SELECT,
                 })
-                .join();
+                .then((pers) => {
+                  let c = "";
+                  pers
+                    .map((e) => {
+                      c +=
+                        '<option value="' +
+                        e.id_entrepot +
+                        '" >' +
+                        e.libele_entrepot +
+                        "</option>";
+                    })
+                    .join();
 
-              document.getElementById("entrepot").innerHTML = c;
+                  document.getElementById("entrepot").innerHTML = c;
 
-              var js_ = document.createElement("script");
-              js_.type = "text/javascript";
-              js_.src = "../../vendors/select2/select2.min.js";
-              document.body.appendChild(js_);
-              var js = document.createElement("script");
-              js.type = "text/javascript";
-              js.src = "../../js/select2.js";
-              document.body.appendChild(js);
-            })
-            .catch((error) => {
-              console.error("Failed to retrieve personnel data : ", error);
+                  var js_ = document.createElement("script");
+                  js_.type = "text/javascript";
+                  js_.src = "../../vendors/select2/select2.min.js";
+                  document.body.appendChild(js_);
+                  var js = document.createElement("script");
+                  js.type = "text/javascript";
+                  js.src = "../../js/select2.js";
+                  document.body.appendChild(js);
+                })
+                .catch((error) => {
+                  console.error("Failed to retrieve personnel data : ", error);
+                });
+
             });
-        });
+
+        })
+          .catch((error) => {
+            console.error(
+              "Failed to retrieve BomCommandes Article conditionments data : ",
+              error
+            );
+          });
       });
 
       //document.getElementById("montant_total").value = artcl[0].montant_boncmd;
@@ -3456,20 +6763,22 @@ const reception_BC = (id) => {
     });
 };
 
-//***** Fonction  d'enregistrement d'un bon de Sortie  ***\\
+//***** Fonction  d'enregistrement d'un bon de reception  ***\\
 
 const insert_BR = (n, c) => {
   compteur = 0;
 
   sequelize
     .query(
-      'INSERT INTO bonreceptions (date_reception,boncmd_id,entrepot_id) VALUES ("' +
-        document.getElementById("date").value +
-        '",' +
-        GET("id") +
-        "," +
-        document.getElementById("entrepot").value +
-        ")"
+      'INSERT INTO bonreceptions (date_reception,boncmd_id,entrepot_id,fournisseur_id) VALUES ("' +
+      document.getElementById("date").value +
+      '",' +
+      GET("id") +
+      "," +
+      document.getElementById("entrepot").value +
+      "," +
+      document.getElementById("fseur").value +
+      ")"
     )
     .then((BR) => {
       for (var i = 1; i <= n; i++) {
@@ -3478,14 +6787,14 @@ const insert_BR = (n, c) => {
         sequelize
           .query(
             'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
-              BR[0] +
-              '","' +
-              document.getElementById("article" + i).value +
-              '","' +
-              document.getElementById("qteR" + i).value +
-              '","' +
-              document.getElementById("cdmnt" + i).value +
-              '")'
+            BR[0] +
+            '","' +
+            document.getElementById("article" + i).value +
+            '","' +
+            document.getElementById("qteR" + i).value +
+            '","' +
+            document.getElementById("cdmnt" + i).value +
+            '")'
           )
           .then((art_bR) => {
             compteur++;
@@ -3503,7 +6812,7 @@ const insert_BR = (n, c) => {
                   sequelize
                     .query(
                       "SELECT * FROM bonreception_article WHERE bonreception_id =" +
-                        BR[0]
+                      BR[0]
                     )
                     .then((B_R) => {
                       //console.log(B_A)
@@ -3515,14 +6824,14 @@ const insert_BR = (n, c) => {
                           sequelize
                             .query(
                               "SELECT * FROM entrepot_article WHERE article_id = " +
-                                e.article_id +
-                                " AND condmnt_id = " +
-                                e.conditionnement_id +
-                                " AND entrepot_id = " +
-                                document.getElementById("entrepot").value
+                              e.article_id +
+                              " AND condmnt_id = " +
+                              e.conditionnement_id +
+                              " AND entrepot_id = " +
+                              document.getElementById("entrepot").value
                             )
                             .then((art_e) => {
-                              //(art_e[0][0].stock - elem.qteSortie )
+                              //alert(art_e[0][0].stock)
 
                               //console.log(art_e)
 
@@ -3600,18 +6909,404 @@ const insert_BR = (n, c) => {
     });
 };
 
+
+//***** Fonction  d'enregistrement d'un bon de reception  ***\\
+
+const insert_BR_ = (n, c) => {
+  // compteur = 0;
+
+  //  sequelize
+  //   .query(
+  //     'INSERT INTO bonreceptions (date_reception,entrepot_id,fournisseur_id) VALUES ("' +
+  //     document.getElementById("date").value +
+  //     '",' +
+  //     document.getElementById("entrepot").value +
+  //     ',' +
+  //     document.getElementById("fseur").value +
+  //     ')'
+  //   )
+  //   .then((BR) => {
+  //     for (var i = 1; i <= n; i++) {
+  //       //alert(i)
+  //       //if (document.getElementById("qteR"+i).value != 0  ) {
+
+  //       sequelize
+  //         .query(
+  //           'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
+  //           BR[0] +
+  //           '","' +
+  //           document.getElementById("article" + i).value +
+  //           '","' +
+  //           document.getElementById("qteR" + i).value +
+  //           '","' +
+  //           document.getElementById("cdmnt" + i).value +
+  //           '")'
+  //         )
+  //         .then((art_bR) => {
+  //           compteur++;
+  //           //alert(compteur+"-"+c)
+  //           if (compteur == c) {
+
+  //             sequelize
+  //               .query(
+  //                 "SELECT * FROM bonreception_article WHERE bonreception_id =" +
+  //                 BR[0]
+  //               )
+  //               .then((B_R) => {
+  //                 //console.log(B_A)
+  //                 d = 0;
+  //                 B_R[0]
+  //                   .map((e) => {
+  //                     //alert(elem.qteSortie)
+
+  //                     sequelize
+  //                       .query(
+  //                         "SELECT * FROM entrepot_article WHERE article_id = " +
+  //                         e.article_id +
+  //                         " AND condmnt_id = " +
+  //                         e.conditionnement_id +
+  //                         " AND entrepot_id = " +
+  //                         document.getElementById("entrepot").value
+  //                       )
+  //                       .then((art_e) => {
+  //                         //alert(art_e[0][0].stock)
+
+  //                         //console.log(art_e)
+
+  //                         sequelize
+  //                           .query(
+  //                             "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+  //                             {
+  //                               replacements: {
+  //                                 Stock:
+  //                                   parseInt(art_e[0][0].stock) +
+  //                                   parseInt(e.qteReçu),
+  //                                 id_entrepot:
+  //                                   document.getElementById("entrepot")
+  //                                     .value,
+  //                                 id_article: e.article_id,
+  //                                 id_condmnt: e.conditionnement_id,
+  //                               },
+  //                               type: sequelize.QueryTypes.UPDATE,
+  //                             }
+  //                           )
+  //                           .then((BC) => {
+  //                             d++;
+
+  //                             if (d == B_R[0].length) {
+  //                               alert(
+  //                                 "Reception enregistrée avec success."
+  //                               );
+  //                               window.location.replace(
+  //                                 "bon_de_reception.html"
+  //                               );
+  //                             }
+  //                           })
+  //                           .catch((error) => {
+  //                             console.error(
+  //                               "Failed to update entrepot_Article data : ",
+  //                               error
+  //                             );
+  //                           });
+  //                       })
+  //                       .catch((error) => {
+  //                         console.error(
+  //                           "Failed to select entrepot_Article data : ",
+  //                           error
+  //                         );
+  //                       });
+  //                   })
+  //                   .join();
+  //               })
+  //               .catch((error) => {
+  //                 console.error(
+  //                   "Failed to select BonReception_Article data : ",
+  //                   error
+  //                 );
+  //               });
+
+  //           }
+  //         })
+  //         .catch((error) => {
+  //           console.error(
+  //             "Failed to insert BonReception_Article data : ",
+  //             error
+  //           );
+  //         });
+  //     }
+  //     //}
+  //   })
+  //   .catch((error) => {
+  //     console.error("Failed to insert BonReceptions data : ", error);
+  //   });
+
+
+  ////////////////////////////////////
+
+  ////////////////////////
+
+
+
+  sequelize
+    .query(
+      'INSERT INTO bonreceptions (date_reception,entrepot_id,fournisseur_id) VALUES ("' +
+      document.getElementById("date").value +
+      '",' +
+      document.getElementById("entrepot").value +
+      ',' +
+      document.getElementById("fseur").value +
+      ')'
+    )
+    .then((BR) => {
+
+
+
+      req = 'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id,date_r,st_b_r,st_a_r,nt_r) VALUES'
+      // for (var i = 1; i <= n; i++) {
+      //   //alert("article : "+ document.getElementById("article"+i).value+" , "+"conditionment : "+ document.getElementById("cdmnt"+i).value +" , "+"prix : "+ document.getElementById("pu"+i).value+" , "+"quantité : "+ document.getElementById("qte"+i).value )
+      //   if (document.getElementById("qteR" + i).value != 0) {
+
+
+      //     if (i != n) {
+      //       req += ' (' + BR[0] + "," +
+      //         document.getElementById("article" + i).value +
+      //         "," + document.getElementById("qteR" + i).value +
+      //         "," +
+      //         document.getElementById("cdmnt" + i).value +
+      //         ") ,"
+      //     } else {
+      //       req += ' (' + BR[0] + "," +
+      //         document.getElementById("article" + i).value +
+      //         "," + document.getElementById("qteR" + i).value +
+      //         "," +
+      //         document.getElementById("cdmnt" + i).value +
+      //         ") ;"
+      //     }
+      //   }
+
+
+      // }
+
+
+      for (var i = 1; i <= n; i++) {
+        if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+          if (i != n) {
+            if (parseInt(document.getElementById("qteR" + i).value.length) >
+              0) {
+              req += ' (' + BR[0] + "," +
+                document.getElementById("article" + i).value +
+                "," + document.getElementById("qteR" + i).value +
+                "," +
+                document.getElementById("cdmnt" + i).value +
+                ",'" +
+                document.getElementById("date").value +
+                "'," +
+                document.getElementById("st" + i).value +
+                "," +
+                (parseInt(document.getElementById("st" + i).value) + parseInt(document.getElementById("qteR" + i).value)) +
+
+                "," + document.getElementById("nt" + i).value +
+                ") ,"
+            }
+
+          } else {
+
+            if (parseInt(document.getElementById("qteR" + i).value.length) >
+              0) {
+
+              req += ' (' + BR[0] + "," +
+                document.getElementById("article" + i).value +
+                "," + document.getElementById("qteR" + i).value +
+                "," +
+                document.getElementById("cdmnt" + i).value +
+                ",'" +
+                document.getElementById("date").value +
+                "'," +
+                document.getElementById("st" + i).value +
+                "," +
+                (parseInt(document.getElementById("st" + i).value) + parseInt(document.getElementById("qteR" + i).value)) +
+
+                "," + document.getElementById("nt" + i).value +
+                ") ;"
+            } else {
+              req1 = req
+              req = ''
+              for (let index = 0; index < req1.length - 2; index++) {
+
+                req += req1[index]
+              }
+              req += ";"
+
+
+            }
+
+          }
+        }
+
+
+      }
+
+      //alert(req)
+      sequelize
+        .query(req)
+        .then((art_bR) => {
+
+          req = 'UPDATE entrepot_article SET stock = CASE '
+          // for (var i = 1; i <= n; i++) {
+          //   //alert("article : "+ document.getElementById("article"+i).value+" , "+"conditionment : "+ document.getElementById("cdmnt"+i).value +" , "+"prix : "+ document.getElementById("pu"+i).value+" , "+"quantité : "+ document.getElementById("qte"+i).value )
+          //   if (document.getElementById("qteR" + i).value != 0) {
+
+          //     if (i != n) {
+          //       req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+          //         ' AND article_id = ' + document.getElementById("article" + i).value +
+          //         ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+          //         ' THEN stock + ' + document.getElementById("qteR" + i).value
+
+          //     } else {
+          //       req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+          //         ' AND article_id = ' + document.getElementById("article" + i).value +
+          //         ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+          //         ' THEN stock + ' + document.getElementById("qteR" + i).value +
+          //         " ELSE stock END"
+          //     }
+          //   }
+          // }
+
+          for (var i = 1; i <= n; i++) {
+            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+              if (i != n) {
+                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                  0) {
+                  req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                    ' AND article_id = ' + document.getElementById("article" + i).value +
+                    ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                    ' THEN stock + ' + document.getElementById("qteR" + i).value
+
+                }
+
+              } else {
+
+                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                  0) {
+
+                  req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                    ' AND article_id = ' + document.getElementById("article" + i).value +
+                    ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                    ' THEN stock + ' + document.getElementById("qteR" + i).value +
+                    " ELSE stock END"
+                } else {
+
+                  req += " ELSE stock END"
+
+                }
+
+              }
+            }
+
+
+          }
+          //alert(req)
+
+          sequelize
+            .query(req)
+            .then((BC) => {
+
+
+              req = 'UPDATE entrepot_article SET n_trans = CASE '
+
+
+              for (var i = 1; i <= n; i++) {
+                if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                  if (i != n) {
+                    if (parseInt(document.getElementById("qteR" + i).value.length) >
+                      0) {
+                      req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                        ' AND article_id = ' + document.getElementById("article" + i).value +
+                        ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                        ' THEN n_trans + 1 '
+
+                    }
+
+                  } else {
+
+                    if (parseInt(document.getElementById("qteR" + i).value.length) >
+                      0) {
+
+                      req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                        ' AND article_id = ' + document.getElementById("article" + i).value +
+                        ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                        ' THEN n_trans + 1' +
+                        " ELSE  n_trans END"
+                    } else {
+
+                      req += " ELSE n_trans END"
+
+                    }
+
+                  }
+                }
+
+
+              }
+              sequelize
+                .query(req)
+                .then((BC) => {
+                  alert(
+                    "Reception enregistrée avec success."
+                  );
+                  window.location.replace(
+                    "bon_de_reception.html"
+                  );
+
+                })
+                .catch((error) => {
+                  console.error(
+                    "Failed to update entrepot_Article data : ",
+                    error
+                  );
+                });
+
+
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to update entrepot_Article data : ",
+                error
+              );
+            });
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to insert BonReception_Article data : ",
+            error
+          );
+        });
+
+
+    })
+    .catch((error) => {
+      console.error("Failed to insert BonReceptions data : ", error);
+    });
+
+};
+
+
 //***** Fonction de chargement de la page de detail de reception d'une commande ***\\
 
 const voir_reception_BC = (id) => {
   sequelize
     .query("SELECT * FROM `fournisseur`")
     .then((fseurs) => {
-      console.log(fseurs[0]);
+      //alert(fseurs[0]);
 
       sequelize
         .query(
           "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
-            id
+          id
         )
         .then((BC) => {
           console.log(BC[0][0].id_fournisseur);
@@ -3667,7 +7362,7 @@ const voir_reception_BC = (id) => {
   sequelize
     .query(
       "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
-        id,
+      id,
       {
         replacements: [],
         type: sequelize.QueryTypes.SELECT,
@@ -3684,13 +7379,13 @@ const voir_reception_BC = (id) => {
           sequelize
             .query(
               "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-                elem.article_id
+              elem.article_id
             )
             .then((cnd) => {
               sequelize
                 .query(
                   "SELECT * FROM `bonreceptions`  WHERE boncmd_id = " +
-                    GET("id"),
+                  GET("id"),
                   {
                     replacements: [],
                     type: sequelize.QueryTypes.SELECT,
@@ -3703,22 +7398,25 @@ const voir_reception_BC = (id) => {
                   sequelize
                     .query(
                       "SELECT * FROM `bonreception_article`  WHERE bonreception_article.conditionnement_id= " +
-                        elem.conditionnement_id +
-                        " AND bonreception_article.article_id = " +
-                        elem.article_id +
-                        " AND bonreception_article.bonreception_id = " +
-                        br[0].id_bonreception,
+                      elem.conditionnement_id +
+                      " AND bonreception_article.article_id = " +
+                      elem.article_id +
+                      " AND bonreception_article.bonreception_id = " +
+                      br[0].id_bonreception,
                       {
                         replacements: [],
                         type: sequelize.QueryTypes.SELECT,
                       }
                     )
                     .then((art_r) => {
+                      //alert(art_r[0].article_id)
                       sequelize
                         .query("SELECT * FROM  `entrepots` ", {
                           type: sequelize.QueryTypes.SELECT,
                         })
                         .then((pers) => {
+
+
                           let c = "";
                           pers
                             .map((e) => {
@@ -3753,98 +7451,440 @@ const voir_reception_BC = (id) => {
 
                           document.getElementById("date").value =
                             br[0].date_reception;
+
+                          c = "";
+
+                          n++;
+                          var table = document.getElementById("myTable");
+                          var row = table.insertRow(n);
+
+                          var cell1 = row.insertCell(0);
+                          var cell2 = row.insertCell(1);
+                          var cell3 = row.insertCell(2);
+                          var cell4 = row.insertCell(3);
+                          // tbody = "<tr><td>aaaaaaaaaaaaaaaaa</td></tr><tr><td>aaaaaaaaaaaaaaaaa</td></tr><tr><td>aaaaaaaaaaaaaaaaa</td></tr>"
+                          // document.getElementById("tbody_br").innerHTML += tbody
+                          a[0].map((e) => {
+                            if (e.id_article == elem.article_id) {
+                              //alert(e.libele_article)
+                              c =
+                                // '<option value="' +
+                                // e.id_article +
+                                // '" selected="true">' +
+                                e.libele_article
+                              // +
+                              // "</option>";
+                            } else {
+                              // c +=
+                              //   '<option value="' +
+                              //   e.id_article +
+                              //   '" >' +
+                              //   e.libele_article +
+                              //   "</option>";
+                            }
+                            //alert(e.libele_article)
+                            //alert(e.libele_article+"--"+art_r[0].qteReçu)
+                          });
+
+
+                          let cc = "";
+                          //console.log("enenenenenene"+cnd[0])
+
+                          cnd[0].map((ele) => {
+                            //alert(elem.conditionnement_id == ele.id_condmnt)
+
+                            if (elem.conditionnement_id == ele.id_condmnt) {
+                              cc =
+                                // '<option value="' +
+                                // ele.id_condmnt +
+                                // '" selected="true">' +
+                                ele.abreviation_condmnt
+                              // +
+                              // "</option>";
+                            } else {
+                              // cc +=
+                              //   '<option value="' +
+                              //   ele.id_condmnt +
+                              //   '">' +
+                              //   ele.abreviation_condmnt +
+                              //   "</option>";
+                            }
+                          });
+
+                          //alert(c+"eeeeee")
+
+                          cell1.innerHTML =
+                            // '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
+                            // n +
+                            // '" disabled="true">' +
+                            c
+                          // +
+                          // '</select></div><div class="col-md-4" ><select disabled="true" class="js-example-basic-single w-100" id="cdmnt' +
+                          // n +
+                          // '">' +
+                          cell2.innerHTML = cc
+                          //  +
+                          // "</select></div></div>";
+                          cell3.innerHTML =
+                            // '<input type="number" min="0" class="form-control" require id="qte' +
+                            // n +
+                            // '" onchange=Montant(this) value=' +
+                            elem.qteCmd
+                          // +
+                          // ' disabled="true">';
+                          cell4.innerHTML =
+                            // '<input type="number"  class="form-control" require id="qteR' +
+                            // n +
+                            // '" value=' +
+                            art_r[0].qteReçu
+                          // +
+                          // " readonly >";
+
+                          var js_ = document.createElement("script");
+                          js_.type = "text/javascript";
+                          js_.src = "../../vendors/select2/select2.min.js";
+                          document.body.appendChild(js_);
+                          var js = document.createElement("script");
+                          js.type = "text/javascript";
+                          js.src = "../../js/select2.js";
+                          document.body.appendChild(js);
                         })
                         .catch((error) => {
                           console.error(
-                            "Failed to retrieve personnel data : ",
+                            "Failed to retrieve Entrepot data : ",
                             error
                           );
                         });
 
-                      c = "";
 
-                      n++;
-                      var table = document.getElementById("myTable");
-                      var row = table.insertRow(n);
-                      //alert(n)
-                      var cell1 = row.insertCell(0);
-                      var cell2 = row.insertCell(1);
-                      var cell3 = row.insertCell(2);
+                    })
+                    .catch((error) => {
+                      console.error(
+                        "Failed to retrieve BonReception_Article  data : ",
+                        error
+                      );
+                    });
+                })
+                .catch((error) => {
+                  console.error(
+                    "Failed to retrieve BonReceptions  data : ",
+                    error
+                  );
+                });
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to retrieve BomCommandes Article conditionments data : ",
+                error
+              );
+            });
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to retrieve BomCommandes data : ", error);
+    });
+};
 
-                      a[0].map((e) => {
-                        if (e.id_article == elem.article_id) {
-                          c +=
-                            '<option value="' +
-                            e.id_article +
-                            '" selected="true">' +
-                            e.libele_article +
-                            "</option>";
-                        } else {
-                          c +=
-                            '<option value="' +
-                            e.id_article +
-                            '" >' +
-                            e.libele_article +
-                            "</option>";
-                        }
-                      });
 
-                      let cc = "";
-                      //console.log("enenenenenene"+cnd[0])
 
-                      cnd[0].map((ele) => {
-                        //alert(elem.conditionnement_id == ele.id_condmnt)
 
-                        if (elem.conditionnement_id == ele.id_condmnt) {
-                          cc +=
-                            '<option value="' +
-                            ele.id_condmnt +
-                            '" selected="true">' +
-                            ele.abreviation_condmnt +
-                            "</option>";
-                        } else {
-                          cc +=
-                            '<option value="' +
-                            ele.id_condmnt +
-                            '">' +
-                            ele.abreviation_condmnt +
-                            "</option>";
-                        }
-                      });
+//***** Fonction de chargement de la page de detail de reception d'une commande ***\\
 
-                      //alert(c+"eeeeee")
+const voir_reception_BC_ = (id) => {
+  sequelize
+    .query("SELECT * FROM `fournisseur`")
+    .then((fseurs) => {
+      // alert(id);
 
-                      cell1.innerHTML =
-                        '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
-                        n +
-                        '" disabled="true">' +
-                        c +
-                        '</select></div><div class="col-md-4" ><select disabled="true" class="js-example-basic-single w-100" id="cdmnt' +
-                        n +
-                        '">' +
-                        cc +
-                        "</select></div></div>";
-                      cell2.innerHTML =
-                        '<input type="number" min="0" class="form-control" require id="qte' +
-                        n +
-                        '" onchange=Montant(this) value=' +
-                        elem.qteCmd +
-                        ' disabled="true">';
-                      cell3.innerHTML =
-                        '<input type="number"  class="form-control" require id="qteR' +
-                        n +
-                        '" value=' +
-                        art_r[0].qteReçu +
-                        " readonly >";
+      sequelize
+        .query(
+          "SELECT * FROM bonreceptions , fournisseur   WHERE fournisseur.id_fournisseur = bonreceptions.fournisseur_id AND bonreceptions.id_bonreception =" +
+          id
+        )
+        .then((BC) => {
+          console.log(BC[0][0].id_fournisseur);
 
-                      var js_ = document.createElement("script");
-                      js_.type = "text/javascript";
-                      js_.src = "../../vendors/select2/select2.min.js";
-                      document.body.appendChild(js_);
-                      var js = document.createElement("script");
-                      js.type = "text/javascript";
-                      js.src = "../../js/select2.js";
-                      document.body.appendChild(js);
+          let c = "";
+          fseurs[0].map((elem) => {
+            if (elem.id_fournisseur == BC[0][0].id_fournisseur) {
+              c +=
+                '<option value="' +
+                elem.id_fournisseur +
+                '" selected>' +
+                elem.nom_fournisseur +
+                "</option>";
+            } else {
+              c +=
+                '<option value="' +
+                elem.id_fournisseur +
+                '">' +
+                elem.nom_fournisseur +
+                "</option>";
+            }
+          });
+
+          document.getElementById("fseur").innerHTML = c;
+          var js_ = document.createElement("script");
+          js_.type = "text/javascript";
+          js_.src = "../../vendors/select2/select2.min.js";
+          //document.body.removeChild(js_)
+          document.body.appendChild(js_);
+          var js = document.createElement("script");
+          js.type = "text/javascript";
+          js.src = "../../js/select2.js";
+          //document.body.removeChild(js)
+          document.body.appendChild(js);
+          //console.log("Query succesfully executed", rows[0].nom_fournisseur);
+
+          // document.getElementById("date_a").value = BC[0][0].date_boncmd;
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve fournisseur Bonreception and fournisseur data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error(
+        "Failed to retrieve fournisseur Fournisseurs data : ",
+        error
+      );
+    });
+
+  sequelize
+    .query(
+      "SELECT * FROM `bonreception_article` , `articles` , `bonreceptions` , `conditionnements` WHERE conditionnements.id_condmnt = bonreception_article.conditionnement_id AND bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.id_bonreception = " +
+      id,
+      {
+        replacements: [],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((artcl) => {
+      //console.log(artcl)
+
+      n = 0;
+      t = 0;
+      artcl.map((elem) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
+          //alert(c+"aaaaa")
+          sequelize
+            .query(
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+              elem.article_id
+            )
+            .then((cnd) => {
+              sequelize
+                .query(
+                  "SELECT * FROM `bonreceptions`  WHERE id_bonreception = " +
+                  GET("id"),
+                  {
+                    replacements: [],
+                    type: sequelize.QueryTypes.SELECT,
+                  }
+                )
+                .then((br) => {
+                  console.log("yoyo");
+                  console.log(br);
+                  console.log("yiyi");
+                  sequelize
+                    .query(
+                      "SELECT * FROM `bonreception_article`  WHERE bonreception_article.conditionnement_id= " +
+                      elem.conditionnement_id +
+                      " AND bonreception_article.article_id = " +
+                      elem.article_id +
+                      " AND bonreception_article.bonreception_id = " +
+                      br[0].id_bonreception,
+                      {
+                        replacements: [],
+                        type: sequelize.QueryTypes.SELECT,
+                      }
+                    )
+                    .then((art_r) => {
+                      //alert(art_r[0].article_id)
+                      sequelize
+                        .query("SELECT * FROM  `entrepots` ", {
+                          type: sequelize.QueryTypes.SELECT,
+                        })
+                        .then((pers) => {
+
+
+                          let c = "";
+                          pers
+                            .map((e) => {
+                              if (e.id_entrepot == br[0].entrepot_id) {
+                                c +=
+                                  '<option value="' +
+                                  e.id_entrepot +
+                                  '" selected="true">' +
+                                  e.libele_entrepot +
+                                  "</option>";
+                              } else {
+                                c +=
+                                  '<option value="' +
+                                  e.id_entrepot +
+                                  '" >' +
+                                  e.libele_entrepot +
+                                  "</option>";
+                              }
+                            })
+                            .join();
+
+                          document.getElementById("entrepot").innerHTML = c;
+
+                          var js_ = document.createElement("script");
+                          js_.type = "text/javascript";
+                          js_.src = "../../vendors/select2/select2.min.js";
+                          document.body.appendChild(js_);
+                          var js = document.createElement("script");
+                          js.type = "text/javascript";
+                          js.src = "../../js/select2.js";
+                          document.body.appendChild(js);
+
+                          document.getElementById("date").value =
+                            br[0].date_reception;
+
+                          c = "";
+
+                          n++;
+                          var table = document.getElementById("myTable");
+                          var row = table.insertRow(n);
+
+                          var cell1 = row.insertCell(0);
+                          var cell2 = row.insertCell(1);
+                          var cell3 = row.insertCell(2);
+
+                          // tbody = "<tr><td>aaaaaaaaaaaaaaaaa</td></tr><tr><td>aaaaaaaaaaaaaaaaa</td></tr><tr><td>aaaaaaaaaaaaaaaaa</td></tr>"
+                          // document.getElementById("tbody_br").innerHTML += tbody
+                          a[0].map((e) => {
+                            if (e.id_article == elem.article_id) {
+                              //alert(e.libele_article)
+                              c =
+                                // '<option value="' +
+                                // e.id_article +
+                                // '" selected="true">' +
+                                e.libele_article
+                              // +
+                              // "</option>";
+                              c1 = e.id_article
+                            } else {
+                              // c +=
+                              //   '<option value="' +
+                              //   e.id_article +
+                              //   '" >' +
+                              //   e.libele_article +
+                              //   "</option>";
+                            }
+                            //alert(e.libele_article)
+                            //alert(e.libele_article+"--"+art_r[0].qteReçu)
+                          });
+
+
+                          let cc = "";
+                          //console.log("enenenenenene"+cnd[0])
+
+                          cnd[0].map((ele) => {
+                            //alert(elem.conditionnement_id == ele.id_condmnt)
+
+                            if (elem.conditionnement_id == ele.id_condmnt) {
+                              cc =
+                                // '<option value="' +
+                                // ele.id_condmnt +
+                                // '" selected="true">' +
+                                ele.abreviation_condmnt
+                              // +
+                              // "</option>";
+                              cc1 = elem.conditionnement_id
+                            } else {
+                              // cc +=
+                              //   '<option value="' +
+                              //   ele.id_condmnt +
+                              //   '">' +
+                              //   ele.abreviation_condmnt +
+                              //   "</option>";
+                            }
+                          });
+
+                          //alert(c+"eeeeee")
+
+                          cell1.innerHTML =
+                            // '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
+                            // n +
+                            // '" disabled="true">' +
+                            c + '<input type="number" min="0" class="form-control" require id="article' +
+                            n +
+                            '"  value=' + c1
+                            +
+                            ' hidden>'
+                            + '<input type="number" min="0" class="form-control" require id="cdmnt' +
+                            n +
+                            '"  value=' + cc1
+                            +
+                            ' hidden>'
+                            + '<input type="number" min="0" class="form-control" require id="entrepot' +
+                            n +
+                            '"  value=' + br[0].entrepot_id
+                            +
+                            ' hidden>' +
+                            '<input type="number" min="0" class="form-control" require id="nt' +
+                            n +
+                            '"  value=' + art_r[0].nt_r
+                            +
+                            ' hidden>'+
+                            '<input type="text"  class="form-control" require id="date' +
+                            n +
+                            '"  value=' +br[0].date_reception
+                            +
+                            ' hidden>'+
+                            '<input type="text"  class="form-control" require id="qteR' +
+                            n +
+                            '"  value=' +art_r[0].qteReçu
+                            +
+                            ' hidden>'
+                            
+                          
+                            
+                          // +
+                          // '</select></div><div class="col-md-4" ><select disabled="true" class="js-example-basic-single w-100" id="cdmnt' +
+                          // n +
+                          // '">' +
+                          cell2.innerHTML = cc
+                          //  +
+                          // "</select></div></div>";
+                          //cell3.innerHTML =
+                          // '<input type="number" min="0" class="form-control" require id="qte' +
+                          // n +
+                          // '" onchange=Montant(this) value=' +
+
+                          // +
+                          // ' disabled="true">';
+                          cell3.innerHTML =
+                            // '<input type="number"  class="form-control" require id="qteR' +
+                            // n +
+                            // '" value=' +
+                            art_r[0].qteReçu
+                          // +
+                          // " readonly >";
+
+                          var js_ = document.createElement("script");
+                          js_.type = "text/javascript";
+                          js_.src = "../../vendors/select2/select2.min.js";
+                          document.body.appendChild(js_);
+                          var js = document.createElement("script");
+                          js.type = "text/javascript";
+                          js.src = "../../js/select2.js";
+                          document.body.appendChild(js);
+                        })
+                        .catch((error) => {
+                          console.error(
+                            "Failed to retrieve Entrepot data : ",
+                            error
+                          );
+                        });
+
+
                     })
                     .catch((error) => {
                       console.error(
@@ -3885,7 +7925,7 @@ const modif_reception_BC = (id) => {
       sequelize
         .query(
           "SELECT * FROM `fournisseur` , `bomcommandes`  WHERE fournisseur.id_fournisseur = bomcommandes.fournisseur_id AND bomcommandes.id_boncmd =" +
-            id
+          id
         )
         .then((BC) => {
           console.log(BC[0][0].id_fournisseur);
@@ -3941,7 +7981,7 @@ const modif_reception_BC = (id) => {
   sequelize
     .query(
       "SELECT * FROM `boncmd_article` , `articles` , `bomcommandes` , `conditionnements` WHERE conditionnements.id_condmnt = boncmd_article.conditionnement_id AND bomcommandes.id_boncmd = boncmd_article.boncmd_id  AND articles.id_article = boncmd_article.article_id AND bomcommandes.id_boncmd = " +
-        id,
+      id,
       {
         replacements: [],
         type: sequelize.QueryTypes.SELECT,
@@ -3958,13 +7998,13 @@ const modif_reception_BC = (id) => {
           sequelize
             .query(
               "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-                elem.article_id
+              elem.article_id
             )
             .then((cnd) => {
               sequelize
                 .query(
                   "SELECT * FROM `bonreceptions`  WHERE boncmd_id = " +
-                    GET("id"),
+                  GET("id"),
                   {
                     replacements: [],
                     type: sequelize.QueryTypes.SELECT,
@@ -3974,11 +8014,11 @@ const modif_reception_BC = (id) => {
                   sequelize
                     .query(
                       "SELECT * FROM `bonreception_article`  WHERE bonreception_article.conditionnement_id= " +
-                        elem.conditionnement_id +
-                        " AND bonreception_article.article_id = " +
-                        elem.article_id +
-                        " AND bonreception_article.bonreception_id = " +
-                        br[0].id_bonreception,
+                      elem.conditionnement_id +
+                      " AND bonreception_article.article_id = " +
+                      elem.article_id +
+                      " AND bonreception_article.bonreception_id = " +
+                      br[0].id_bonreception,
                       {
                         replacements: [],
                         type: sequelize.QueryTypes.SELECT,
@@ -4042,6 +8082,7 @@ const modif_reception_BC = (id) => {
                             '" selected="true">' +
                             e.libele_article +
                             "</option>";
+                          aaa = e.libele_article
                         } else {
                           c +=
                             '<option value="' +
@@ -4086,7 +8127,7 @@ const modif_reception_BC = (id) => {
                       var cell3 = row.insertCell(2);
 
                       cell1.innerHTML =
-                        '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="m_article' +
+                        '<div class="row"><div class="col-md-8" ><input type"texte" id="a' + n + '" value="' + aaa + '" hidden ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="m_article' +
                         n +
                         '" disabled="true">' +
                         c +
@@ -4175,6 +8216,379 @@ const modif_reception_BC = (id) => {
     });
 };
 
+
+//***** Fonction de chargement de la page de modificationl de reception d'une commande ***\\
+
+const modif_reception_BC_ = (id) => {
+
+
+  sequelize
+    .query("SELECT * FROM `fournisseur`")
+    .then((fseurs) => {
+      console.log(fseurs[0]);
+
+      sequelize
+        .query(
+          "SELECT * FROM bonreceptions , fournisseur   WHERE fournisseur.id_fournisseur = bonreceptions.fournisseur_id AND bonreceptions.id_bonreception =" +
+          id
+        )
+        .then((BC) => {
+          console.log(BC[0][0].id_fournisseur);
+
+          let c = "";
+          fseurs[0].map((elem) => {
+            if (elem.id_fournisseur == BC[0][0].id_fournisseur) {
+              c +=
+                '<option value="' +
+                elem.id_fournisseur +
+                '" selected>' +
+                elem.nom_fournisseur +
+                "</option>";
+            } else {
+              c +=
+                '<option value="' +
+                elem.id_fournisseur +
+                '">' +
+                elem.nom_fournisseur +
+                "</option>";
+            }
+          });
+
+          document.getElementById("fseur").innerHTML = c;
+          var js_ = document.createElement("script");
+          js_.type = "text/javascript";
+          js_.src = "../../vendors/select2/select2.min.js";
+          //document.body.removeChild(js_)
+          document.body.appendChild(js_);
+          var js = document.createElement("script");
+          js.type = "text/javascript";
+          js.src = "../../js/select2.js";
+          //document.body.removeChild(js)
+          document.body.appendChild(js);
+          //console.log("Query succesfully executed", rows[0].nom_fournisseur);
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve fournisseur BomCommandes data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error(
+        "Failed to retrieve fournisseur BomCommandes data : ",
+        error
+      );
+    });
+
+  sequelize
+    .query(
+      "SELECT * FROM `bonreception_article` , `articles` , `bonreceptions` , `conditionnements` WHERE conditionnements.id_condmnt = bonreception_article.conditionnement_id AND bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.id_bonreception = " +
+      id,
+      {
+        replacements: [],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((artcl) => {
+      //console.log(artcl)
+
+      n = 0;
+      t = 0;
+      artcl.map((elem) => {
+        sequelize.query("SELECT * FROM `articles` ").then((a) => {
+          //alert(c+"aaaaa")
+          sequelize
+            .query(
+              "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
+              elem.article_id
+            )
+            .then((cnd) => {
+              sequelize
+                .query(
+                  "SELECT * FROM `bonreceptions`  WHERE id_bonreception  = " +
+                  GET("id"),
+                  {
+                    replacements: [],
+                    type: sequelize.QueryTypes.SELECT,
+                  }
+                )
+                .then((br) => {
+                  sequelize
+                    .query(
+                      "SELECT * FROM `bonreception_article`  WHERE bonreception_article.conditionnement_id= " +
+                      elem.conditionnement_id +
+                      " AND bonreception_article.article_id = " +
+                      elem.article_id +
+                      " AND bonreception_article.bonreception_id = " +
+                      br[0].id_bonreception,
+                      {
+                        replacements: [],
+                        type: sequelize.QueryTypes.SELECT,
+                      }
+                    )
+                    .then(async (art_r) => {
+                      sequelize
+                        .query("SELECT * FROM  `entrepots` ", {
+                          type: sequelize.QueryTypes.SELECT,
+                        })
+                        .then((pers) => {
+                          let c = "";
+                          pers
+                            .map((e) => {
+                              if (e.id_entrepot == br[0].entrepot_id) {
+                                c +=
+                                  '<option value="' +
+                                  e.id_entrepot +
+                                  '" selected="true">' +
+                                  e.libele_entrepot +
+                                  "</option>";
+                              } else {
+                                c +=
+                                  '<option value="' +
+                                  e.id_entrepot +
+                                  '" >' +
+                                  e.libele_entrepot +
+                                  "</option>";
+                              }
+                            })
+                            .join();
+
+                          document.getElementById("entrepot").innerHTML = c;
+
+                          var js_ = document.createElement("script");
+                          js_.type = "text/javascript";
+                          js_.src = "../../vendors/select2/select2.min.js";
+                          document.body.appendChild(js_);
+                          var js = document.createElement("script");
+                          js.type = "text/javascript";
+                          js.src = "../../js/select2.js";
+                          document.body.appendChild(js);
+
+                          document.getElementById("date").value =
+                            br[0].date_reception;
+                        })
+                        .catch((error) => {
+                          console.error(
+                            "Failed to retrieve personnel data : ",
+                            error
+                          );
+                        });
+
+                      let c = "";
+                      let r, rr
+
+                      a[0].map((e) => {
+                        if (e.id_article == elem.article_id) {
+                          c +=
+                            '<option value="' +
+                            e.id_article +
+                            '" selected="true">' +
+                            e.libele_article +
+                            "</option>";
+                          aaa = e.libele_article
+                          r = e.id_article
+                        } else {
+                          c +=
+                            '<option value="' +
+                            e.id_article +
+                            '" >' +
+                            e.libele_article +
+                            "</option>";
+                        }
+                      });
+
+                      let cc = "";
+                      //console.log("enenenenenene"+cnd[0])
+
+                      cnd[0].map((ele) => {
+                        //alert(elem.conditionnement_id == ele.id_condmnt)
+
+                        if (elem.conditionnement_id == ele.id_condmnt) {
+                          cc +=
+                            '<option value="' +
+                            ele.id_condmnt +
+                            '" selected="true">' +
+                            ele.abreviation_condmnt +
+                            "</option>";
+                          rr = ele.id_condmnt
+                        } else {
+                          cc +=
+                            '<option value="' +
+                            ele.id_condmnt +
+                            '">' +
+                            ele.abreviation_condmnt +
+                            "</option>";
+                        }
+                      });
+
+                      //alert(c+"eeeeee")
+
+                      const BS = await sequelize
+                        .query(
+                          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+                          r +
+                          " AND bonsortie.provenance = " + br[0].entrepot_id +
+                          " AND conditionnements.id_condmnt =" + rr
+                          +
+                          " AND bonsortie_article.date_s <= '" + artcl[0].date_r + "' "
+
+                          ,
+
+                          {
+                            type: sequelize.QueryTypes.SELECT,
+                          }
+                        )
+
+                      const BR = await sequelize
+                        .query(
+                          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+                          r +
+                          " AND bonreceptions.entrepot_id = " + br[0].entrepot_id
+                          + " AND conditionnements.id_condmnt =" + rr +
+                          " AND bonreceptions.date_reception <= '" + artcl[0].date_r
+                          + "'"
+                          ,
+
+                          {
+                            type: sequelize.QueryTypes.SELECT,
+                          }
+                        )
+                      console.log(BS)
+                      console.log(BR)
+
+                      // //a++;
+                      nt = 0
+                      st = 0
+                      BS.map((S) => {
+                        if (S.nt_s > nt) {
+                          st = S.st_a_s
+                          nt = S.nt_s
+                        }
+
+                      })
+                      BR.map((R) => {
+                        if (R.nt_r > nt) {
+                          st = R.st_a_r
+                          nt = R.nt_r
+                        }
+
+                      })
+
+                      // document.getElementById("st" + n).value = st;
+                      // document.getElementById("nt" + n).value = nt;
+
+                      n++;
+
+                      var table = document.getElementById("myTable");
+                      var row = table.insertRow(n);
+                      //alert(n)
+                      var cell1 = row.insertCell(0);
+                      var cell2 = row.insertCell(1);
+                      var cell3 = row.insertCell(2);
+
+
+
+                      cell1.innerHTML =
+                        '<div class="row"><div class="col-md-8" ><input type="number" min="0" class="form-control" require id="nt' + n + '" readonly  value=' + nt + ' hidden><input type="number" min="0" class="form-control" require id="st' + n + '" readonly value=' + st + ' hidden><input type"texte" id="a' + n + '" value="' + aaa + '" hidden ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article' +
+                        n +
+                        '">' +
+                        c +
+                        '</select></div><div class="col-md-4" ><select  class="js-example-basic-single w-100" id="cdmnt' +
+                        n +
+                        '"   onchange="chargement_st(this)" id="cdmnt' + n + '">' +
+                        cc +
+                        "</select></div></div>";
+                      //cell2.innerHTML =
+
+                      cell2.innerHTML =
+                        '<input type="number"  class="form-control" require id="qteR' +
+                        n +
+                        '" value=' +
+                        art_r[0].qteReçu +
+                        " >";
+                      cell3.innerHTML =
+                        '<i title="Retirer" style="font-size: 25px" class="mdi mdi-minus-circle text-danger icon-remove" onclick="RemoveRow(this)" id="m_' +
+                        n +
+                        '"></i>';
+                      ////////////////////////////////////////////
+
+                      var table1 = document.getElementById("myTable_m");
+                      var row1 = table1.insertRow(n);
+                      //alert(n)
+                      var cel1 = row1.insertCell(0);
+                      var cel2 = row1.insertCell(1);
+                      var cel3 = row1.insertCell(2);
+                      cel1.innerHTML =
+                        '<div class="row"><input type="number" min="0" class="form-control" require id="nt_' + n + '" readonly  value=' + art_r[0].nt_r + '><input type="number" min="0" class="form-control" require id="st_' + n + '" readonly value=' + art_r[0].st_b_r + ' ><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article_' +
+                        n +
+                        '">' +
+                        c +
+                        '</select></div><div class="col-md-4" ><select  class="js-example-basic-single w-100" id="cdmnt_' +
+                        n +
+                        '">' +
+                        cc +
+                        "</select></div></div>";
+                      //cell2.innerHTML =
+
+                      cel2.innerHTML =
+                        '<input type="number"  class="form-control" require id="qteR_' +
+                        n +
+                        '" value=' +
+                        art_r[0].qteReçu +
+                        " >";
+                      cel3.innerHTML =
+                        '<input type="number"  class="form-control" require id="entrepot' +
+                        n +
+                        '" value=' +
+                        br[0].entrepot_id +
+                        " >";
+
+
+                      var js_ = document.createElement("script");
+                      js_.type = "text/javascript";
+                      js_.src = "../../vendors/select2/select2.min.js";
+                      document.body.appendChild(js_);
+                      var js = document.createElement("script");
+                      js.type = "text/javascript";
+                      js.src = "../../js/select2.js";
+                      document.body.appendChild(js);
+
+
+
+
+
+
+                    })
+                    .catch((error) => {
+                      console.error(
+                        "Failed to retrieve BonReception_Article  data : ",
+                        error
+                      );
+                    });
+                })
+                .catch((error) => {
+                  console.error(
+                    "Failed to retrieve BonReceptions  data : ",
+                    error
+                  );
+                });
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to retrieve BomCommandes Article conditionments data : ",
+                error
+              );
+            });
+        });
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to retrieve BomCommandes data : ", error);
+    });
+};
+
 //***** Fonction  d'enregistrement d'un bon de Sortie  ***\\
 
 const Update_BR = (n, c) => {
@@ -4186,7 +8600,7 @@ const Update_BR = (n, c) => {
       sequelize
         .query(
           "SELECT * FROM bonreception_article WHERE bonreception_id =" +
-            BR[0][0].id_bonreception
+          BR[0][0].id_bonreception
         )
         .then((B_R) => {
           //console.log(B_A)
@@ -4198,11 +8612,11 @@ const Update_BR = (n, c) => {
               sequelize
                 .query(
                   "SELECT * FROM entrepot_article WHERE article_id = " +
-                    e.article_id +
-                    " AND condmnt_id = " +
-                    e.conditionnement_id +
-                    " AND entrepot_id = " +
-                    BR[0][0].entrepot_id
+                  e.article_id +
+                  " AND condmnt_id = " +
+                  e.conditionnement_id +
+                  " AND entrepot_id = " +
+                  BR[0][0].entrepot_id
                 )
                 .then((art_e) => {
                   //(art_e[0][0].stock - elem.qteSortie )
@@ -4263,12 +8677,13 @@ const Update_BR = (n, c) => {
 
   sequelize
     .query(
-      "UPDATE bonreceptions SET date_reception = :date_reception , entrepot_id = :entrepot_id  WHERE boncmd_id = :boncmd_id",
+      "UPDATE bonreceptions SET date_reception = :date_reception , entrepot_id = :entrepot_id , fournisseur_id = :fournisseur_id  WHERE boncmd_id = :boncmd_id",
       {
         replacements: {
           date_reception: date_bon,
           boncmd_id: GET("id"),
           entrepot_id: document.getElementById("entrepot").value,
+          fournisseur_id: document.getElementById("fseur").value,
         },
         type: sequelize.QueryTypes.UPDATE,
       }
@@ -4287,7 +8702,7 @@ const Update_BR = (n, c) => {
           sequelize
             .query(
               "DELETE FROM bonreception_article WHERE bonreception_id =" +
-                BR[0].id_bonreception
+              BR[0].id_bonreception
             )
             .then((D) => {
               for (var i = 1; i <= n; i++) {
@@ -4296,14 +8711,14 @@ const Update_BR = (n, c) => {
                 sequelize
                   .query(
                     'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
-                      BR[0].id_bonreception +
-                      '","' +
-                      document.getElementById("article" + i).value +
-                      '","' +
-                      document.getElementById("qteR" + i).value +
-                      '","' +
-                      document.getElementById("cdmnt" + i).value +
-                      '")'
+                    BR[0].id_bonreception +
+                    '","' +
+                    document.getElementById("article" + i).value +
+                    '","' +
+                    document.getElementById("qteR" + i).value +
+                    '","' +
+                    document.getElementById("cdmnt" + i).value +
+                    '")'
                   )
                   .then((art_bR) => {
                     compteur++;
@@ -4312,7 +8727,7 @@ const Update_BR = (n, c) => {
                       sequelize
                         .query(
                           "SELECT * FROM bonreception_article WHERE bonreception_id =" +
-                            BR[0].id_bonreception
+                          BR[0].id_bonreception
                         )
                         .then((B_R) => {
                           //console.log(B_A)
@@ -4324,11 +8739,11 @@ const Update_BR = (n, c) => {
                               sequelize
                                 .query(
                                   "SELECT * FROM entrepot_article WHERE article_id = " +
-                                    e.article_id +
-                                    " AND condmnt_id = " +
-                                    e.conditionnement_id +
-                                    " AND entrepot_id = " +
-                                    document.getElementById("entrepot").value
+                                  e.article_id +
+                                  " AND condmnt_id = " +
+                                  e.conditionnement_id +
+                                  " AND entrepot_id = " +
+                                  document.getElementById("entrepot").value
                                 )
                                 .then((art_e) => {
                                   //(art_e[0][0].stock - elem.qteSortie )
@@ -4356,9 +8771,9 @@ const Update_BR = (n, c) => {
                                       d++;
 
                                       if (d == B_R[0].length) {
-                                        alert(
-                                          "Reception modifieé avec success."
-                                        );
+                                        // alert(
+                                        //   "Reception modifieé avec success."
+                                        // );
                                         window.location.replace(
                                           "voir_bon_R.html?id=" + GET("id")
                                         );
@@ -4413,6 +8828,1065 @@ const Update_BR = (n, c) => {
     });
 };
 
+
+const Update_BR_ = (n, c) => {
+
+  date_bon = document.getElementById("date_n").value;
+
+  if (date_bon == "") {
+    date_bon = document.getElementById("date").value;
+  }
+
+  req = 'UPDATE entrepot_article SET stock = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 1; i++) {
+    if (parseInt(document.getElementById("qteR_" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 1) {
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+            ' AND article_id = ' + document.getElementById("article_" + i).value +
+            ' AND condmnt_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' THEN stock - ' + document.getElementById("qteR_" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+
+          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot" + i).value +
+            ' AND article_id = ' + document.getElementById("article_" + i).value +
+            ' AND condmnt_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' THEN stock - ' + document.getElementById("qteR_" + i).value +
+            " ELSE stock END"
+        } else {
+
+          req += " ELSE stock END"
+
+        }
+
+      }
+    }
+
+
+  }
+  req_r1 = 'UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_b_r = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 1; i++) {
+    if (parseInt(document.getElementById("qteR_" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 1) {
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+          req_r1 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_r >= "' + document.getElementById("date").value +
+            '" AND  nt_r >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_b_r - ' + document.getElementById("qteR_" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+
+          req_r1 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_r >= "' + document.getElementById("date").value +
+            '" AND  nt_r >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_b_r - ' + document.getElementById("qteR_" + i).value +
+            " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_r1 += " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  req_r2 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_a_r = CASE '
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 1; i++) {
+    if (parseInt(document.getElementById("qteR_" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 1) {
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+          req_r2 += '   WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_r >= "' + document.getElementById("date").value +
+            '" AND  nt_r >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_a_r - ' + document.getElementById("qteR_" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+
+          req_r2 += ' WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_r >= "' + document.getElementById("date").value +
+            '" AND  nt_r >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_a_r - ' + document.getElementById("qteR_" + i).value +
+            " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_r2 += " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+
+  req_s1 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie  \n SET  st_b_s = CASE '
+
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 1; i++) {
+    if (parseInt(document.getElementById("qteR_" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 1) {
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+          req_s1 += '\n WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_s >= "' + document.getElementById("date").value +
+            '" AND  nt_s >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_b_s - ' + document.getElementById("qteR_" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+
+          req_s1 += '\n WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_s >= "' + document.getElementById("date").value +
+            '" AND  nt_s >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_b_s - ' + document.getElementById("qteR_" + i).value +
+            " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_s1 += " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  req_s2 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  st_a_s = CASE '
+  for (var i = 1; i <= document.getElementById("myTable_m").rows.length - 1; i++) {
+    if (parseInt(document.getElementById("qteR_" + i).value) != 0) {
+
+      if (i != document.getElementById("myTable_m").rows.length - 1) {
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+          req_s2 += '  \n WHEN ' +
+            ' article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_s >= "' + document.getElementById("date").value +
+            '" AND  nt_s >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_a_s - ' + document.getElementById("qteR_" + i).value
+
+        }
+
+      } else {
+
+        if (parseInt(document.getElementById("qteR_" + i).value.length) >
+          0) {
+
+          req_s2 += '  \n WHEN ' +
+            '  article_id = ' + document.getElementById("article_" + i).value +
+            ' AND conditionnement_id = ' + document.getElementById("cdmnt_" + i).value +
+            ' AND date_s >= "' + document.getElementById("date").value +
+            '" AND  nt_s >= ' + document.getElementById("nt_" + i).value +
+            ' THEN st_a_s - ' + document.getElementById("qteR_" + i).value +
+            " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+        } else {
+
+          req_s2 += " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot" + i).value
+
+        }
+
+      }
+    }
+
+
+  }
+  //alert(req_s)
+
+  sequelize
+    .query(req)
+    .then((BC) => {
+      sequelize
+        .query(req_r1)
+        .then((BC) => {
+          sequelize
+            .query(req_r2)
+            .then((BC) => {
+              sequelize
+                .query(req_s1)
+                .then((BC) => {
+                  sequelize
+                    .query(req_s2)
+                    .then(async (BC) => {
+
+                      for (var i = 1; i <= n - 1; i++) {
+                        //alert("rtyui")
+
+                        if (document.getElementById("article" + i).value != 0) {
+                          const BS = await sequelize
+                            .query(
+                              "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+                              document.getElementById("article" + i).value +
+                              " AND bonsortie.provenance = " + document.getElementById("entrepot").value +
+                              " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value
+                              +
+                              " AND bonsortie_article.date_s <= '" + document.getElementById("date").value + "' "
+
+                              ,
+
+                              {
+                                type: sequelize.QueryTypes.SELECT,
+                              }
+                            )
+
+                          const BR = await sequelize
+                            .query(
+                              "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+                              document.getElementById("article" + i).value +
+                              " AND bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+                              + " AND conditionnements.id_condmnt =" + document.getElementById("cdmnt" + i).value +
+                              " AND bonreceptions.date_reception <= '" + document.getElementById("date").value
+                              + "'"
+                              ,
+
+                              {
+                                type: sequelize.QueryTypes.SELECT,
+                              }
+                            )
+                          console.log(BS)
+                          console.log(BR)
+
+                          // //a++;
+                          nt = 0
+                          st = 0
+                          BS.map((S) => {
+                            if (S.nt_s > nt) {
+                              st = S.st_a_s
+                              nt = S.nt_s
+                            }
+
+                          })
+                          BR.map((R) => {
+                            if (R.nt_r > nt) {
+                              st = R.st_a_r
+                              nt = R.nt_r
+                            }
+
+                          })
+
+                          document.getElementById("st" + i).value = st;
+                          document.getElementById("nt" + i).value = nt;
+
+
+
+                        }
+                      }
+
+                      sequelize
+                        .query(
+                          "UPDATE bonreceptions SET date_reception = :date_reception , entrepot_id = :entrepot_id , fournisseur_id = :fournisseur_id  WHERE id_bonreception = :id_bonreception",
+                          {
+                            replacements: {
+                              date_reception: date_bon,
+                              id_bonreception: GET("id"),
+                              entrepot_id: document.getElementById("entrepot").value,
+                              fournisseur_id: document.getElementById("fseur").value,
+                            },
+                            type: sequelize.QueryTypes.UPDATE,
+                          }
+                        )
+                        .then((B) => {
+                          sequelize
+                            .query(
+                              "DELETE FROM bonreception_article WHERE bonreception_id =" +
+                              GET("id")
+                            )
+                            .then((D) => {
+                              req = 'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id,date_r,st_b_r,st_a_r,nt_r) VALUES'
+
+
+                              for (var i = 1; i <= n - 1; i++) {
+                                if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                  if (i != n - 1) {
+                                    if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                      0) {
+
+                                      req += ' (' + GET("id") + "," +
+                                        document.getElementById("article" + i).value +
+                                        "," + document.getElementById("qteR" + i).value +
+                                        "," +
+                                        document.getElementById("cdmnt" + i).value +
+                                        ",'" +
+                                        document.getElementById("date").value +
+                                        "'," +
+                                        document.getElementById("st" + i).value +
+                                        "," +
+                                        (parseInt(document.getElementById("st" + i).value) + parseInt(document.getElementById("qteR" + i).value)) +
+                                        "," +
+                                        (parseInt(document.getElementById("nt" + i).value) + 1) +
+                                        ") ,"
+                                    }
+
+                                  } else {
+
+                                    if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                      0) {
+
+                                      req += ' (' + GET("id") + "," +
+                                        document.getElementById("article" + i).value +
+                                        "," + document.getElementById("qteR" + i).value +
+                                        "," +
+                                        document.getElementById("cdmnt" + i).value +
+                                        ",'" +
+                                        document.getElementById("date").value +
+                                        "'," +
+                                        document.getElementById("st" + i).value +
+                                        "," +
+                                        (parseInt(document.getElementById("st" + i).value) + parseInt(document.getElementById("qteR" + i).value)) +
+                                        "," +
+                                        (parseInt(document.getElementById("nt" + i).value) + 1) +
+                                        ") ;"
+                                    } else {
+                                      req1 = req
+                                      req = ''
+                                      for (let index = 0; index < req1.length - 2; index++) {
+
+                                        req += req1[index]
+
+                                      }
+                                      req += ";"
+
+
+                                    }
+
+                                  }
+                                }
+                                //alert(parseInt(document.getElementById("qteR" + i).value) )
+                              }
+                              //alert(req)
+
+                              sequelize
+                                .query(req)
+                                .then((BC) => {
+                                  req = 'UPDATE entrepot_article SET stock = CASE '
+                                  for (var i = 1; i <= n - 1; i++) {
+                                    if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                      if (i != n - 1) {
+                                        if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                          0) {
+                                          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN stock + ' + document.getElementById("qteR" + i).value
+
+                                        }
+
+                                      } else {
+
+                                        if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                          0) {
+
+                                          req += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN stock + ' + document.getElementById("qteR" + i).value +
+                                            " ELSE stock END"
+                                        } else {
+
+                                          req += " ELSE stock END"
+
+                                        }
+
+                                      }
+                                    }
+
+
+                                  }
+
+                                  req_ = 'UPDATE entrepot_article SET n_trans = CASE '
+                                  for (var i = 1; i <= n - 1; i++) {
+                                    if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                      if (i != n - 1) {
+                                        if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                          0) {
+                                          req_ += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN n_trans + 1'
+
+                                        }
+
+                                      } else {
+
+                                        if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                          0) {
+
+                                          req_ += ' WHEN entrepot_id = ' + document.getElementById("entrepot").value +
+                                            ' AND article_id = ' + document.getElementById("article" + i).value +
+                                            ' AND condmnt_id = ' + document.getElementById("cdmnt" + i).value +
+                                            ' THEN n_trans + 1' +
+                                            " ELSE n_trans END"
+                                        } else {
+
+                                          req_ += " ELSE n_trans END"
+
+                                        }
+
+                                      }
+                                    }
+
+
+                                  }
+                                  //alert(req)
+
+                                  sequelize
+                                    .query(req)
+                                    .then((BC) => {
+                                      sequelize
+                                        .query(req_)
+                                        .then((BC) => {
+
+
+                                          req_r1 = 'UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_b_r = CASE '
+
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+                                                  req_r1 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + document.getElementById("date").value +
+                                                    '" THEN st_b_r + ' + document.getElementById("qteR" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+
+                                                  req_r1 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + document.getElementById("date").value +
+                                                    '" THEN st_b_r + ' + document.getElementById("qteR" + i).value +
+                                                    " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+                                                } else {
+
+                                                  req_r1 += " ELSE st_b_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+                                          req_r2 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  st_a_r = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+                                                  req_r2 += '   WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + document.getElementById("date").value +
+                                                    '" THEN st_a_r + ' + document.getElementById("qteR" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+
+                                                  req_r2 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + document.getElementById("date").value +
+                                                    '" THEN st_a_r + ' + document.getElementById("qteR" + i).value +
+                                                    " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+                                                } else {
+
+                                                  req_r2 += " ELSE st_a_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+
+                                          req_r3 = ' UPDATE bonreception_article  INNER JOIN bonreceptions ON bonreception_article.bonreception_id =  bonreceptions.id_bonreception  SET  nt_r = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+                                                  req_r3 += '   WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + document.getElementById("date").value +
+                                                    '" THEN nt_r + 1 '
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+
+                                                  req_r3 += ' WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_r > "' + document.getElementById("date").value +
+                                                    '" THEN nt_r + 1 ' +
+                                                    " ELSE nt_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+                                                } else {
+
+                                                  req_r3 += " ELSE nt_r END WHERE bonreceptions.entrepot_id = " + document.getElementById("entrepot").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+
+                                          req_s1 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie  \n SET  st_b_s = CASE '
+
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+                                                  req_s1 += '\n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + document.getElementById("date").value +
+                                                    '" THEN st_b_s + ' + document.getElementById("qteR" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+
+                                                  req_s1 += '\n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + document.getElementById("date").value +
+                                                    '" THEN st_b_s + ' + document.getElementById("qteR" + i).value +
+                                                    " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot").value
+                                                } else {
+
+                                                  req_s1 += " ELSE st_b_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+                                          req_s2 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  st_a_s = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+                                                  req_s2 += '  \n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + document.getElementById("date").value +
+                                                    '" THEN st_a_s + ' + document.getElementById("qteR" + i).value
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+
+                                                  req_s2 += '  \n WHEN ' +
+                                                    '  article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + document.getElementById("date").value +
+                                                    '" THEN st_a_s + ' + document.getElementById("qteR" + i).value +
+                                                    " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot").value
+                                                } else {
+
+                                                  req_s2 += " ELSE st_a_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+
+                                          req_s3 = 'UPDATE  bonsortie_article INNER JOIN bonsortie ON bonsortie_article.bonsortie_id =  bonsortie.id_bonsortie \n SET  nt_s = CASE '
+                                          for (var i = 1; i <= document.getElementById("myTable").rows.length - 2; i++) {
+                                            if (parseInt(document.getElementById("qteR" + i).value) != 0) {
+
+                                              if (i != document.getElementById("myTable").rows.length - 2) {
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+                                                  req_s3 += '  \n WHEN ' +
+                                                    ' article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + document.getElementById("date").value +
+                                                    '" THEN nt_s + 1'
+
+                                                }
+
+                                              } else {
+
+                                                if (parseInt(document.getElementById("qteR" + i).value.length) >
+                                                  0) {
+
+                                                  req_s3 += '  \n WHEN ' +
+                                                    '  article_id = ' + document.getElementById("article" + i).value +
+                                                    ' AND conditionnement_id = ' + document.getElementById("cdmnt" + i).value +
+                                                    ' AND date_s > "' + document.getElementById("date").value +
+                                                    '" THEN nt_s + 1' +
+                                                    " ELSE nt_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot").value
+                                                } else {
+
+                                                  req_s3 += " ELSE nt_s END WHERE bonsortie.provenance = " + document.getElementById("entrepot").value
+
+                                                }
+
+                                              }
+                                            }
+
+
+                                          }
+                                          sequelize
+                                            .query(req_r1)
+                                            .then((BC) => {
+                                              sequelize
+                                                .query(req_r2)
+                                                .then((BC) => {
+                                                  sequelize
+                                                    .query(req_r3)
+                                                    .then((BC) => {
+                                                      sequelize
+                                                        .query(req_s1)
+                                                        .then((BC) => {
+                                                          sequelize
+                                                            .query(req_s2)
+                                                            .then((BC) => {
+                                                              sequelize
+                                                                .query(req_s3)
+                                                                .then((BC) => {
+                                                                  ////////////////////
+                                                                  alert(
+                                                                    "Reception modifieé avec success."
+                                                                  );
+                                                                  window.location.replace(
+                                                                    "voir_bon_R_.html?id=" + GET("id")
+                                                                  );
+                                                                })
+                                                                .catch((error) => {
+                                                                  console.error(
+                                                                    "Failed to update entrepot_Article data : ",
+                                                                    error
+                                                                  );
+                                                                });
+                                                            })
+                                                            .catch((error) => {
+                                                              console.error(
+                                                                "Failed to update entrepot_Article data : ",
+                                                                error
+                                                              );
+                                                            });
+                                                        })
+                                                        .catch((error) => {
+                                                          console.error(
+                                                            "Failed to update entrepot_Article data : ",
+                                                            error
+                                                          );
+                                                        });
+                                                    })
+                                                    .catch((error) => {
+                                                      console.error(
+                                                        "Failed to update entrepot_Article data : ",
+                                                        error
+                                                      );
+                                                    });
+                                                })
+                                                .catch((error) => {
+                                                  console.error(
+                                                    "Failed to update entrepot_Article data : ",
+                                                    error
+                                                  );
+                                                });
+                                            })
+                                            .catch((error) => {
+                                              console.error(
+                                                "Failed to update entrepot_Article data : ",
+                                                error
+                                              );
+                                            });
+                                        })
+                                        .catch((error) => {
+                                          console.error(
+                                            "Failed to update entrepot_Article data : ",
+                                            error
+                                          );
+                                        });
+
+
+
+                                    })
+                                    .catch((error) => {
+                                      console.error(
+                                        "Failed to Insert bomreception_Article data : ",
+                                        error
+                                      );
+                                    });
+
+
+
+                                })
+                                .catch((error) => {
+                                  console.error(
+                                    "Failed to DELETE BonReception_Article data : ",
+                                    error
+                                  );
+                                });
+
+                            })
+                            .catch((error) => {
+                              console.error("Failed to update BonReceptions data : ", error);
+                            });
+                        })
+                        .catch((error) => {
+                          console.error("Failed to update BonReceptions data : ", error);
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(
+                        "Failed to update entrepot_Article data : ",
+                        error
+                      );
+                    });
+                })
+                .catch((error) => {
+                  console.error(
+                    "Failed to update entrepot_Article data : ",
+                    error
+                  );
+                });
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to update entrepot_Article data : ",
+                error
+              );
+            });
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to update entrepot_Article data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error(
+        "Failed to update entrepot_Article data : ",
+        error
+      );
+    });
+
+
+  // compteur = 0;
+
+  // sequelize
+  //   .query("SELECT * FROM bonreceptions WHERE  id_bonreception = " + GET("id"))
+  //   .then((BR) => {
+  //     sequelize
+  //       .query(
+  //         "SELECT * FROM bonreception_article WHERE bonreception_id =" +
+  //         BR[0][0].id_bonreception
+  //       )
+  //       .then((B_R) => {
+  //         //console.log(B_A)
+  //         d = 0;
+  //         B_R[0]
+  //           .map((e) => {
+  //             //alert(elem.qteSortie)
+
+  //             sequelize
+  //               .query(
+  //                 "SELECT * FROM entrepot_article WHERE article_id = " +
+  //                 e.article_id +
+  //                 " AND condmnt_id = " +
+  //                 e.conditionnement_id +
+  //                 " AND entrepot_id = " +
+  //                 BR[0][0].entrepot_id
+  //               )
+  //               .then((art_e) => {
+  //                 //(art_e[0][0].stock - elem.qteSortie )
+
+  //                 //alert(art_e[0][0].stock)
+
+  //                 sequelize
+  //                   .query(
+  //                     "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+  //                     {
+  //                       replacements: {
+  //                         Stock:
+  //                           parseInt(art_e[0][0].stock) - parseInt(e.qteReçu),
+  //                         id_entrepot: BR[0][0].entrepot_id,
+  //                         id_article: e.article_id,
+  //                         id_condmnt: e.conditionnement_id,
+  //                       },
+  //                       type: sequelize.QueryTypes.UPDATE,
+  //                     }
+  //                   )
+  //                   .then((BC) => {
+  //                     d++;
+
+  //                     if (d == B_R[0].length) {
+  //                       //alert("Reception enregistrée avec success.")
+  //                       //window.location.replace('bon_de_reception.html');
+  //                     }
+  //                   })
+  //                   .catch((error) => {
+  //                     console.error(
+  //                       "Failed to update entrepot_Article data : ",
+  //                       error
+  //                     );
+  //                   });
+  //               })
+  //               .catch((error) => {
+  //                 console.error(
+  //                   "Failed to select entrepot_Article data : ",
+  //                   error
+  //                 );
+  //               });
+  //           })
+  //           .join();
+  //       })
+  //       .catch((error) => {
+  //         console.error("Failed to select BonReception_Article data : ", error);
+  //       });
+  //   })
+  //   .catch((error) => {
+  //     console.error("Failed to insert BonReceptions data : ", error);
+  //   });
+
+  // date_bon = document.getElementById("date_n").value;
+
+  // if (date_bon == "") {
+  //   date_bon = document.getElementById("date").value;
+  // }
+
+  // sequelize
+  //   .query(
+  //     "UPDATE bonreceptions SET date_reception = :date_reception , entrepot_id = :entrepot_id , fournisseur_id = :fournisseur_id  WHERE id_bonreception = :id_bonreception",
+  //     {
+  //       replacements: {
+  //         date_reception: date_bon,
+  //         id_bonreception: GET("id"),
+  //         entrepot_id: document.getElementById("entrepot").value,
+  //         fournisseur_id: document.getElementById("fseur").value,
+  //       },
+  //       type: sequelize.QueryTypes.UPDATE,
+  //     }
+  //   )
+  //   .then((B) => {
+  //     sequelize
+  //       .query(
+  //         "SELECT * FROM bonreceptions WHERE id_bonreception =" + GET("id"),
+
+  //         {
+  //           replacements: {},
+  //           type: sequelize.QueryTypes.SELECT,
+  //         }
+  //       )
+  //       .then((BR) => {
+  //         sequelize
+  //           .query(
+  //             "DELETE FROM bonreception_article WHERE bonreception_id =" +
+  //             GET("id")
+  //           )
+  //           .then((D) => {
+  //             for (var i = 1; i <= n; i++) {
+  //               //if (document.getElementById("qteR"+i).value != 0  ) {
+
+  //               sequelize
+  //                 .query(
+  //                   'INSERT INTO bonreception_article (bonreception_id,article_id,qteReçu,conditionnement_id) VALUES ("' +
+  //                   GET("id") +
+  //                   '","' +
+  //                   document.getElementById("article" + i).value +
+  //                   '","' +
+  //                   document.getElementById("qteR" + i).value +
+  //                   '","' +
+  //                   document.getElementById("cdmnt" + i).value +
+  //                   '")'
+  //                 )
+  //                 .then((art_bR) => {
+
+  //                   compteur++;
+  //                   //alert(compteur+"-"+c)
+  //                   if (compteur == c) {
+  //                     // alert("ddddd")
+  //                     sequelize
+  //                       .query(
+  //                         "SELECT * FROM bonreception_article WHERE bonreception_id =" +
+  //                         GET("id")
+  //                       )
+  //                       .then((B_R) => {
+
+  //                         //console.log(B_A)
+  //                         d = 0;
+  //                         B_R[0]
+  //                           .map((e) => {
+  //                             //alert(elem.qteSortie)
+
+  //                             sequelize
+  //                               .query(
+  //                                 "SELECT * FROM entrepot_article WHERE article_id = " +
+  //                                 e.article_id +
+  //                                 " AND condmnt_id = " +
+  //                                 e.conditionnement_id +
+  //                                 " AND entrepot_id = " +
+  //                                 document.getElementById("entrepot").value
+  //                               )
+  //                               .then((art_e) => {
+  //                                 //(art_e[0][0].stock - elem.qteSortie )
+
+  //                                 // alert(e.qteSortie)
+
+  //                                 sequelize
+  //                                   .query(
+  //                                     "UPDATE entrepot_article SET stock = :Stock WHERE entrepot_id = :id_entrepot AND article_id = :id_article AND condmnt_id = :id_condmnt  ",
+  //                                     {
+  //                                       replacements: {
+  //                                         Stock:
+  //                                           parseInt(art_e[0][0].stock) +
+  //                                           parseInt(e.qteReçu),
+  //                                         id_entrepot:
+  //                                           document.getElementById("entrepot")
+  //                                             .value,
+  //                                         id_article: e.article_id,
+  //                                         id_condmnt: e.conditionnement_id,
+  //                                       },
+  //                                       type: sequelize.QueryTypes.UPDATE,
+  //                                     }
+  //                                   )
+  //                                   .then((BC) => {
+  //                                     d++;
+
+  //                                     if (d == B_R[0].length) {
+  //                                       // alert(
+  //                                       //   "Reception modifieé avec success."
+  //                                       // );
+  //                                       window.location.replace(
+  //                                         "voir_bon_R_.html?id=" + GET("id")
+  //                                       );
+  //                                     }
+  //                                   })
+  //                                   .catch((error) => {
+  //                                     console.error(
+  //                                       "Failed to update entrepot_Article data : ",
+  //                                       error
+  //                                     );
+  //                                   });
+  //                               })
+  //                               .catch((error) => {
+  //                                 console.error(
+  //                                   "Failed to select entrepot_Article data : ",
+  //                                   error
+  //                                 );
+  //                               });
+  //                           })
+  //                           .join();
+  //                       })
+  //                       .catch((error) => {
+  //                         console.error(
+  //                           "Failed to select BonReception_Article data : ",
+  //                           error
+  //                         );
+  //                       });
+  //                   }
+  //                 })
+  //                 .catch((error) => {
+  //                   console.error(
+  //                     "Failed to insert BonReception_Article data : ",
+  //                     error
+  //                   );
+  //                 });
+  //               //}
+  //             }
+  //           })
+  //           .catch((error) => {
+  //             console.error(
+  //               "Failed to DELETE BonReception_Article data : ",
+  //               error
+  //             );
+  //           });
+  //       })
+  //       .catch((error) => {
+  //         console.error("Failed to select BonReceptions data : ", error);
+  //       });
+  //   })
+  //   .catch((error) => {
+  //     console.error("Failed to update BonReceptions data : ", error);
+  //   });
+};
+
 //***** Fonction de suppression d'unentrepot ***\\
 
 const del_entrepot = (id) => {
@@ -4436,9 +9910,9 @@ const moov_entrepot = (param) => {
 
     S += '<div class="row"><div class="col-md-6">';
     S +=
-      '<div class="form-group row"><label class="col-sm-3 col-form-label">Date </label><div class="col-sm-9">';
+      '<div class="form-group row"><label class="col-sm-3 col-form-label">Date  </label><div class="col-sm-9">';
     S +=
-      '<input type="datetime-local" name="cli_lname" id="date" class="form-control" /></div></div></div>';
+      'du <input type="datetime-local" name="cli_lname" id="date" class="form-control" /> au <input type="datetime-local" name="cli_lname" id="date_f" class="form-control" /></div></div></div>';
     S +=
       '<div class="col-md-6"><div class="form-group row"><label class="col-sm-3 col-form-label">Mouvement</label><div class="col-sm-9">';
     S +=
@@ -4454,10 +9928,10 @@ const moov_entrepot = (param) => {
       '<select class="js-example-basic-single w-100" id="cdnmnt"><option value="null">Choisir un conditionnement</option></select></div></div></div>';
 
     S +=
-      '<div class="col-md-6"><button onclick="search()" style="font-size: 25px" type="submit" class="btn btn-primary text-white me-0">Filtrer</button></div></div></div></div></div></div>';
+      '<div class="col-md-6"><button onclick="search()" style="font-size: 25px" type="submit" class="btn btn-primary text-white me-0">Filtrer</button><div id="st"></div></div></div></div></div></div></div>';
 
     S +=
-      '<table class="table table-striped"><thead id="entete"></thead><tbody id="tab_moov"></tbody></table>';
+      '<table class="table table-striped" id="tab_S"><thead id="entete"></thead><tbody id="tab_moov"></tbody></table>';
     document.getElementById("etats_ech").innerHTML = S;
 
     var js_ = document.createElement("script");
@@ -4506,9 +9980,10 @@ const moov_entrepot = (param) => {
 
   if (param == "E") {
     var E =
-      "</div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Mouvements journaliers</button></li><li class='nav-item'><button class='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Etat des stocks</button></li></ul>  <h4 class='card-title'>Liste des Articles et leurs quantité en stock</h4>";
+      "</div><div class='card-body'><ul class='nav nav-pills mb-3' id='pills-tab' role='tablist'><li class='nav-item'><button class='nav-link ' id='pills-contact-tab' data-toggle='pill' href='#pills-contact' role='tab' aria-controls='pills-contact' aria-selected='false' onclick=Etats_echanges('S')>Mouvements journaliers</button></li><li class='nav-item'><button class='nav-link active' id='pills-home-tab' data-toggle='pill' href='#pills-home' role='tab' aria-controls='pills-home' aria-selected='true' onclick=Etats_echanges('E')>Etat des stocks</button></li></ul>  <h4 class='card-title'>Liste des Articles et leurs quantité en stock</h4><i style='animation : blink;' id='blink'>veuillez patientez ..........</i>";
     E +=
-      '<table class="table table-striped"><thead id=""><tr><th>.</th><th style="width: 30%">Designation</th><th style="width: 15%"> Conditionnement </th><th style="width: 5%"> Quantité en stock </th> <th>Actions </th></tr></thead><tbody id="tab-article"></tbody></table>';
+      '<table class="table table-striped" id="tab_E"><thead id=""><tr><th>.</th><th style="width: 30%">Designation</th><th>Actions </th></tr></thead><tbody id="tab-article"></tbody></table>';
+    //<th style="width: 15%"> Conditionnement </th><th style="width: 5%"> Quantité en stock </th> 
     document.getElementById("etats_ech").innerHTML = E;
 
     var js_ = document.createElement("script");
@@ -4521,81 +9996,84 @@ const moov_entrepot = (param) => {
     document.body.appendChild(js);
 
     sequelize
-      .query("SELECT * FROM  `articles`  ", {
+      .query("SELECT * FROM  `articles`  ORDER BY libele_article ASC", {
         type: sequelize.QueryTypes.SELECT,
       })
       .then((artcl) => {
         console.log(artcl);
 
         artcl.map((elem) => {
-          sequelize
-            .query(
-              "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
-                GET("id") +
-                " AND articles.id_article = " +
-                elem.id_article,
+          // sequelize
+          //   .query(
+          //     "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+          //     GET("id") +
+          //     " AND articles.id_article = " +
+          //     elem.id_article,
 
-              {
-                type: sequelize.QueryTypes.SELECT,
-              }
-            )
-            .then((a) => {
-              //console.log(artcl)
-              let c = "";
-              c += "<tr>";
-              c +=
-                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
-                elem.libele_article +
-                '</td><td><select class="form-control" style=" color : black "  onchange=chargement_qte(this,' +
-                elem.id_article +
-                ")>";
+          //     {
+          //       type: sequelize.QueryTypes.SELECT,
+          //     }
+          //   )
+          //   .then((a) => {
+          //console.log(artcl)
+          let c = "";
+          c += "<tr>";
+          c +=
+            '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+            elem.libele_article +
+            '</td>'
+          // '<td><select class="form-control" style=" color : black "  onchange=chargement_qte(this,' +
+          // elem.id_article +
+          // ")>";
 
-              let st;
-              nn = 0;
-              a.map((e) => {
-                c +=
-                  '<option value="' +
-                  e.condmnt_id +
-                  '"  >' +
-                  e.abreviation_condmnt +
-                  "</option>";
+          let st;
+          nn = 0;
+          // a.map((e) => {
+          //   c +=
+          //     '<option value="' +
+          //     e.condmnt_id +
+          //     '"  >' +
+          //     e.abreviation_condmnt +
+          //     "</option>";
 
-                if (nn == 0) {
-                  st = e.stock;
-                  nn++;
-                }
-              }).join();
+          //   if (nn == 0) {
+          //     st = e.stock;
+          //     nn++;
+          //   }
+          // }).join();
 
-              c +=
-                '</select></td><td><input type="number" class="form-control" name="" id="' +
-                elem.id_article +
-                '" readonly value="' +
-                st +
-                '"></td><td><div class="btn-wrapper"><a href="voir-article-stock.html?id_a=' +
-                elem.id_article +
-                "&id_e=" +
-                GET("id") +
-                '" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; Mouvement</a></td>';
-              c += "</tr>";
 
-              document.getElementById("tab-article").innerHTML += c;
+          // '</select></td><td><input type="number" class="form-control" name="" id="' +
+          // elem.id_article +
+          // '" readonly value="' +
+          // st +
+          // '"></td>'
+          c += '<td><div class="btn-wrapper"><a href="voir-article-stock.html?id_a=' +
+            elem.id_article +
+            "&id_e=" +
+            GET("id") +
+            '" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; Mouvement</a></td>';
+          c += "</tr>";
 
-              var js_ = document.createElement("script");
-              js_.type = "text/javascript";
-              js_.src = "../../vendors/select2/select2.min.js";
-              document.body.appendChild(js_);
-              var js = document.createElement("script");
-              js.type = "text/javascript";
-              js.src = "../../js/select2.js";
-              document.body.appendChild(js);
-            })
-            .catch((error) => {
-              console.error(
-                "Failed to retrieve `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` data : ",
-                error
-              );
-            });
+          document.getElementById("tab-article").innerHTML += c;
+
+          var js_ = document.createElement("script");
+          js_.type = "text/javascript";
+          js_.src = "../../vendors/select2/select2.min.js";
+          document.body.appendChild(js_);
+          var js = document.createElement("script");
+          js.type = "text/javascript";
+          js.src = "../../js/select2.js";
+          document.body.appendChild(js);
+          // })
+          // .catch((error) => {
+          //   console.error(
+          //     "Failed to retrieve `Entrepots`, `Entrepot_Article` , `Articles` , `Conditionnements` data : ",
+          //     error
+          //   );
+          // });
         });
+        document.getElementById("blink").innerHTML = "<i></i>";
       })
       .catch((error) => {
         console.error(
@@ -4612,7 +10090,7 @@ const chargement_cdmnt_e = (id) => {
   sequelize
     .query(
       "SELECT * FROM `conditionnements` , `articles_condmnt` , `articles` WHERE conditionnements.id_condmnt = articles_condmnt.condmnt_id AND articles.id_article = articles_condmnt.article_id AND articles.id_article = " +
-        id,
+      id,
       {
         type: sequelize.QueryTypes.SELECT,
       }
@@ -4660,11 +10138,67 @@ const filtre_moov = () => {
   // 	document.getElementById('tab_moov').innerHTML = S
 
   date = "";
-  for (var i = 0; i < 10; i++) {
-    date += document.getElementById("date").value[i];
+  date_f = "";
+  if (document.getElementById("date").value == '' && document.getElementById("date_f").value == '') {
+    date = "";
+  } else {
+    if (document.getElementById("date_f").value != '' && document.getElementById("date").value != '') {
+      for (var i = 0; i < 10; i++) {
+        date += document.getElementById("date").value[i];
+      }
+      for (var i = 0; i < 10; i++) {
+        date_f += document.getElementById("date_f").value[i];
+      }
+      //alert(date+" "+date_f)
+    } else {
+      if (document.getElementById("date_f").value == '' && document.getElementById("date").value != '') {
+        for (var i = 0; i < 10; i++) {
+          date += document.getElementById("date").value[i];
+        }
+
+        //alert(date)
+      } else {
+        for (var i = 0; i < 10; i++) {
+          date += document.getElementById("date_f").value[i];
+        }
+
+        //alert(date)
+      }
+    }
+
+  }
+
+  rq_e = ""
+  rq_s = ""
+  if (document.getElementById("date").value == '' && document.getElementById("date_f").value == '') {
+    rq_e = ' ORDER BY bonreceptions.date_reception DESC'
+    rq_s = ' ORDER BY bonsortie.date_bonsortie DESC'
+
+
+  } else {
+    if (document.getElementById("date_f").value != '' && document.getElementById("date").value != '') {
+
+      rq_e = ' AND bonreceptions.date_reception >= "' +
+        date + '" AND bonreceptions.date_reception <= "' +
+        date_f + '" ORDER BY bonreceptions.date_reception DESC'
+
+      rq_s = ' AND bonsortie.date_bonsortie >= "' +
+        date + '" AND bonsortie.date_bonsortie <= "' +
+        date_f + '" ORDER BY bonsortie.date_bonsortie DESC'
+    } else {
+
+      rq_e = ' AND bonreceptions.date_reception = "' +
+        date + '" ORDER BY bonreceptions.date_reception DESC'
+
+      rq_s = ' AND bonsortie.date_bonsortie = "' +
+        date + '" ORDER BY bonsortie.date_bonsortie DESC'
+
+    }
+
   }
 
   if (document.getElementById("article").value == "null") {
+
     if (document.getElementById("moov").value == "entr") {
       E =
         '<tr><th>.</th><th style="">Date</th><th style="">Article</th><th style="">Conditionnement</th><th style="width: 10%">Quantité Reçue</th><th style="">Provenance</th></tr>';
@@ -4675,11 +10209,9 @@ const filtre_moov = () => {
 
       sequelize
         .query(
-          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND  bonreceptions.entrepot_id = " +
-            GET("id") +
-            ' AND bonreceptions.date_reception = "' +
-            date +
-            '"',
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements`, `fournisseur` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND  bonreceptions.entrepot_id = " +
+          GET("id") +
+          rq_e,
 
           {
             type: sequelize.QueryTypes.SELECT,
@@ -4687,45 +10219,51 @@ const filtre_moov = () => {
         )
         .then((BR) => {
           document.getElementById("tab_moov").innerHTML = "";
-
+          nb_e = 0
+          qt_t = 0
           BR.map((e) => {
-            sequelize
-              .query(
-                "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
-                  e.boncmd_id,
-                {
-                  type: sequelize.QueryTypes.SELECT,
-                }
-              )
-              .then((BC) => {
-                //console.log(BC[0].nom_fournisseur)
+            //   sequelize
+            //     .query(
+            //       "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
+            //       e.boncmd_id,
+            //       {
+            //         type: sequelize.QueryTypes.SELECT,
+            //       }
+            //     )
+            //     .then((BC) => {
+            //console.log(BC[0].nom_fournisseur)
 
-                E = "<tr>";
+            E = "<tr>";
 
-                E +=
-                  '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-                E += '<td class="py-1">' + e.date_reception + "</td>";
-                E += '<td class="py-1">' + e.libele_article + "</td>";
-                E +=
-                  "<td>" +
-                  e.abreviation_condmnt +
-                  '</td><td><input type="number" class="form-control"  readonly value="' +
-                  e.qteReçu +
-                  '"></td>';
+            E +=
+              '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+            E += '<td class="py-1">' + e.date_reception + "</td>";
+            E += '<td class="py-1">' + e.libele_article + "</td>";
+            E +=
+              "<td>" +
+              e.abreviation_condmnt +
+              '</td><td><input type="number" class="form-control"  readonly value="' +
+              e.qteReçu +
+              '"></td>';
 
-                E += '<td class="py-1">' + BC[0].nom_fournisseur + "</td></tr>";
+            E += '<td class="py-1">' + e.nom_fournisseur + "</td></tr>";
 
-                E += "</tr>";
+            E += "</tr>";
 
-                document.getElementById("tab_moov").innerHTML += E;
-              })
-              .catch((error) => {
-                console.error(
-                  "Failed to retrieve Conditionnements data : ",
-                  error
-                );
-              });
-          }).join();
+            document.getElementById("tab_moov").innerHTML += E;
+            // })
+            // .catch((error) => {
+            //   console.error(
+            //     "Failed to retrieve Conditionnements data : ",
+            //     error
+            //   );
+            // });
+            nb_e += 1
+            qt_t += e.qteReçu
+          });
+          //alert("n="+nb_e+" qt="+qt_t)
+          document.getElementById("st").innerHTML = "<B>Nombre d'enregistrements ( " + nb_e + " ) / Qantité Totale ( " + qt_t + " )</B>";
+
         })
         .catch((error) => {
           console.error(
@@ -4733,27 +10271,49 @@ const filtre_moov = () => {
             error
           );
         });
+      // sequelize
+      // .query(
+      //   "SELECT COUNT(`bonreceptions.id_bonreception`)  FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements`, `fournisseur` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND  bonreceptions.entrepot_id = " +
+      //   GET("id") +
+      //   rq_e,
+
+      //   {
+      //     type: sequelize.QueryTypes.SELECT,
+      //   }
+      // )
+      // .then((BR) => {
+      //   console.log(BR[0])
+      //   //document.getElementById("tab_moov").innerHTML = ;
+
+      // })
+      // .catch((error) => {
+      //   console.error(
+      //     "Failed to retrieve `BonReceptions`, `BonReception_Article` , `Articles` , `Conditionnements` data : ",
+      //     error
+      //   );
+      // });
     } else {
-      S =
-        '<tr><th>.</th><th style="">Date</th><th style="">Article</th><th style="">Conditionnement</th><th style="width: 10%">Quantité Sortie</th><th style="">Destination</th></tr>';
+
+      S = '<tr><th>.</th><th style="">Date</th><th style="">Article</th><th style="">Conditionnement</th><th style="width: 10%">Quantité Sortie</th><th style="">Destination</th></tr>';
 
       document.getElementById("entete").innerHTML = S;
 
       sequelize
         .query(
-          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_Article.article_id  AND bonsortie.provenance = " +
-            GET("id") +
-            ' AND bonsortie.date_bonsortie = "' +
-            date +
-            '"',
+          "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id  AND bonsortie.provenance = " +
+          GET("id") +
+          rq_s,
 
           {
             type: sequelize.QueryTypes.SELECT,
           }
         )
         .then((BS) => {
-          document.getElementById("tab_moov").innerHTML = "";
 
+
+          document.getElementById("tab_moov").innerHTML = "";
+          nb_e = 0
+          qt_t = 0
           BS.map((e) => {
             //console.log(e.nom_client != )
 
@@ -4818,7 +10378,7 @@ const filtre_moov = () => {
                 sequelize
                   .query(
                     "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                      e.destination,
+                    e.destination,
                     {
                       type: sequelize.QueryTypes.SELECT,
                     }
@@ -4867,7 +10427,12 @@ const filtre_moov = () => {
             // 	}).catch((error) => {
 
             // console.error('Failed to retrieve Conditionnements data : ', error);});
+            nb_e += 1
+            qt_t += e.qteSortie
+
           }).join();
+          document.getElementById("st").innerHTML = "<B>Nombre d'enregistrements ( " + nb_e + " ) / Qantité Totale ( " + qt_t + " )</B>";
+
         })
         .catch((error) => {
           console.error(
@@ -4888,13 +10453,11 @@ const filtre_moov = () => {
 
         sequelize
           .query(
-            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND  bonreceptions.entrepot_id = " +
-              GET("id") +
-              " AND articles.id_article = " +
-              document.getElementById("article").value +
-              ' AND bonreceptions.date_reception = "' +
-              date +
-              '"',
+            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` ,`fournisseur` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND bonreceptions.entrepot_id = " +
+            GET("id") +
+            " AND articles.id_article = " +
+            document.getElementById("article").value +
+            rq_e,
 
             {
               type: sequelize.QueryTypes.SELECT,
@@ -4902,46 +10465,52 @@ const filtre_moov = () => {
           )
           .then((BR) => {
             document.getElementById("tab_moov").innerHTML = "";
-
+            nb_e = 0
+            qt_t = 0
             BR.map((e) => {
-              sequelize
-                .query(
-                  "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
-                    e.boncmd_id,
-                  {
-                    type: sequelize.QueryTypes.SELECT,
-                  }
-                )
-                .then((BC) => {
-                  //console.log(BC[0].nom_fournisseur)
+              //   sequelize
+              //     .query(
+              //       "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
+              //       e.boncmd_id,
+              //       {
+              //         type: sequelize.QueryTypes.SELECT,
+              //       }
+              //     )
+              //     .then((BC) => {
+              //console.log("zzzzzzzzzz"+BC[0].nom_fournisseur)
 
-                  E = "<tr>";
+              E = "<tr>";
 
-                  E +=
-                    '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-                  E += '<td class="py-1">' + e.date_reception + "</td>";
-                  E += '<td class="py-1">' + e.libele_article + "</td>";
-                  E +=
-                    "<td>" +
-                    e.abreviation_condmnt +
-                    '</td><td><input type="number" class="form-control"  readonly value="' +
-                    e.qteReçu +
-                    '"></td>';
+              E +=
+                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+              E += '<td class="py-1">' + e.date_reception + "</td>";
+              E += '<td class="py-1">' + e.libele_article + "</td>";
+              E +=
+                "<td>" +
+                e.abreviation_condmnt +
+                '</td><td><input type="number" class="form-control"  readonly value="' +
+                e.qteReçu +
+                '"></td>';
 
-                  E +=
-                    '<td class="py-1">' + BC[0].nom_fournisseur + "</td></tr>";
+              E +=
+                '<td class="py-1">' + e.nom_fournisseur + "</td></tr>";
 
-                  E += "</tr>";
+              E += "</tr>";
 
-                  document.getElementById("tab_moov").innerHTML += E;
-                })
-                .catch((error) => {
-                  console.error(
-                    "Failed to retrieve Conditionnements data : ",
-                    error
-                  );
-                });
-            }).join();
+              document.getElementById("tab_moov").innerHTML += E;
+              // })
+              // .catch((error) => {
+              //   console.error(
+              //     "Failed to retrieve Conditionnements data : ",
+              //     error
+              //   );
+              // });
+              nb_e += 1
+              qt_t += e.qteReçu
+
+            });
+            document.getElementById("st").innerHTML = "<B>Nombre d'enregistrements ( " + nb_e + " ) / Qantité Totale ( " + qt_t + " )</B>";
+
           })
           .catch((error) => {
             console.error(
@@ -4952,15 +10521,13 @@ const filtre_moov = () => {
       } else {
         sequelize
           .query(
-            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND  bonreceptions.entrepot_id = " +
-              GET("id") +
-              " AND articles.id_article = " +
-              document.getElementById("article").value +
-              " AND conditionnements.id_condmnt = " +
-              document.getElementById("cdnmnt").value +
-              ' AND bonreceptions.date_reception = "' +
-              date +
-              '"',
+            "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `conditionnements` , `fournisseur` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND   bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND bonreceptions.entrepot_id = " +
+            GET("id") +
+            " AND articles.id_article = " +
+            document.getElementById("article").value +
+            " AND conditionnements.id_condmnt = " +
+            document.getElementById("cdnmnt").value +
+            rq_e,
 
             {
               type: sequelize.QueryTypes.SELECT,
@@ -4968,46 +10535,51 @@ const filtre_moov = () => {
           )
           .then((BR) => {
             document.getElementById("tab_moov").innerHTML = "";
-
+            nb_e = 0
+            qt_t = 0
             BR.map((e) => {
-              sequelize
-                .query(
-                  "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
-                    e.boncmd_id,
-                  {
-                    type: sequelize.QueryTypes.SELECT,
-                  }
-                )
-                .then((BC) => {
-                  //console.log(BC[0].nom_fournisseur)
+              // sequelize
+              //   .query(
+              //     "SELECT * FROM bomcommandes , fournisseur WHERE  bomcommandes.fournisseur_id = fournisseur.id_fournisseur AND id_boncmd = " +
+              //     e.boncmd_id,
+              //     {
+              //       type: sequelize.QueryTypes.SELECT,
+              //     }
+              //   )
+              //   .then((BC) => {
+              //console.log(BC[0].nom_fournisseur)
 
-                  E = "<tr>";
+              E = "<tr>";
 
-                  E +=
-                    '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
-                  E += '<td class="py-1">' + e.date_reception + "</td>";
-                  E += '<td class="py-1">' + e.libele_article + "</td>";
-                  E +=
-                    "<td>" +
-                    e.abreviation_condmnt +
-                    '</td><td><input type="number" class="form-control"  readonly value="' +
-                    e.qteReçu +
-                    '"></td>';
+              E +=
+                '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td>';
+              E += '<td class="py-1">' + e.date_reception + "</td>";
+              E += '<td class="py-1">' + e.libele_article + "</td>";
+              E +=
+                "<td>" +
+                e.abreviation_condmnt +
+                '</td><td><input type="number" class="form-control"  readonly value="' +
+                e.qteReçu +
+                '"></td>';
 
-                  E +=
-                    '<td class="py-1">' + BC[0].nom_fournisseur + "</td></tr>";
+              E +=
+                '<td class="py-1">' + e.nom_fournisseur + "</td></tr>";
 
-                  E += "</tr>";
+              E += "</tr>";
 
-                  document.getElementById("tab_moov").innerHTML += E;
-                })
-                .catch((error) => {
-                  console.error(
-                    "Failed to retrieve Conditionnements data : ",
-                    error
-                  );
-                });
-            }).join();
+              document.getElementById("tab_moov").innerHTML += E;
+              // })
+              // .catch((error) => {
+              //   console.error(
+              //     "Failed to retrieve Conditionnements data : ",
+              //     error
+              //   );
+              // });
+              nb_e += 1
+              qt_t += e.qteReçu
+            });
+            document.getElementById("st").innerHTML = "<B>Nombre d'enregistrements ( " + nb_e + " ) / Qantité Totale ( " + qt_t + " )</B>";
+
           })
           .catch((error) => {
             console.error(
@@ -5026,12 +10598,9 @@ const filtre_moov = () => {
         sequelize
           .query(
             "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id  AND bonsortie.provenance = " +
-              GET("id") +
-              " AND articles.id_article = " +
-              document.getElementById("article").value +
-              ' AND bonsortie.date_bonsortie = "' +
-              date +
-              '"',
+            GET("id") +
+            " AND articles.id_article = " +
+            document.getElementById("article").value + rq_s,
 
             {
               type: sequelize.QueryTypes.SELECT,
@@ -5039,7 +10608,8 @@ const filtre_moov = () => {
           )
           .then((BS) => {
             document.getElementById("tab_moov").innerHTML = "";
-
+            nb_e = 0
+            qt_t = 0
             BS.map((e) => {
               //console.log(e.nom_client != )
 
@@ -5106,7 +10676,7 @@ const filtre_moov = () => {
                   sequelize
                     .query(
                       "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                        e.destination,
+                      e.destination,
                       {
                         type: sequelize.QueryTypes.SELECT,
                       }
@@ -5142,7 +10712,11 @@ const filtre_moov = () => {
                     });
                 }
               }
+              nb_e += 1
+              qt_t += e.qteSortie
             }).join();
+            document.getElementById("st").innerHTML = "<B>Nombre d'enregistrements ( " + nb_e + " ) / Qantité Totale ( " + qt_t + " )</B>";
+
           })
           .catch((error) => {
             console.error(
@@ -5154,14 +10728,11 @@ const filtre_moov = () => {
         sequelize
           .query(
             "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id  AND bonsortie.provenance = " +
-              GET("id") +
-              " AND articles.id_article = " +
-              document.getElementById("article").value +
-              " AND conditionnements.id_condmnt = " +
-              document.getElementById("cdnmnt").value +
-              ' AND bonsortie.date_bonsortie = "' +
-              date +
-              '"',
+            GET("id") +
+            " AND articles.id_article = " +
+            document.getElementById("article").value +
+            " AND conditionnements.id_condmnt = " +
+            document.getElementById("cdnmnt").value + rq_s,
 
             {
               type: sequelize.QueryTypes.SELECT,
@@ -5169,7 +10740,8 @@ const filtre_moov = () => {
           )
           .then((BS) => {
             document.getElementById("tab_moov").innerHTML = "";
-
+            nb_e = 0
+            qt_t = 0
             BS.map((e) => {
               //console.log(e.nom_client != )
 
@@ -5236,7 +10808,7 @@ const filtre_moov = () => {
                   sequelize
                     .query(
                       "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                        e.destination,
+                      e.destination,
                       {
                         type: sequelize.QueryTypes.SELECT,
                       }
@@ -5272,7 +10844,11 @@ const filtre_moov = () => {
                     });
                 }
               }
+              nb_e += 1
+              qt_t += e.qteSortie
             }).join();
+            document.getElementById("st").innerHTML = "<B>Nombre d'enregistrements ( " + nb_e + " ) / Qantité Totale ( " + qt_t + " )</B>";
+
           })
           .catch((error) => {
             console.error(
@@ -5766,12 +11342,14 @@ const insert_article_details = (globalArticleInfo) => {
 };
 
 const delete_article = (article_id) => {
+
   sequelize
     .query("DELETE FROM articles WHERE id_article = ?", {
       replacements: [article_id],
       type: sequelize.QueryTypes.DELETE,
     })
     .then((delete_article_query) => {
+
       window.location.reload();
     })
     .catch((error) => {
@@ -5780,9 +11358,10 @@ const delete_article = (article_id) => {
 };
 
 const delete_article_details = (article_id, conditionment_id, entrepot_id) => {
+
   sequelize
     .query(
-      "DELETE FROM articles_condmnt, entrepot_article WHERE articles_condmnt.article_id = :article_id AND articles_condmnt.condmnt_id = :conditionment_id AND entrepot_article.article_id = :article_id AND entrepot_article.condmnt_id = :conditionment_id AND entrepot_article.entrepot_id = :entrepot_id",
+      "DELETE FROM articles_condmnt WHERE article_id = :article_id AND condmnt_id = :conditionment_id ",
       {
         replacements: {
           article_id: article_id,
@@ -5793,6 +11372,25 @@ const delete_article_details = (article_id, conditionment_id, entrepot_id) => {
       }
     )
     .then((delete_article_query) => {
+      sequelize
+        .query(
+          "DELETE FROM entrepot_article WHERE  entrepot_article.article_id = :article_id AND entrepot_article.condmnt_id = :conditionment_id AND entrepot_article.entrepot_id = :entrepot_id",
+          {
+            replacements: {
+              article_id: article_id,
+              conditionment_id: conditionment_id,
+              entrepot_id: entrepot_id,
+            },
+            type: sequelize.QueryTypes.DELETE,
+          }
+        )
+        .then((delete_article_query) => {
+
+        })
+        .catch((error) => {
+          console.error("Failed to DELETE Article data : ", error);
+        });
+
       window.location.reload();
     })
     .catch((error) => {
@@ -5809,7 +11407,7 @@ const show_arrivals = () => {
 
   sequelize
     .query(
-      "SELECT * FROM BonSortie, Entrepots WHERE Entrepots.id_entrepot = BonSortie.provenance AND BonSortie.status=1",
+      "SELECT * FROM bonsortie, entrepots WHERE entrepots.id_entrepot = bonsortie.provenance AND bonsortie.status=1",
       {
         type: sequelize.QueryTypes.SELECT,
       }
@@ -5859,7 +11457,7 @@ const show_arrival_details = (reception_id) => {
   // Perform a query
 
   sequelize
-    .query("SELECT * FROM Articles_Condmnt WHERE article_id = ?", {
+    .query("SELECT * FROM articles_condmnt WHERE article_id = ?", {
       replacements: [article_id],
       type: sequelize.QueryTypes.SELECT,
     })
@@ -5872,7 +11470,7 @@ const show_arrival_details = (reception_id) => {
         .map((article_conditionment) => {
           sequelize
             .query(
-              "SELECT * FROM Entrepot_Article, Conditionnements WHERE Entrepot_Article.article_id = :id_article AND Entrepot_Article.condmnt_id = :id_condmnt AND Conditionnements.id_condmnt = :id_condmnt",
+              "SELECT * FROM entrepot_article, conditionnements WHERE entrepot_article.article_id = :id_article AND entrepot_article.condmnt_id = :id_condmnt AND conditionnements.id_condmnt = :id_condmnt",
               {
                 replacements: {
                   id_article: article_id,
@@ -5933,7 +11531,7 @@ const load_new_arrivals = () => {
 
   sequelize
     .query(
-      "SELECT * FROM Bonsortie, Entrepots WHERE Entrepots.id_entrepot = Bonsortie.provenance AND BonSortie.status = 0 AND Bonsortie.destination IS NOT NULL",
+      "SELECT * FROM bonsortie, entrepots WHERE entrepots.id_entrepot = bonsortie.provenance AND bonsortie.status = 0 AND bonsortie.destination IS NOT NULL",
       {
         type: sequelize.QueryTypes.SELECT,
       }
@@ -5980,7 +11578,7 @@ const show_new_arrival_details = (bonsortie_id) => {
 
   sequelize
     .query(
-      "SELECT * FROM Bonsortie_Article, Articles, Conditionnements WHERE Bonsortie_Article.bonsortie_id = :id_bonsortie AND  Articles.id_article = Bonsortie_Article.article_id AND Conditionnements.id_condmnt = Bonsortie_Article.conditionnement_id",
+      "SELECT * FROM bonsortie_article, articles, conditionnements WHERE bonsortie_article.bonsortie_id = :id_bonsortie AND  articles.id_article = bonsortie_article.article_id AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id",
       {
         replacements: { id_bonsortie: bonsortie_id },
         type: sequelize.QueryTypes.SELECT,
@@ -6039,7 +11637,7 @@ const receiveNewBonSortie = (bonsortie_id) => {
 
   sequelize
     .query(
-      "UPDATE BonSortie SET status = 1 WHERE id_bonsortie = :bonsortie_id",
+      "UPDATE bonsortie SET status = 1 WHERE id_bonsortie = :bonsortie_id",
       {
         replacements: {
           bonsortie_id: bonsortie_id,
@@ -6351,10 +11949,10 @@ const update_customer_account = (amount_to_pay, customer_id, caissier_id) => {
                 customer_account_query[0].nom_client,
                 customer_account_query[0].montant_a_payer,
                 customer_account_query[0].montant_regler +
-                  parseFloat(amount_to_pay),
+                parseFloat(amount_to_pay),
                 customer_account_query[0].montant_a_payer -
-                  (customer_account_query[0].montant_regler +
-                    parseFloat(amount_to_pay)),
+                (customer_account_query[0].montant_regler +
+                  parseFloat(amount_to_pay)),
                 parseFloat(amount_to_pay)
               );
             })
@@ -6403,48 +12001,114 @@ const show_sells = () => {
     .then((bill_query) => {
       console.log(bill_query);
 
+
+
       let c = "";
       bill_query
         .map((element) => {
-          c += "<tr>";
-          c +=
-            '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
-            element.id_facture +
-            "</td><td>" +
-            element.nom_client +
-            "</td><td>FCFA " +
-            element.reduction +
-            "</td><td>FCFA " +
-            element.montant__facture +
-            "</td><td>" +
-            element.reglement_facture +
-            "</td><td>" +
-            element.date_facture +
-            "</td>";
-          c += '<td><div class="btn-wrapper">';
-          c +=
-            '<a href="vendeur_details.html?id_facture=' +
-            element.id_facture +
-            "&update_parameter=" +
-            true +
-            "&total=" +
-            element.montant__facture +
-            '" type="button" class="btn btn-primary text-white me-0"></i>&nbsp; <i class="icon-eye"></i></a>';
-          c +=
-            '<a href="vendeur_details.html?id_facture=' +
-            element.id_facture +
-            "&update_parameter=" +
-            false +
-            "&total=" +
-            element.montant__facture +
-            '" type="button" class="btn btn-warning text-white me-0""></i>&nbsp; Modifier</a>';
-          c +=
-            '<button onclick="getBillPdfToPrint(' +
-            element.id_facture +
-            ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick="delete_sell_from_database(' +
-            element.id_facture +
-            ')" type="button" class="btn btn-danger text-white me-0" ></i>&nbsp; <i class="icon-trash"></i></button></td>';
-          c += "</tr>";
+          c = ""
+          //alert(!!element.nom_client)
+          if (!!element.nom_client) {
+
+            c += "<tr>";
+            c +=
+              '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+              element.id_facture +
+              "</td><td>" +
+              element.nom_client +
+              "</td><td>FCFA " +
+              element.reduction +
+              "</td><td>FCFA " +
+              element.montant__facture +
+              "</td><td>" +
+              element.reglement_facture +
+              "</td><td>" +
+              element.date_facture +
+              "</td>";
+            c += '<td><div class="btn-wrapper">';
+            c +=
+              '<a href="vendeur_details.html?id_facture=' +
+              element.id_facture +
+              "&update_parameter=" +
+              true +
+              "&total=" +
+              element.montant__facture +
+              '" type="button" class="btn btn-primary text-white me-0"></i>&nbsp; <i class="icon-eye"></i></a>';
+            c +=
+              '<a href="vendeur_details.html?id_facture=' +
+              element.id_facture +
+              "&update_parameter=" +
+              false +
+              "&total=" +
+              element.montant__facture +
+              '" type="button" class="btn btn-warning text-white me-0""></i>&nbsp; Modifier</a>';
+            c +=
+              '<button onclick="getBillPdfToPrint(' +
+              element.id_facture +
+              ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick="delete_sell_from_database(' +
+              element.id_facture +
+              ')" type="button" class="btn btn-danger text-white me-0" ></i>&nbsp; <i class="icon-trash"></i></button></td>';
+            c += "</tr>";
+            document.getElementById("tab_sells").innerHTML += c;
+          } else {
+
+
+            sequelize
+              .query("SELECT * FROM clients WHERE id_client = " + element.client_id, {
+                type: sequelize.QueryTypes.SELECT,
+              })
+              .then((costomer) => {
+                console.log(costomer);
+                //alert("zzz")
+
+                c += "<tr>";
+                c +=
+                  '<td class="py-1"><i class="mdi mdi-grid-large menu-icon"></i></td><td>' +
+                  element.id_facture +
+                  "</td><td>" +
+                  costomer[0].nom_client +
+                  "</td><td>FCFA " +
+                  element.reduction +
+                  "</td><td>FCFA " +
+                  element.montant__facture +
+                  "</td><td>" +
+                  element.reglement_facture +
+                  "</td><td>" +
+                  element.date_facture +
+                  "</td>";
+                c += '<td><div class="btn-wrapper">';
+                c +=
+                  '<a href="vendeur_details.html?id_facture=' +
+                  element.id_facture +
+                  "&update_parameter=" +
+                  true +
+                  "&total=" +
+                  element.montant__facture +
+                  '" type="button" class="btn btn-primary text-white me-0"></i>&nbsp; <i class="icon-eye"></i></a>';
+                c +=
+                  '<a href="vendeur_details.html?id_facture=' +
+                  element.id_facture +
+                  "&update_parameter=" +
+                  false +
+                  "&total=" +
+                  element.montant__facture +
+                  '" type="button" class="btn btn-warning text-white me-0""></i>&nbsp; Modifier</a>';
+                c +=
+                  '<button onclick="getBillPdfToPrint(' +
+                  element.id_facture +
+                  ')" type="button" class="btn btn-success text-white me-0" ></i>&nbsp; <i class="icon-printer"></i></button><button onclick="delete_sell_from_database(' +
+                  element.id_facture +
+                  ')" type="button" class="btn btn-danger text-white me-0" ></i>&nbsp; <i class="icon-trash"></i></button></td>';
+                c += "</tr>";
+                document.getElementById("tab_sells").innerHTML += c;
+                c = ""
+              })
+              .catch((error) => {
+                console.error("Failed to retrieve clients : ", error);
+              });
+          }
+
+
         })
         .join();
 
@@ -6452,7 +12116,7 @@ const show_sells = () => {
       // localStorage.setItem('update_parameter', true)
       // localStorage.setItem('total', element.montant__facture)
 
-      document.getElementById("tab_sells").innerHTML = c;
+      //document.getElementById("tab_sells").innerHTML = c;
     })
     .catch((error) => {
       console.error("Failed to retrieve Bills data : ", error);
@@ -6524,12 +12188,19 @@ const show_sell_details = (id_facture) => {
 };
 
 const delete_sell = (id_facture) => {
+
   sequelize
-    .query("DELETE FROM fFactures WHERE id_facture = ?", {
-      replacements: [id_facture],
-      type: sequelize.QueryTypes.DELETE,
-    })
+    .query(
+      "DELETE FROM factures WHERE id_facture = :id_facture ",
+      {
+        replacements: {
+          id_facture: id_facture,
+        },
+        type: sequelize.QueryTypes.DELETE,
+      }
+    )
     .then((delete_article_query) => {
+
       alert("Facture Supprimée avec success.");
       window.location.reload();
     })
@@ -6783,7 +12454,7 @@ const load_articles_items_entrepot = (item) => {
   // Perform a query
 
   sequelize
-    .query("SELECT * FROM entrepots", {
+    .query("SELECT * FROM entrepots LIMIT 1", {
       type: sequelize.QueryTypes.SELECT,
     })
     .then(function (Entrepots_query) {
@@ -6857,7 +12528,8 @@ const load_caisser_items = () => {
 
 //***** Function to register new sell ***\\
 const insert_sell = (customer_data) => {
-  console.log(customer_data);
+
+  console.log("eeeeeeeeeee" + customer_data);
   //   generateBilPDFFile();
   // Perform a query
   var currentBillDateCreation = new Date();
@@ -6865,9 +12537,10 @@ const insert_sell = (customer_data) => {
   // Insertquery to add an bill into database
   if (customer_data.customer_article_items_entrepot.length != 0) {
     let client_identification = [];
+
     if (customer_data.customer_payement_method == "Credit") {
       sequelize
-        .query("SELECT * FROM clients WHERE nom_client = ?", {
+        .query("SELECT * FROM clients WHERE id_client = ?", {
           replacements: [customer_data.customer_name],
           type: sequelize.QueryTypes.SELECT,
         })
@@ -6882,7 +12555,7 @@ const insert_sell = (customer_data) => {
                   replacements: {
                     date_bonsortie: new Date(),
                     provenance: entrepot.entrepot_id,
-                    id_client: customer_query[0].id_client,
+                    id_client: customer_data.customer_name,
                   },
                   type: sequelize.QueryTypes.INSERT,
                 }
@@ -6902,32 +12575,44 @@ const insert_sell = (customer_data) => {
           console.error("Failed to retrieve Customer data : ", error);
         });
     } else {
-      for (entrepot of customer_data.customer_article_items_entrepot) {
-        console.log(entrepot);
-        sequelize
-          .query(
-            "INSERT INTO bonsortie (id_bonsortie, date_bonsortie, provenance, nom_client) VALUES (DEFAULT, :date_bonsortie, :provenance, :nom_client)",
-            {
-              replacements: {
-                date_bonsortie: new Date(),
-                provenance: entrepot.entrepot_id,
-                nom_client: customer_data.customer_name,
-              },
-              type: sequelize.QueryTypes.INSERT,
-            }
-          )
-          .then((bon_sortie_query) => {
-            // console.log(customer_data.bill_article);
+      console.log("aeaeaeaeaeae" + customer_data)
+      sequelize
+        .query("SELECT * FROM clients ", {
+          type: sequelize.QueryTypes.SELECT,
+        })
+        .then((customer_query) => {
+          for (entrepot of customer_data.customer_article_items_entrepot) {
+            console.log(entrepot);
+            sequelize
+              .query(
+                "INSERT INTO bonsortie (id_bonsortie, date_bonsortie, provenance, nom_client) VALUES (DEFAULT, :date_bonsortie, :provenance, :nom_client)",
+                {
+                  replacements: {
+                    date_bonsortie: new Date(),
+                    provenance: entrepot.entrepot_id,
+                    nom_client: customer_data.customer_name,
+                  },
+                  type: sequelize.QueryTypes.INSERT,
+                }
+              )
+              .then((bon_sortie_query) => {
+                // console.log(customer_data.bill_article);
 
-            insert_bon_sortie_details(bon_sortie_query[0], entrepot);
-            // window.location.reload();
-          })
-          .catch((error) => {
-            console.error("Failed to insert bill data : ", error);
-          });
-      }
+                insert_bon_sortie_details(bon_sortie_query[0], entrepot);
+                // window.location.reload();
+              })
+              .catch((error) => {
+                console.error("Failed to insert bill data : ", error);
+              });
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to retrieve Customer data : ", error);
+        });
     }
   }
+
+
 
   if (customer_data.customer_article_items.length != 0) {
     if (customer_data.customer_payement_method == "Credit") {
@@ -7306,16 +12991,16 @@ const generateBilPDFFile = (id_facture, data) => {
           styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
         },
         day +
-          "/" +
-          month +
-          "/" +
-          year +
-          " à " +
-          hour +
-          ":" +
-          minutes +
-          ":" +
-          seconds,
+        "/" +
+        month +
+        "/" +
+        year +
+        " à " +
+        hour +
+        ":" +
+        minutes +
+        ":" +
+        seconds,
       ],
       ["CLIENT : " + data.customer_name, "", "Magasin : Boutique"],
     ],
@@ -7331,8 +13016,9 @@ const generateBilPDFFile = (id_facture, data) => {
     tableLineColor: "black",
     tableLineWidth: 1,
     columnStyles: {
-      0: { halign: "left", cellWidth: 300 },
-      1: { halign: "left" },
+      0: { halign: "left" },
+      1: { halign: "center", cellWidth: 200 },
+      2: { halign: "left" },
     },
   });
 
@@ -7374,7 +13060,7 @@ const generateBilPDFFile = (id_facture, data) => {
     body: [
       [
         "Nombre de Produits       " +
-          data.customer_article_items.article_infos.length,
+        data.customer_article_items.article_infos.length,
         "Montant Total       " + data.customer_total_sell_price + " FCFA",
       ],
     ],
@@ -7492,16 +13178,16 @@ const generateBonSortiePDFFile = (id_bonsortie, data) => {
           styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
         },
         day +
-          "/" +
-          month +
-          "/" +
-          year +
-          " à " +
-          hour +
-          ":" +
-          minutes +
-          ":" +
-          seconds,
+        "/" +
+        month +
+        "/" +
+        year +
+        " à " +
+        hour +
+        ":" +
+        minutes +
+        ":" +
+        seconds,
       ],
       [
         "Provenance : " + data.bonsortie_provenance,
@@ -7521,8 +13207,9 @@ const generateBonSortiePDFFile = (id_bonsortie, data) => {
     tableLineColor: "black",
     tableLineWidth: 1,
     columnStyles: {
-      0: { halign: "left", cellWidth: 300 },
-      1: { halign: "left" },
+      0: { halign: "left" },
+      1: { halign: "center", cellWidth: 200 },
+      2: { halign: "left" },
     },
   });
 
@@ -7561,7 +13248,7 @@ const generateBonSortiePDFFile = (id_bonsortie, data) => {
     body: [
       [
         "Nombre de Produits       " +
-          data.bonsortie_article_items.article_infos.length,
+        data.bonsortie_article_items.article_infos.length,
         " ",
       ],
     ],
@@ -7681,16 +13368,16 @@ const generateBonCommandePDFFile = (id_boncommande, data) => {
           styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
         },
         day +
-          "/" +
-          month +
-          "/" +
-          year +
-          " à " +
-          hour +
-          ":" +
-          minutes +
-          ":" +
-          seconds,
+        "/" +
+        month +
+        "/" +
+        year +
+        " à " +
+        hour +
+        ":" +
+        minutes +
+        ":" +
+        seconds,
       ],
       ["Fournisseur : " + data.fournisseur, "", ""],
     ],
@@ -7706,8 +13393,9 @@ const generateBonCommandePDFFile = (id_boncommande, data) => {
     tableLineColor: "black",
     tableLineWidth: 1,
     columnStyles: {
-      0: { halign: "left", cellWidth: 300 },
-      1: { halign: "left" },
+      0: { halign: "left" },
+      1: { halign: "center", cellWidth: 200 },
+      2: { halign: "left" },
     },
   });
 
@@ -7748,7 +13436,7 @@ const generateBonCommandePDFFile = (id_boncommande, data) => {
     body: [
       [
         "Nombre de Produits       " +
-          data.boncommande_article_items.article_infos.length,
+        data.boncommande_article_items.article_infos.length,
         "Montant Total       " + data.boncommande_total_sell_price + " FCFA",
       ],
     ],
@@ -7864,16 +13552,16 @@ const generateReceiptPDFFile = (
           styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
         },
         day +
-          "/" +
-          month +
-          "/" +
-          year +
-          " à " +
-          hour +
-          ":" +
-          minutes +
-          ":" +
-          seconds,
+        "/" +
+        month +
+        "/" +
+        year +
+        " à " +
+        hour +
+        ":" +
+        minutes +
+        ":" +
+        seconds,
       ],
       ["CLIENT : " + customer_name, "", "Magasin : Boutique"],
     ],
@@ -7888,8 +13576,9 @@ const generateReceiptPDFFile = (
     tableLineColor: "black",
     tableLineWidth: 1,
     columnStyles: {
-      0: { halign: "left", cellWidth: 300 },
-      1: { halign: "left" },
+      0: { halign: "left" },
+      1: { halign: "center", cellWidth: 200 },
+      2: { halign: "left" },
     },
   });
 
@@ -7968,6 +13657,7 @@ const generateReceiptPDFFile = (
 
   window.open(absolutePdfFilePath);
 };
+
 
 const getBillPdfFileToPrint = (id_facture) => {
   sequelize
@@ -8114,7 +13804,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
       sequelize
         .query(
           "SELECT * FROM entrepots WHERE  id_entrepot = " +
-            bonsortie_query[0].provenance,
+          bonsortie_query[0].provenance,
           {
             type: sequelize.QueryTypes.SELECT,
           }
@@ -8124,7 +13814,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
             sequelize
               .query(
                 "SELECT * FROM entrepots WHERE  id_entrepot = " +
-                  bonsortie_query[0].destination,
+                bonsortie_query[0].destination,
                 {
                   type: sequelize.QueryTypes.SELECT,
                 }
@@ -8221,8 +13911,8 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
             } else {
               sequelize
                 .query(
-                  "SELECT * FROM Clients WHERE  id_client = " +
-                    bonsortie_query[0].client_id,
+                  "SELECT * FROM clients WHERE  id_client = " +
+                  bonsortie_query[0].client_id,
                   {
                     type: sequelize.QueryTypes.SELECT,
                   }
@@ -8233,7 +13923,7 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
                       article_infos: [],
                     },
                     bonsortie_provenance: pr[0].libele_entrepot,
-                    bonsortie_destination: des[0].nom_ckient,
+                    bonsortie_destination: des[0].nom_client,
                   };
 
                   sequelize
@@ -8293,6 +13983,764 @@ const findBonSortiePdfToPrint = (id_bonsortie) => {
     });
 };
 
+
+/////// print Bonreception
+
+
+const generateBonReceptionPDFFile = (id, data) => {
+  const date = new Date();
+  const [month, day, year] = [
+    date.getMonth() + 1,
+    date.getDate(),
+    date.getFullYear(),
+  ];
+  const [hour, minutes, seconds] = [
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+  ];
+
+  var doc = new jsPDF("p", "pt");
+
+  doc.setFont("courier", "italic");
+
+  // generate the above data table
+  var body = [];
+
+  console.log(data);
+  nb = 0
+  for (article of data.bonreception_article_items.article_infos) {
+    body.push([
+      // counter++,
+      article.articles_items,
+      article.conditionment,
+      article.article_quantity,
+
+
+      //article.article_unit_price,
+      //article.article_quantity * article.article_unit_price,
+      nb += parseInt(article.article_quantity)
+    ]);
+  }
+
+  // New Header and Footer Data Include the table
+  var y = 10;
+  doc.setLineWidth(2);
+
+  // First Table (Bill Head)
+  doc.autoTable({
+    body: [
+      ["COMMERCE GENERAL", "", "Date de la Reception : "],
+      [
+        "Bon De Reception N°" + id,
+        {
+          content: "BR",
+          styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
+        },
+        day +
+        "/" +
+        month +
+        "/" +
+        year +
+        " à " +
+        hour +
+        ":" +
+        minutes +
+        ":" +
+        seconds,
+      ],
+      ["Fournisseur :" + data.bonreception_provenance, "",
+      "Entrepot:" + data.bonreception_destination
+      ],
+
+    ],
+    startY: 30,
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      // minCellHeight: 10,
+      // fontSize: 12,
+      // cellPadding: 10,
+    },
+    theme: "plain",
+    tableLineColor: "black",
+    tableLineWidth: 1,
+    columnStyles: {
+      0: { halign: "left" },
+      1: { halign: "center", cellWidth: 200 },
+      2: { halign: "left" },
+    },
+  });
+
+  // Second table (Bill Body)
+  doc.autoTable({
+    body: body,
+    // startY: 200,
+    head: [
+      [
+        // "N°",
+        "Article",
+        "Conditionnement",
+        "Quantité",
+
+
+      ],
+    ],
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      fontSize: 12,
+      lineColor: "black",
+      lineWidth: 1,
+    },
+    theme: "plain",
+    tableLineColor: "black",
+    tableLineWidth: 1,
+    // columnStyles: {
+    // 0: {halign: 'right', cellWidth: 25,},
+    // 1: {halign: 'left', cellWidth: 100,},
+    // 2: {halign: 'right', cellWidth: 50,},
+    // 3: {halign: 'right', cellWidth: 50,}
+    // },
+  });
+
+  // Third Table (Bill Footer)
+  doc.autoTable({
+    body: [
+      [
+        "Nombre de Produits   ( " +
+        data.bonreception_article_items.article_infos.length + " )",
+        "Nombre  Total d'articles reçu ( " + nb + " )",
+      ],
+    ],
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      fontSize: 12,
+    },
+    theme: "plain",
+    columnStyles: {
+      0: { halign: "left" },
+      1: { halign: "right" },
+    },
+  });
+
+  // Forth Table (Bill Last element)
+  // doc.autoTable({
+  //   body: [
+  //     [
+  //       "Les marchandises vendues et livrées ne sont ni reprises ni échangées",
+  //     ],
+  //   ],
+  //   styles: {
+  //     font: "courier",
+  //     fontStyle: "bold",
+  //     fontSize: 12,
+  //   },
+  //   theme: "plain",
+  //   columnStyles: {
+  //     0: { halign: 'center' },
+  //   },
+  // });
+
+  // Fifth Table (Bill Signature)
+  doc.autoTable({
+    body: [["Le Fournisseur", "Le Directeur"]],
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      minCellHeight: 10,
+      // fontSize: 12,
+      cellPadding: {
+        horizontal: 20,
+      },
+    },
+    theme: "plain",
+    columnStyles: {
+      0: { halign: "left", valign: "top" },
+      1: { halign: "right", valign: "top" },
+    },
+  });
+
+  var file_Path =
+    "Bon_de_Reception_de_" +
+    data.bonreception_provenance +
+    "_du_" +
+    year +
+    "-" +
+    month +
+    "-" +
+    day +
+    "_" +
+    id +
+    ".pdf";
+
+  doc.autoPrint({ variant: "non-conform" });
+
+  doc.save(file_Path);
+  var absolutePdfFilePath = resolve(file_Path);
+
+  window.open(absolutePdfFilePath);
+};
+//////((((((()))))))
+const findBonReceptionPdfToPrint = (id) => {
+  sequelize
+    .query("SELECT * FROM bonreceptions WHERE id_bonreception = ?", {
+      replacements: [id],
+      type: sequelize.QueryTypes.SELECT,
+    })
+    .then((query) => {
+      console.log(query);
+
+      sequelize
+        .query(
+          "SELECT * FROM fournisseur WHERE  id_fournisseur = " +
+          query[0].fournisseur_id,
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((pr) => {
+          sequelize
+            .query(
+              "SELECT * FROM entrepots WHERE  id_entrepot = " +
+              query[0].entrepot_id,
+              {
+                type: sequelize.QueryTypes.SELECT,
+              }
+            )
+            .then((des) => {
+              var globalBonReception = {
+                bonreception_article_items: {
+                  article_infos: [],
+                },
+                bonreception_provenance: pr[0].nom_fournisseur,
+                bonreception_destination: des[0].libele_entrepot,
+              };
+
+              sequelize
+                .query(
+                  "SELECT * FROM bonreception_article, articles, conditionnements WHERE bonreception_article.bonreception_id = :id_bonreception AND  articles.id_article = bonreception_article.article_id AND conditionnements.id_condmnt = bonreception_article.conditionnement_id",
+                  {
+                    replacements: {
+                      id_bonreception: id,
+                    },
+                    type: sequelize.QueryTypes.SELECT,
+                  }
+                )
+                .then((bill_details_query) => {
+                  // console.log(bill_details_query);
+
+                  for (bill_detail of bill_details_query) {
+                    globalBonReception.bonreception_article_items.article_infos.push(
+                      {
+                        articles_items: bill_detail.libele_article,
+                        conditionment: bill_detail.libele_condmnt,
+                        article_quantity: bill_detail.qteReçu,
+                      }
+                    );
+                  }
+                  // console.log(globalBonSortieInfo)
+
+                  generateBonReceptionPDFFile(id, globalBonReception);
+                })
+                .catch((error) => {
+                  console.error(
+                    "Failed to retrieve Bill Details data : ",
+                    error
+                  );
+                });
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to retrieve Entrepots destination data : ",
+                error
+              );
+            });
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve Entrepots provenance data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error("Failed to retrieve Bill data : ", error);
+    });
+};
+////////////////
+
+
+/////// print Inventaire
+
+
+const generateInventairePDFFile = (id, data) => {
+  const date = new Date();
+  const [month, day, year] = [
+    date.getMonth() + 1,
+    date.getDate(),
+    date.getFullYear(),
+  ];
+  const [hour, minutes, seconds] = [
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+  ];
+
+  var doc = new jsPDF("p", "pt");
+
+  doc.setFont("courier", "italic");
+
+  // generate the above data table
+  var body = [];
+
+  console.log(data);
+  nb = 0
+  for (mv of data.items.infos) {
+    body.push([
+      mv.date,
+      mv.entree,
+      mv.sortie,
+      mv.stock,
+
+
+      //article.article_unit_price,
+      //article.article_quantity * article.article_unit_price,
+      nb = mv.stock
+    ]);
+  }
+
+  // New Header and Footer Data Include the table
+  var y = 10;
+  doc.setLineWidth(2);
+
+  // First Table (Bill Head)
+  doc.autoTable({
+    body: [
+      ["COMMERCE GENERAL", "", "Date de consultation: "],
+      [
+        "Detaille",
+        {
+          content: "INVENTAIRE",
+          styles: { fontSize: 14, font: "courier", fontStyle: "bold" },
+        },
+        day +
+        "/" +
+        month +
+        "/" +
+        year +
+        " à " +
+        hour +
+        ":" +
+        minutes +
+        ":" +
+        seconds,
+      ],
+      ["Produit :" + data.article + " - " + data.cdn, "",
+      "Entrepot:" + data.provenance
+      ],
+
+    ],
+    startY: 30,
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      // minCellHeight: 10,
+      // fontSize: 12,
+      // cellPadding: 10,
+    },
+    theme: "plain",
+    tableLineColor: "black",
+    tableLineWidth: 1,
+    columnStyles: {
+      0: { halign: "left" },
+      1: { halign: "center", cellWidth: 200 },
+      2: { halign: "left" },
+    },
+  });
+
+  // Second table (Bill Body)
+  doc.autoTable({
+    body: body,
+    // startY: 200,
+    head: [
+      [
+        // "N°",
+        "Date",
+        "Entrée",
+        "Sortie",
+        "Stock",
+
+
+      ],
+    ],
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      fontSize: 12,
+      lineColor: "black",
+      lineWidth: 1,
+    },
+    theme: "plain",
+    tableLineColor: "black",
+    tableLineWidth: 1,
+    // columnStyles: {
+    // 0: {halign: 'right', cellWidth: 25,},
+    // 1: {halign: 'left', cellWidth: 100,},
+    // 2: {halign: 'right', cellWidth: 50,},
+    // 3: {halign: 'right', cellWidth: 50,}
+    // },
+  });
+
+  // Third Table (Bill Footer)
+  doc.autoTable({
+    body: [
+      [
+        "INVENTAIRE :  " + nb + " ",
+      ],
+    ],
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      fontSize: 12,
+    },
+    theme: "plain",
+    columnStyles: {
+      0: { halign: "left" },
+      1: { halign: "right" },
+    },
+  });
+
+  // Forth Table (Bill Last element)
+  // doc.autoTable({
+  //   body: [
+  //     [
+  //       "Les marchandises vendues et livrées ne sont ni reprises ni échangées",
+  //     ],
+  //   ],
+  //   styles: {
+  //     font: "courier",
+  //     fontStyle: "bold",
+  //     fontSize: 12,
+  //   },
+  //   theme: "plain",
+  //   columnStyles: {
+  //     0: { halign: 'center' },
+  //   },
+  // });
+
+  // Fifth Table (Bill Signature)
+  doc.autoTable({
+    body: [["", "Le Directeur"]],
+    styles: {
+      font: "courier",
+      fontStyle: "bold",
+      minCellHeight: 10,
+      // fontSize: 12,
+      cellPadding: {
+        horizontal: 20,
+      },
+    },
+    theme: "plain",
+    columnStyles: {
+      0: { halign: "left", valign: "top" },
+      1: { halign: "right", valign: "top" },
+    },
+  });
+
+  var file_Path =
+    "Inventaire_" +
+    data.provenance +
+    "_consulter_le_" +
+    year +
+    "-" +
+    month +
+    "-" +
+    day +
+    "_" +
+    id +
+    ".pdf";
+
+  doc.autoPrint({ variant: "non-conform" });
+
+  doc.save(file_Path);
+  var absolutePdfFilePath = resolve(file_Path);
+
+  window.open(absolutePdfFilePath);
+};
+//////((((((()))))))
+
+const findInventrairePdfToPrint = (id_e, id_a) => {
+  date = "";
+  date_f = "";
+
+  if (document.getElementById("date").value == '' && document.getElementById("date_f").value == '') {
+    date = "";
+  } else {
+    if (document.getElementById("date_f").value != '' && document.getElementById("date").value != '') {
+      for (var i = 0; i < 10; i++) {
+        date += document.getElementById("date").value[i];
+      }
+      for (var i = 0; i < 10; i++) {
+        date_f += document.getElementById("date_f").value[i];
+      }
+      //alert(date + " " + date_f)
+    } else {
+      if (document.getElementById("date_f").value == '' && document.getElementById("date").value != '') {
+        for (var i = 0; i < 10; i++) {
+          date += document.getElementById("date").value[i];
+        }
+
+        //alert(date)
+      } else {
+        for (var i = 0; i < 10; i++) {
+          date += document.getElementById("date_f").value[i];
+        }
+
+        //alert(date)
+      }
+    }
+  }
+
+  if (document.getElementById("date").value == '' && document.getElementById("date_f").value == '') {
+
+
+    rq_e = ' ORDER BY bonreception_article.nt_r ASC'
+    rq_s = ' ORDER BY bonsortie_article.nt_s ASC'
+
+
+  } else {
+    if (document.getElementById("date_f").value != '' && document.getElementById("date").value != '') {
+
+      rq_e = ' AND bonreceptions.date_reception >= "' +
+        date + '" AND bonreceptions.date_reception <= "' +
+        date_f + '" ORDER BY bonreception_article.nt_r ASC'
+
+      rq_s = ' AND bonsortie.date_bonsortie >= "' +
+        date + '" AND bonsortie.date_bonsortie <= "' +
+        date_f + '" ORDER BY bonsortie_article.nt_s ASC'
+    } else {
+
+      rq_e = ' AND bonreceptions.date_reception = "' +
+        date + '" ORDER BY bonreception_article.nt_r ASC'
+
+      rq_s = ' AND bonsortie.date_bonsortie = "' +
+        date + '" ORDER BY bonsortie_article.nt_s ASC'
+
+    }
+
+  }
+  sequelize
+    .query(
+      "SELECT * FROM  `bonsortie`, `bonsortie_article` , `articles` , `conditionnements` WHERE  bonsortie.id_bonsortie= bonsortie_article.bonsortie_id  AND conditionnements.id_condmnt = bonsortie_article.conditionnement_id  AND articles.id_article = bonsortie_article.article_id AND articles.id_article = " +
+      id_a + " AND conditionnements.id_condmnt =" + document.getElementById("cdnmnt").value +
+      " AND bonsortie.provenance = " +
+      id_e + rq_s,
+
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((BS) => {
+
+      sequelize
+        .query(
+          "SELECT * FROM  `bonreceptions`, `bonreception_article` , `articles` , `fournisseur` , `conditionnements` WHERE  bonreceptions.id_bonreception = bonreception_article.bonreception_id  AND conditionnements.id_condmnt = bonreception_article.conditionnement_id  AND articles.id_article = bonreception_article.article_id AND bonreceptions.fournisseur_id = fournisseur.id_fournisseur AND articles.id_article = " +
+          id_a + " AND conditionnements.id_condmnt =" + document.getElementById("cdnmnt").value +
+          " AND bonreceptions.entrepot_id = " +
+          id_e + rq_e,
+
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        )
+        .then((BR) => {
+
+
+          sequelize
+            .query(
+              "SELECT * FROM  `entrepots`, `entrepot_article` , `articles` , `conditionnements` WHERE  entrepots.id_entrepot = entrepot_article.entrepot_id  AND conditionnements.id_condmnt = entrepot_article.condmnt_id  AND articles.id_article = entrepot_article.article_id AND entrepots.id_entrepot = " +
+              id_e +
+              " AND articles.id_article = " + id_a +
+              " AND conditionnements.id_condmnt = " +
+              document.getElementById("cdnmnt").value)
+            .then((entrepot) => {
+              console.log(entrepot)
+
+              var globalInventaire = {
+                items: {
+                  infos: [],
+                },
+                provenance: entrepot[0][0].libele_entrepot,
+                article: entrepot[0][0].libele_article,
+                cdn: entrepot[0][0].libele_condmnt,
+
+              };
+              ent = 0
+              sort = 0
+              n = 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+              st = 0
+              BS.map((S) => {
+                if (S.nt_s < n) {
+                  st = S.st_b_s
+                  n = S.nt_s
+                }
+
+              })
+              BR.map((R) => {
+                if (R.nt_r < n) {
+                  st = R.st_b_r
+                  n = R.nt_r
+                }
+
+              })
+              globalInventaire.items.infos.push(
+                {
+                  date: 'Stock Initial',
+                  entree: '/',
+                  sortie: '/',
+                  stock: st,
+                }
+              );
+
+              taille = 0
+              BS.map((S) => {
+                if (taille < S.nt_s) {
+                  taille = S.nt_s
+                }
+
+              })
+              BR.map((R) => {
+                if (taille < R.nt_r) {
+                  taille = R.nt_r
+                }
+
+              })
+              ///alert(taille)
+              tab = new Array(taille).fill(0)
+
+
+              BS.map((S) => {
+                //alert(S.nt_s)
+                tab[S.nt_s] = [S.date_bonsortie, -S.qteSortie]
+              })
+              BR.map((R) => {
+                //alert(R.nt_r)
+                tab[R.nt_r] = [R.date_reception, R.qteReçu]
+              })
+              tab1 = []
+              a = 0
+
+              for (let i = 0; i < tab.length; i++) {
+                if (tab[i] != 0) {
+                  tab1[a] = tab[i]
+                  a++
+                }
+              }
+              //alert(tab1)
+              if (tab1.length != 1) {
+                if (tab1[0][1] < 0) {
+                  sort -= tab1[0][1]
+                } else {
+                  ent += tab1[0][1]
+                }
+                st += tab1[0][1]
+              } else {
+                if (tab1[0][1] < 0) {
+                  sort -= tab1[0][1]
+                } else {
+                  ent += tab1[0][1]
+                }
+                st += tab1[0][1]
+
+                globalInventaire.items.infos.push(
+                  {
+                    date: tab1[0][0],
+                    entree: (ent != 0 ? ent : '/'),
+                    sortie: (sort != 0 ? sort : '/'),
+                    stock: st,
+                  }
+                );
+              }
+
+              for (let i = 1; i < tab1.length; i++) {
+
+                if (tab1[i - 1][0] == tab1[i][0]) {
+                  //alert(tab1[i][0])
+                  if (tab1[i][1] < 0) {
+                    sort -= tab1[i][1]
+                    //alert(tab1[i][1])
+                  } else {
+                    ent += tab1[i][1]
+                  }
+                  st += tab1[i][1]
+                } else {
+
+                  globalInventaire.items.infos.push(
+                    {
+                      date: tab1[i - 1][0],
+                      entree: (ent != 0 ? ent : '/'),
+                      sortie: (sort != 0 ? sort : '/'),
+                      stock: st,
+                    }
+                  );
+
+
+                  ent = 0
+                  sort = 0
+                  if (tab1[i][1] < 0) {
+                    sort -= tab1[i][1]
+                  } else {
+                    ent += tab1[i][1]
+                  }
+                  st += tab1[i][1]
+                }
+                if (i == tab1.length - 1) {
+
+                  globalInventaire.items.infos.push(
+                    {
+                      date: tab1[i][0],
+                      entree: (ent != 0 ? ent : '/'),
+                      sortie: (sort != 0 ? sort : '/'),
+                      stock: st,
+                    }
+                  );
+
+                }
+
+
+
+              }
+              generateInventairePDFFile(0, globalInventaire)
+              //generateBonReceptionPDFFile(id, globalBonReception);
+            })
+            .catch((error) => {
+              console.error(
+                "Failed to retrieve Entrepots destination data : ",
+                error
+              );
+            });
+
+        })
+        .catch((error) => {
+          console.error(
+            "Failed to retrieve `BR`, `BR_Article` , `Articles` , `Conditionnements` data : ",
+            error
+          );
+        });
+    })
+    .catch((error) => {
+      console.error(
+        "Failed to retrieve `BonSortie`, `BonSortie_Article` , `Articles` , `Conditionnements` data : ",
+        error
+      );
+    });
+
+};
+
+///////////////////////////
 const findBonCommandePdfToPrint = (id_boncommande) => {
   sequelize
     .query(
@@ -8773,8 +15221,16 @@ contextBridge.exposeInMainWorld("electron", {
   chargement_entrepot_BS_modif: chargement_entrepot_BS_modif,
   chargement_articles_BS: chargement_articles_BS,
   chargement_cdmnt_BS: chargement_cdmnt_BS,
+  chargement_cdmnt_BS_: chargement_cdmnt_BS_,
   chargement_st_BS: chargement_st_BS,
+  chargement_st_BS_: chargement_st_BS_,
+  chargement_st_BR: chargement_st_BR,
+  chargement_st_BR_: chargement_st_BR_,
   modif_entr_pr: modif_entr_pr,
+  modif_entr_pr_: modif_entr_pr_,
+
+  modif_entr: modif_entr,
+  modif_entr_: modif_entr_,
   modif_stock: modif_stock,
   enreg_modif_stock: enreg_modif_stock,
   afiche_BS: afiche_BS,
@@ -8783,15 +15239,24 @@ contextBridge.exposeInMainWorld("electron", {
   delete_bon_sortie: delete_bon_sortie,
   update_bon_sortie: update_bon_sortie,
   afiche_BR: afiche_BR,
+  chargement_entrepot_R: chargement_entrepot_R,
+  chargement_cdmnt_BR: chargement_cdmnt_BR,
+  chargement_cdmnt_BR_: chargement_cdmnt_BR_,
   reception_BC: reception_BC,
   insert_BR: insert_BR,
+  insert_BR_: insert_BR_,
+  delete_br: delete_br,
   voir_reception_BC: voir_reception_BC,
+  voir_reception_BC_: voir_reception_BC_,
   modif_reception_BC: modif_reception_BC,
+  modif_reception_BC_: modif_reception_BC_,
   Update_BR: Update_BR,
+  Update_BR_: Update_BR_,
   del_entrepot: del_entrepot,
   moov_entrepot: moov_entrepot,
   chargement_cdmnt_e: chargement_cdmnt_e,
   filtre_moov: filtre_moov,
+  Inventaires: Inventaires,
 
   // Functions to manage Articles
 
@@ -8846,6 +15311,8 @@ contextBridge.exposeInMainWorld("electron", {
   getBillPdfFileToPrint: getBillPdfFileToPrint,
   findBonSortiePdfToPrint: findBonSortiePdfToPrint,
   findBonCommandePdfToPrint: findBonCommandePdfToPrint,
+  findBonReceptionPdfToPrint: findBonReceptionPdfToPrint,
+  findInventrairePdfToPrint: findInventrairePdfToPrint,
 });
 
 // "scripts": {

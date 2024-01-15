@@ -22,21 +22,35 @@ document.getElementById('annuler').innerHTML += '<a  href="voir-boncmd.html?id='
 
 function chargement_cdmnt(x) {
  	//alert(document.getElementById("frs").value)
-
- 	window.electron.chargement_cdmnt_BC(x.value,x.id[7])
+   i = ""
+   for (let index = 7; index < x.id.length; index++) {
+     //alert(x.id[index]) 
+     i += x.id[index]
+   }
+   //alert(i)
+   window.electron.chargement_cdmnt_BC(x.value, i)
  }
 
 
- function Montant(x) {
- 	a=parseInt(x.id.length)
- 	
- 	//alert("montant"+x.id[a-1])
- 
+ function Montant(x, elem) {
 
- 	document.getElementById("montant"+x.id[a-1]).value=document.getElementById("pu"+x.id[a-1]).value*document.getElementById("qte"+x.id[a-1]).value
+  i = ""
+  if (elem == 'qt') {
+    for (let index = 3; index < x.id.length; index++) {
+      //alert(x.id[index]) 
+      i += x.id[index]
+    }
+  }else{
+    for (let index = 2; index < x.id.length; index++) {
+      //alert(x.id[index]) 
+      i += x.id[index]
+    }
+  }
 
- 	Montant_T()
- }
+  document.getElementById("montant" + i).value = document.getElementById("pu" + i).value * document.getElementById("qte" + i).value
+
+  Montant_T()
+}
 
  function Montant_T() {
 
@@ -80,8 +94,8 @@ var c = 0
       
 
       cell1.innerHTML = '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article'+n+'"></select></div><div class="col-md-4" ><select class="js-example-basic-single w-100" id="cdmnt'+n+'"></select></div></div>';
-      cell2.innerHTML = '<input type="number" min="0" class="form-control" require id="qte'+n+'" onchange=Montant(this)>';
-      cell3.innerHTML = '<input type="number" min="0" class="form-control" require id="pu'+n+'" onchange=Montant(this)>';
+      cell2.innerHTML = '<input type="number" min="0" class="form-control" require id="qte'+n+'" onchange=Montant(this,"qt")>';
+      cell3.innerHTML = '<input type="number" min="0" class="form-control" require id="pu'+n+'" onchange=Montant(this,"pu")>';
       cell4.innerHTML = '<input type="number" readonly class="form-control" require id="montant'+n+'">';
       cell5.innerHTML = '<i title="Retirer" style="font-size: 25px" class="mdi mdi-minus-circle text-danger icon-remove" onclick="RemoveRow(this)" id="'+n+'"></i>';
 
@@ -120,3 +134,44 @@ var c = 0
 
 
 function actualiser() { window.location.reload()}
+
+function filtrer() {
+
+	//alert(document.getElementById("select_f").options[document.getElementById("select_f").options.selectedIndex].value)
+	var filtre, tableau, ligne, cellule, i, texte;
+  
+	filtre = document.getElementById("maRecherche").value.toUpperCase();
+	tableau = document.getElementById("myTable");
+	ligne = tableau.getElementsByTagName("tr");
+	//alert(ligne.length)
+	for (i = 1; i < ligne.length-1; i++) {
+		  let t = false;
+		  //for (j = 0; j <= 5; j++) {
+  
+				// if (j == 0 || j == 1 || j == 2 || j == 3 ) {
+				 	  //cellule = ligne[i].getElementsByTagName("td")[j];
+             cellule =document.getElementById('a'+i).value
+  
+					  if (cellule) {
+							//texte = cellule.innerText.toLocaleString();
+              //alert(document.getElementById('a'+i).value)
+							if (document.getElementById('a'+i).value.toUpperCase().indexOf(filtre) > -1) {
+                ligne[i].style.display = "";
+                t = true;
+            }
+  
+					  }
+				//}
+  
+  
+		  // }
+		  if (!t) {
+				ligne[i].style.display = "none";
+  
+		  }
+  
+  
+	}
+  
+  }
+  

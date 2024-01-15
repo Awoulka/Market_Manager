@@ -52,14 +52,13 @@ function Montant(x) {
   var getQuantityState = document.getElementById(
     "article_quantity" + x.id[a - 1]
   );
-  if (parseInt(getQuantityState.getAttribute("max")) < getQuantityState.value) {
-    document.getElementById("message").innerHTML =
-      '<strong style="color: red;">La Quantité entré pour le produit de la ligne ' +
-      x.id[a - 1] +
-      " excède la limite!!!\nVeuillez enter une nouvelle quantité!!!</strong>";
-
-    getQuantityState.value = 0;
-  } else {
+  // if (parseInt(getQuantityState.getAttribute("max")) < getQuantityState.value) {
+    // document.getElementById("message").innerHTML =
+    //   '<strong style="color: red;">La Quantité entré pour le produit de la ligne ' +
+    //   x.id[a - 1] +
+    //   " excède la limite!!!\nVeuillez enter une nouvelle quantité!!!</strong>";
+    // getQuantityState.value = 0;
+  // } else {
     // alert(document.getElementById("article_quantity"+x.id[a-1]).value)
     document.getElementById("article_total_price" + x.id[a - 1]).value =
       document.getElementById("article_quantity" + x.id[a - 1]).value *
@@ -67,7 +66,7 @@ function Montant(x) {
         document.getElementById("reduction" + x.id[a - 1]).value);
 
     Montant_T();
-  }
+ // }
 }
 
 function Montant_T() {
@@ -156,7 +155,7 @@ function generateBill() {
   var exist_value = true;
   var registered_data = 0;
 
-  var bill_article_list_per_entrepot = [];
+  let bill_article_list_per_entrepot = [];
 
   // Pushing the first line of our table
 
@@ -264,7 +263,8 @@ function generateBill() {
       // alert(registered_data);
       var bill_article_from_boutique =
         bill_article_list_per_entrepot[registered_data];
-      bill_article_list_per_entrepot.splice(registered_data, registered_data);
+      bill_article_list_per_entrepot =
+        bill_article_list_per_entrepot.slice(registered_data);
       break;
     }
     registered_data++;
@@ -314,3 +314,14 @@ function DisableOtherInput(selectedInput) {
       "<strong style=\"color: red;\">Veuillez sélectionner un client\nSi le client n'existe psa dans la liste, veuillez le créer à partir de l'onglet COMPTE CLIENT -> NOUVEAU CLIENT</strong>";
   }
 }
+
+var js_ = document.createElement("script");
+js_.type = "text/javascript";
+js_.src = "../../vendors/select2/select2.min.js";
+//document.body.removeChild(js_)
+document.body.appendChild(js_);
+var js = document.createElement("script");
+js.type = "text/javascript";
+js.src = "../../js/select2.js";
+//document.body.removeChild(js)
+document.body.appendChild(js);

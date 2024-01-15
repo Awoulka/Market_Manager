@@ -7,7 +7,7 @@
 
   <!-- Required meta tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
   <title>Industriel Pressing • Achats</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
@@ -60,7 +60,7 @@
           <li class="nav-item">
             <form class="search-form" action="#">
               <i class="icon-search"></i>
-              <input type="search" class="form-control" placeholder="Search Here" title="Search here">
+              <input type="search" class="form-control" placeholder="Search Here" title="Search here" id="maRecherche" onkeyup="filtrer()">
             </form>
           </li>
           <li class="nav-item dropdown d-none d-lg-block user-dropdown">
@@ -102,14 +102,14 @@
             </a>
           </li>
 
-          <li class="nav-item nav-category">Vendeur</li>
+          <!-- <li class="nav-item nav-category">Vendeur</li>
           <li class="nav-item">
             <a class="nav-link" href="../vendeur/vendeur.html">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Ventes</span>
             </a>
-          </li>
-          <li class="nav-item">
+          </li> -->
+          <!-- <li class="nav-item">
             <a class="nav-link" href="../vendeur/vendeur.html#ClientsList">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Liste des ventes</span>
@@ -131,7 +131,7 @@
                 </li>
               </ul>
             </div>
-          </li>
+          </li> -->
           <li class="nav-item nav-category">Boutique</li>
           <li class="nav-item">
             <a class="nav-link" href="../boutique/new_articles.html">
@@ -139,27 +139,27 @@
               <span class="menu-title">Nouvel Article</span>
             </a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" href="../boutique/new_articles.html#Articles">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Stock Boutique</span>
             </a>
-          </li>
-          <li class="nav-item">
+          </li> -->
+          <!-- <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#arrivee" aria-expanded="false" aria-controls="arrivee">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Reception Boutique</span>
               <i class="menu-arrow"></i>
-            </a>
+            </a> -->
             <div class="collapse" id="arrivee">
-              <ul class="nav flex-column sub-menu">
+              <!-- <ul class="nav flex-column sub-menu">
                 <li class="nav-item">
                   <a class="nav-link" href="../boutique/arrivee.html">Arrivée</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="../boutique/arrivee.html#ClientsList">Liste des Arrivées</a>
                 </li>
-              </ul>
+              </ul> -->
             </div>
           </li>
           <li class="nav-item nav-category">Entrepôt</li>
@@ -375,11 +375,11 @@
                                         </td>
                                         <td>
                                           <input type="number" min="0" style="width: 120px;" class="form-control" require id="qte1"
-                                            onchange="Montant(this)">
+                                            onchange="Montant(this,'qt')">
                                         </td>
                                         <td>
                                           <input type="number" min="0" style="width: 120px;" class="form-control" require id="pu1"
-                                            onchange="Montant(this)">
+                                            onchange="Montant(this,'pu')">
                                         </td>
                                         <td>
                                           <input type="number" readonly style="width: 120px;" class="form-control" require id="montant1">

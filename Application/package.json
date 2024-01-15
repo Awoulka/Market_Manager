@@ -11,7 +11,7 @@
   "author": "Joachim Nedaouka & Awoulka Dawaï Berrenger",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^23.1.2",
+    "electron": "^23.3.13",
     "electron-builder": "^24.2.0"
   },
   "dependencies": {

@@ -21,7 +21,8 @@ document.getElementById('card').innerHTML += '<button onclick="actualiser()" typ
 
  window.electron.chargement_entrepot_BS_modif();
 
-
+ var n = document.getElementById("myTable").rows.length-2;
+ var c = 0
 function chargement_cdmnt(x) {
  	//alert(document.getElementById("frs").value)
 
@@ -55,7 +56,7 @@ function chargement_qt(x) {
     indice+=x.id[i]
   }
 
-  if (document.getElementById("st"+indice).value == 0) {
+  if (parseInt(document.getElementById("st" + indice).value) < parseInt(document.getElementById("qte" + indice).value)) {
 
     alert("Vous ne pouvez pas sortir un article dont la quantité en stock est 0. veuillez aprovisionner l'entrepot .")
     document.getElementById("qte"+indice).value = 0
@@ -63,6 +64,7 @@ function chargement_qt(x) {
 
   }
 }
+
 
  function chargement_st(x) {
  	//alert(document.getElementById("frs").value)
@@ -88,17 +90,17 @@ function chargement_qt(x) {
  	
  }
 function modif_entrepot_pr(x) {
+  
  	if (document.getElementById("myTable").rows.length-2 != 0) {
 
- 		window.electron.modif_entr_pr(x.value,n)
+ 		window.electron.modif_entr_pr(x.value,document.getElementById("myTable").rows.length-2)
  	}
 		
 
  }
 
 
-var n = document.getElementById("myTable").rows.length-2;
-var c = 0
+
 //alert(n)
 
  function AddRow() {
@@ -116,40 +118,72 @@ var c = 0
       
 
       cell1.innerHTML = '<div class="row"><div class="col-md-8" ><select class="js-example-basic-single w-100" onchange=chargement_cdmnt(this) id="article'+n+'"></select></div><div class="col-md-4" ><select class="js-example-basic-single w-100" onchange=chargement_st(this) id="cdmnt'+n+'"></select></div></div>';
-      cell2.innerHTML = '<input type="number" min="0" class="form-control" require id="st'+n+'" readonly>';
+      cell2.innerHTML = '<input type="number" min="0" class="form-control" require id="nt'+n+'" readonly hidden><input type="number" min="0" class="form-control" require id="st'+n+'" readonly >';
       cell3.innerHTML = '<input type="number" min="0" class="form-control" require id="qte'+n+'" onchange=chargement_qt(this)>';
       cell4.innerHTML = '<i title="Retirer" style="font-size: 25px" class="mdi mdi-minus-circle text-danger icon-remove" onclick="RemoveRow(this)" id="'+n+'"></i>';
 
       window.electron.chargement_articles_BS (n);
     }
-
-    
     function RemoveRow(x) {
- 
-       if (document.getElementById("myTable").rows.length-3 != 0) {
 
-           if (confirm("Confirmer la suppression ?"))
-      {
-        var table = document.getElementById("myTable");
-        //alert(x.id);
-        //table.deleteRow(x.parentElement.parentElement.rowIndex);
-        x.parentElement.parentElement.style.display = 'none';
+      if (document.getElementById("myTable").rows.length - 3 != 0) {
+    
+        // if (confirm("Confirmer la suppression ?")) {
+          //var table = document.getElementById("myTable");
+          //alert(x.id);
+          //table.deleteRow(x.parentElement.parentElement.rowIndex);
+          x.parentElement.parentElement.style.display = 'none';
+    
+          //n--;
+        // }
+    
+        c++;
+        indice = ""
+      for (var i = 2; x.id.length - 1 >= i; i++) {
+        indice += x.id[i]
         
-        //n--;
-
-         c++;
       }
+      //alert("qteR"+indice)
+      if (parseInt(document.getElementById("qte" + indice).value.length) >
+      0) {
+        document.getElementById("qte"+indice).value = 0
+      }
+      
+      } else {
+    
+        confirm("Le bon de sortie doit contenir au moins un article")
+    
+      }
+    
+    
+    }
+    
+  //   function RemoveRow(x) {
+ 
+  //      if (document.getElementById("myTable").rows.length-3 != 0) {
 
-      document.getElementById("qte"+x.id).value = 0
+  //          if (confirm("Confirmer la suppression ?"))
+  //     {
+  //       var table = document.getElementById("myTable");
+  //       //alert(x.id);
+  //       //table.deleteRow(x.parentElement.parentElement.rowIndex);
+  //       x.parentElement.parentElement.style.display = 'none';
+        
+  //       //n--;
 
-  }else{
+  //        c++;
+  //     }
 
-    confirm("Le bon de sortie doit contenir au moins un article")
+  //     document.getElementById("qte"+x.id).value = 0
 
-  }
+  // }else{
+
+  //   confirm("Le bon de sortie doit contenir au moins un article")
+
+  // }
 
       
-    }
+  //   }
 
 function modif_bonS() {
 
@@ -205,3 +239,54 @@ function modif_bonS() {
     }
 
     function actualiser() { window.location.reload()}
+
+
+    function filtrer() {
+
+      //alert(document.getElementById("select_f").options[document.getElementById("select_f").options.selectedIndex].value)
+      var filtre, tableau, ligne, cellule, i, texte;
+      
+      filtre = document.getElementById("maRecherche").value.toUpperCase();
+      tableau = document.getElementById("myTable");
+      ligne = tableau.getElementsByTagName("tr");
+      //alert(ligne.length)
+      for (i = 1; i < ligne.length-1; i++) {
+          let t = false;
+          //for (j = 0; j <= 5; j++) {
+      
+            // if (j == 0 || j == 1 || j == 2 || j == 3 ) {
+                 //cellule = ligne[i].getElementsByTagName("td")[j];
+                 cellule =document.getElementById('a'+i).value
+      
+                if (cellule) {
+                  //texte = cellule.innerText.toLocaleString();
+                  //alert(document.getElementById('a'+i).value)
+                  if (document.getElementById('a'+i).value.toUpperCase().indexOf(filtre) > -1) {
+                    ligne[i].style.display = "";
+                    t = true;
+                }
+      
+                }
+            //}
+      
+      
+          // }
+          if (!t) {
+            ligne[i].style.display = "none";
+      
+          }
+      
+      
+      }
+      
+      }
+    
+
+var js_ = document.createElement("script");
+js_.type = "text/javascript";
+js_.src = "../../vendors/select2/select2.min.js";
+document.body.appendChild(js_);
+var js = document.createElement("script");
+js.type = "text/javascript";
+js.src = "../../js/select2.js";
+document.body.appendChild(js);

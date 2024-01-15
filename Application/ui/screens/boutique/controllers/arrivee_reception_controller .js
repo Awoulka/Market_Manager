@@ -13,11 +13,11 @@ function GetURLParameter(sParam) {
 
 const bonsortie_id = GetURLParameter("bonsortie_id");
 // var bonsortie_id = localStorage.getItem('bonsortie_id')
-const hideButton = GetURLParameter("hideButton");
-hideReceiveButton(hideButton)
-function hideReceiveButton(value) {
-    document.getElementById('hideButton').hidden = value
-}
+// const hideButton = GetURLParameter("hideButton");
+// hideReceiveButton(hideButton)
+// function hideReceiveButton(value) {
+//     document.getElementById('hideButton').hidden = value
+// }
 
 
 window.electron.show_new_arrival_details(bonsortie_id);

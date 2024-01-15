@@ -206,3 +206,13 @@ function delete_article_details_from_database(
   );
   // loadPageContent("screens/boutique/article_details.html");
 }
+
+
+var js_ = document.createElement("script");
+js_.type = "text/javascript";
+js_.src = "../../vendors/select2/select2.min.js";
+document.body.appendChild(js_);
+var js = document.createElement("script");
+js.type = "text/javascript";
+js.src = "../../js/select2.js";
+document.body.appendChild(js);

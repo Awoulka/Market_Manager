@@ -27,3 +27,13 @@ function new_customer() {
 function delete_customer_from_database(customer_id) {
   window.electron.delete_customer(customer_id);
 }
+var js_ = document.createElement("script");
+js_.type = "text/javascript";
+js_.src = "../../vendors/select2/select2.min.js";
+//document.body.removeChild(js_)
+document.body.appendChild(js_);
+var js = document.createElement("script");
+js.type = "text/javascript";
+js.src = "../../js/select2.js";
+//document.body.removeChild(js)
+document.body.appendChild(js);
