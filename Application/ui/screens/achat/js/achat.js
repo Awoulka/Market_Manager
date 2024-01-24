@@ -9,6 +9,7 @@ function getBonCommandePdfToPrint(id_boncommande) {
 }
 
 
+
 function chargement_cdmnt(x) {
   //alert(document.getElementById("frs").value)
   i = ""
